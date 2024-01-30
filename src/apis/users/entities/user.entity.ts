@@ -2,7 +2,12 @@
 //추가적으로 데이터베이스를 사용하기 위해 typeorm과 graphql 관련 설정도 해줘야 함.
 
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'; //typeorm: 데이터베이스 관련
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm'; //typeorm: 데이터베이스 관련
 
 @Entity() //@ 들어간거 다 decorator  |  Entity: typeorm
 @ObjectType() //graphql
@@ -40,15 +45,15 @@ export class User {
   @Field(() => String)
   password: string;
 
-  @Column()
+  @Column({ default: false })
   @Field(() => Boolean)
   is_find_mate: boolean;
 
-  @Column()
+  @Column({ default: 0 })
   @Field(() => Int)
   point: number;
 
-  @Column({ type: 'timestamp' }) //Date 타입은 이런 식으로 하면 돼요
+  @CreateDateColumn({ type: 'timestamp' }) // 기본값으로 현재시간을 가져오려면 이렇게 하면 됩니다
   @Field(() => Date)
   create_at: Date;
 }
