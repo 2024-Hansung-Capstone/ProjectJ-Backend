@@ -43,7 +43,7 @@ export class Letter {
 
   @Column({ default: false })
   @Field(() => Boolean)
-  is_read: number;
+  is_read: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   @Field(() => Date)
