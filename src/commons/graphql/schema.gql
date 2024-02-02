@@ -10,7 +10,6 @@ type User {
   birth_at: DateTime!
   mbti: String!
   phone_number: String!
-  password: String!
   is_find_mate: Boolean!
   point: Int!
   create_at: DateTime!
