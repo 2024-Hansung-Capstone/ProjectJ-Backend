@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { IUserServiceCreate } from './interfaces/user-service.interface';
 import * as bcrypt from 'bcrypt';
 import { Token } from './entities/token.entity';
+import { sendTokenToSMS } from '../../utils/phone';
 
 @Injectable()
 export class UserService {
@@ -84,6 +85,7 @@ export class UserService {
           token: token,
         });
       }
+      sendTokenToSMS(phone_number, token);
       return token;
     } catch (error) {
       throw new BadRequestException('Token 생성에 실패하였습니다.');
