@@ -7,8 +7,9 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  ManyToMany,
 } from 'typeorm'; //typeorm: 데이터베이스 관련
-
+import { Like_user } from 'src/apis/used_markets/entities/like_user.entity';
 @Entity() //@ 들어간거 다 decorator  |  Entity: typeorm
 @ObjectType() //graphql
 export class User {
@@ -56,4 +57,7 @@ export class User {
   @CreateDateColumn({ type: 'timestamp' }) // 기본값으로 현재시간을 가져오려면 이렇게 하면 됩니다
   @Field(() => Date)
   create_at: Date;
+
+  @ManyToMany(() => Like_user, (like_user) => like_user.users)
+  like_user: Like_user[];
 }
