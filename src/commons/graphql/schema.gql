@@ -27,6 +27,8 @@ type Query {
 
 type Mutation {
   signUp(createUserInput: CreateUserInput!): User!
+  makeToken(phone_number: String!): String!
+  authPhone(phone_number: String!, token: String!): Boolean!
 }
 
 input CreateUserInput {

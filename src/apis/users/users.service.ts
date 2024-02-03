@@ -4,12 +4,15 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IUserServiceCreate } from './interfaces/user-service.interface';
 import * as bcrypt from 'bcrypt';
+import { Token } from './entities/token.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Token)
+    private readonly tokenRepository: Repository<Token>,
   ) {}
 
   async create({ createUserInput }: IUserServiceCreate): Promise<User> {
@@ -54,5 +57,57 @@ export class UserService {
 
   async findByEmail(email: string): Promise<User> {
     return await this.userRepository.findOne({ where: { email: email } });
+  }
+
+  async createToken(phone_number: string): Promise<string> {
+    try {
+      //랜덤한 6자리 숫자 토큰 생성, 빈 자리는 0으로 채워줌.
+      const token = String(Math.floor(Math.random() * 1000000)).padStart(
+        6,
+        '0',
+      );
+
+      //이미 인증번호를 받은 휴대폰인지 확인
+      const existingToken = await this.tokenRepository.findOneBy({
+        phone_number,
+      });
+
+      //인증번호를 이미 받은 휴대폰인 경우
+      if (existingToken) {
+        //토큰값은 새로 만든 토큰으로 넣어주고, 인증은 되지 않은 상태로 만든 후, 데이터베이스에 업데이트해줌.
+        existingToken.token = token;
+        existingToken.is_auth = false;
+        await this.tokenRepository.save(existingToken);
+      } else {
+        await this.tokenRepository.save({
+          phone_number: phone_number,
+          token: token,
+        });
+      }
+      return token;
+    } catch (error) {
+      throw new BadRequestException('Token 생성에 실패하였습니다.');
+    }
+  }
+
+  async checkToken(phone_number: string, token: string): Promise<boolean> {
+    try {
+      //데이터베이스에 존재하는 올바른 토큰 찾기
+      const rightToken = (
+        await this.tokenRepository.findOne({
+          where: { phone_number: phone_number },
+        })
+      ).token;
+      //올바른 토큰과 사용자가 입력한 토큰이 같으면 true, 다르면 false
+      const checkResult = rightToken === token;
+      //update: 이미 존재하는 데이터를 특정 값만 변경하는 기능
+      await this.tokenRepository.update(
+        { phone_number: phone_number },
+        { is_auth: checkResult },
+      );
+      return checkResult;
+    } catch (error) {
+      throw new BadRequestException('인증번호를 받지 않은 휴대폰 번호 입니다.');
+    }
   }
 }

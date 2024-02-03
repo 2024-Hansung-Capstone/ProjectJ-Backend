@@ -7,6 +7,8 @@ import { CreateUserInput } from './dto/create-user.input';
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
+  //Mutation: 추가, 삭제, 변경, 생성
+  //Query: 조회
   @Mutation(() => User)
   async signUp(
     @Args('createUserInput') createUserInput: CreateUserInput,
@@ -25,5 +27,18 @@ export class UserResolver {
   @Query(() => User)
   async fetchUserById(@Args('user_id') user_id: string): Promise<User> {
     return await this.userService.findById(user_id);
+  }
+
+  @Mutation(() => String)
+  async makeToken(@Args('phone_number') phone_number: string): Promise<string> {
+    return await this.userService.createToken(phone_number);
+  }
+
+  @Mutation(() => Boolean)
+  async authPhone(
+    @Args('phone_number') phone_number: string,
+    @Args('token') token: string,
+  ): Promise<boolean> {
+    return await this.userService.checkToken(phone_number, token);
   }
 }
