@@ -16,4 +16,3 @@ export class Sido {
   @Field(() => Date)
   crtr_at: Date;
 }
-

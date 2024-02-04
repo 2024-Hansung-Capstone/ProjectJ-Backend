@@ -16,7 +16,8 @@ export class Dong {
   id: string;
 
   @ManyToOne(() => Sgng)
-  sgng_id: Sgng;
+  @Field(() => Sgng)
+  sgng: Sgng;
 
   @Column({ length: 50 })
   @Field(() => String)

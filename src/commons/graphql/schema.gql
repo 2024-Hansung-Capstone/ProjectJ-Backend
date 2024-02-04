@@ -21,9 +21,31 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Sido {
+  id: String!
+  name: String!
+  crtr_at: DateTime!
+}
+
+type Sgng {
+  id: String!
+  sido: Sido!
+  name: String!
+  crtr_at: DateTime!
+}
+
+type Dong {
+  id: String!
+  sgng: Sgng!
+  name: String!
+  crtr_at: DateTime!
+}
+
 type Query {
   fetchUsers: [User!]!
   fetchUserById(user_id: String!): User!
+  fetchSidoNameByDongName(dongName: String!): String!
+  fetchDongByName(dongName: String!): Dong!
 }
 
 type Mutation {
