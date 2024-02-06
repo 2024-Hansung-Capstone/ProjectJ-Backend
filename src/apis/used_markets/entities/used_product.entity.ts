@@ -18,6 +18,7 @@ export class Used_product {
   id: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @Field(() => User)
   user_id: User;
 
   @Column({ length: 100 })
