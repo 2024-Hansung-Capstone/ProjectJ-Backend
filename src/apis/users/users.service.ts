@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -109,7 +113,9 @@ export class UserService {
       );
       return checkResult;
     } catch (error) {
-      throw new BadRequestException('인증번호를 받지 않은 휴대폰 번호 입니다.');
+      throw new UnauthorizedException(
+        '인증번호를 받지 않은 휴대폰 번호 입니다.',
+      );
     }
   }
 }
