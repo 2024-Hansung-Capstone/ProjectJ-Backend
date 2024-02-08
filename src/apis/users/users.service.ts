@@ -10,6 +10,7 @@ import { IUserServiceCreate } from './interfaces/user-service.interface';
 import * as bcrypt from 'bcrypt';
 import { Token } from './entities/token.entity';
 import { sendTokenToSMS } from '../../utils/phone';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
@@ -18,6 +19,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Token)
     private readonly tokenRepository: Repository<Token>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async create({ createUserInput }: IUserServiceCreate): Promise<User> {
@@ -117,5 +119,13 @@ export class UserService {
         '인증번호를 받지 않은 휴대폰 번호 입니다.',
       );
     }
+  }
+
+  //JWT Token 생성=>로그인을 위함
+  getAccessToken(user: User) {
+    return this.jwtService.sign(
+      { sub: user.id },
+      { secret: 'sujin', expiresIn: '10m' },
+    );
   }
 }

@@ -3,7 +3,8 @@ import { UserService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import * as bcrypt from 'bcrypt';
-import { UnprocessableEntityException } from '@nestjs/common';
+import { UnprocessableEntityException, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 @Resolver()
 export class UserResolver {
@@ -63,6 +64,13 @@ export class UserResolver {
       throw new UnprocessableEntityException('비밀번호가 틀렸습니다.');
     }
     //에러가 모두 나지 않았을 경우
-    return user.name + '님의 로그인이 성공하였습니다.';
+    return this.userService.getAccessToken(user);
+  }
+
+  //현재 로그인 되어있는 사용자의 정보를 가져오는 함수(JWT)
+  @UseGuards(AuthGuard('heoga'))
+  @Query(() => User)
+  async whoAmI() {
+    console.log('수정 필요!!');
   }
 }
