@@ -3,6 +3,8 @@ import { UsedProductService } from './used_products.service';
 import { Used_product } from './entities/used_product.entity';
 import { UpdateUsed_ProductInput } from './dto/update-used_products.input';
 import { User } from '../users/entities/user.entity';
+import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { Serach_ProductInput } from './dto/serach-used_products.input';
 @Resolver(() => Used_product)
 export class UsedProductResolver {
   constructor(private readonly usedProductService: UsedProductService) {}
@@ -25,27 +27,11 @@ export class UsedProductResolver {
   }
 
   @Query(() => [Used_product])
-  async usedProductByCategory(
-    @Args('category') catrgory: string,
+  @UsePipes(ValidationPipe)
+  getPosts(
+    @Args('Serach_ProductInput') searchPostDto: Serach_ProductInput,
   ): Promise<Used_product[]> {
-    return this.usedProductService.findByCategory(catrgory);
-  }
-
-  @Query(() => [Used_product])
-  async usedProductByDetail(@Args('detail') detail: string) {
-    return this.usedProductService.findByDetail(detail);
-  }
-
-  @Query(() => [Used_product])
-  async usedProductByTitle(@Args('title') title: string) {
-    return this.usedProductService.findByTitle(title);
-  }
-
-  @Query(() => [Used_product])
-  async usedProductsBelowPrice(
-    @Args('price') price: number,
-  ): Promise<Used_product[]> {
-    return this.usedProductService.findBelowPrice(price);
+    return this.usedProductService.findBySerach(searchPostDto);
   }
 
   @Mutation(() => Used_product)
