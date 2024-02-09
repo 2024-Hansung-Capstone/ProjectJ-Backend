@@ -5,6 +5,7 @@ import { CreateUserInput } from './dto/create-user.input';
 import * as bcrypt from 'bcrypt';
 import { UnprocessableEntityException, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { gqlAccessGuard } from './guards/gql-auth.guard';
 
 @Resolver()
 export class UserResolver {
@@ -68,9 +69,9 @@ export class UserResolver {
   }
 
   //현재 로그인 되어있는 사용자의 정보를 가져오는 함수(JWT)
-  @UseGuards(AuthGuard('heoga'))
-  @Query(() => User)
+  @UseGuards(gqlAccessGuard)
+  @Query(() => String)
   async whoAmI() {
-    console.log('수정 필요!!');
+    return '수정 필요!!';
   }
 }
