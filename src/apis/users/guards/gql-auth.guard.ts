@@ -9,3 +9,11 @@ export class gqlAccessGuard extends AuthGuard('heoga') {
     return gqlContext.getContext().req;
   }
 }
+
+//accessToken이 만료되었지만, refreshToken이 있는 사람들이 restoreAccessToken을 하기 위해 생성
+export class gqlAuthRefreshGuard extends AuthGuard('jaeheoga') {
+  getRequest(context: ExecutionContext) {
+    const gqlContext = GqlExecutionContext.create(context);
+    return gqlContext.getContext().req;
+  }
+}

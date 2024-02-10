@@ -6,7 +6,11 @@ import {
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IUserServiceCreate } from './interfaces/user-service.interface';
+import {
+  IContext,
+  IUserContext,
+  IUserServiceCreate,
+} from './interfaces/user-service.interface';
 import * as bcrypt from 'bcrypt';
 import { Token } from './entities/token.entity';
 import { sendTokenToSMS } from '../../utils/phone';
@@ -122,10 +126,32 @@ export class UserService {
   }
 
   //JWT Token 생성=>로그인을 위함
-  getAccessToken(user: User) {
+  //JWT Token은 만들어지면 string 타입이다.(리턴 타입: string)
+  getAccessToken(user: User | IUserContext['user']): string {
     return this.jwtService.sign(
       { sub: user.id },
       { secret: 'sujin', expiresIn: '10m' },
     );
+  }
+
+  //AccessToken을 재생성해주는 RefreshToken 생성
+  //=>유효기간이 짧은 AccessToken을 자동으로 생성하는 기능을 구현하기 위한 Token
+  //자동 생성 이유: AccessToken만 하면 사용자가 10분에 한 번 씩 로그인을 해야 해서
+  //cookie에만 저장하면 되는거라 리턴 타입은 void(없다는 뜻)
+  getRefreshToken(user: User, context: IContext): void {
+    const refreshToken = this.jwtService.sign(
+      { sub: user.id },
+      { secret: 'sujin2', expiresIn: '2w' },
+    );
+
+    //cookie에 저장하는거
+    context.res.setHeader(
+      'set-cookie',
+      `refreshToken=${refreshToken}; path=/;`,
+    );
+  }
+
+  getRestoreToken(user: IUserContext['user']): string {
+    return this.getAccessToken(user);
   }
 }

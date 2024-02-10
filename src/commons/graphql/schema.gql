@@ -23,12 +23,15 @@ scalar DateTime
 type Query {
   fetchUsers: [User!]!
   fetchUserById(user_id: String!): User!
+  whoAmI: User!
 }
 
 type Mutation {
   signUp(createUserInput: CreateUserInput!): User!
   makeToken(phone_number: String!): String!
   authPhone(phone_number: String!, token: String!): Boolean!
+  login(email: String!, password: String!): String!
+  restoreAccessToken: String!
 }
 
 input CreateUserInput {

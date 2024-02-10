@@ -1,11 +1,11 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import * as bcrypt from 'bcrypt';
 import { UnprocessableEntityException, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-import { gqlAccessGuard } from './guards/gql-auth.guard';
+import { gqlAccessGuard, gqlAuthRefreshGuard } from './guards/gql-auth.guard';
+import { IContext } from './interfaces/user-service.interface';
 
 @Resolver()
 export class UserResolver {
@@ -51,6 +51,7 @@ export class UserResolver {
   async login(
     @Args('email') email: string,
     @Args('password') password: string,
+    @Context() context: IContext,
   ): Promise<string> {
     const user = await this.userService.findByEmail(email); //이메일 기준으로 사용자 찾기
     //이메일을 통해 DB로부터 찾아진 유저가 없을 때
@@ -65,13 +66,21 @@ export class UserResolver {
       throw new UnprocessableEntityException('비밀번호가 틀렸습니다.');
     }
     //에러가 모두 나지 않았을 경우
+    this.userService.getRefreshToken(user, context); //refreshToken 생성
     return this.userService.getAccessToken(user);
   }
 
   //현재 로그인 되어있는 사용자의 정보를 가져오는 함수(JWT)
   @UseGuards(gqlAccessGuard)
-  @Query(() => String)
-  async whoAmI() {
-    return '수정 필요!!';
+  @Query(() => User)
+  async whoAmI(@Context() context: IContext) {
+    return await this.userService.findById(context.req.user.id);
+  }
+
+  //accessToken이 만료되었을 때, refreshToken이 있다면 새 accessToken을 발급해주는 함수
+  @UseGuards(gqlAuthRefreshGuard)
+  @Mutation(() => String)
+  restoreAccessToken(@Context() context: IContext): string {
+    return this.userService.getRestoreToken({ id: context.req.user.id });
   }
 }
