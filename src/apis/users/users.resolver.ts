@@ -3,9 +3,17 @@ import { UserService } from './users.service';
 import { User } from './entities/user.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import * as bcrypt from 'bcrypt';
-import { UnprocessableEntityException, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  UnprocessableEntityException,
+  UseGuards,
+} from '@nestjs/common';
 import { gqlAccessGuard, gqlAuthRefreshGuard } from './guards/gql-auth.guard';
-import { IContext } from './interfaces/user-service.interface';
+import {
+  IContext,
+  IUserServiceUpdate,
+} from './interfaces/user-service.interface';
+import { UpdateUserInput } from './dto/update-user-input';
 
 @Resolver()
 export class UserResolver {
@@ -19,6 +27,33 @@ export class UserResolver {
   ): Promise<User> {
     //함수의 return 타입을 지정해줌.
     return await this.userService.create({ createUserInput });
+  }
+
+  //회원 정보 수정
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => User)
+  async updateLoginUserInfo(
+    @Context() Context: IContext,
+    @Args('updateUserInput') updateUserInput: UpdateUserInput,
+  ): Promise<User> {
+    const result = await this.userService.update(Context.req.user.id, {
+      updateUserInput,
+    });
+    //회원 정보 수정 실패
+    if (!result) {
+      throw new BadRequestException(
+        '알 수 없는 이유로 사용자 정보 수정에 실패하였습니다.',
+      );
+    }
+    //회원 정보 수정 성공
+    return result;
+  }
+
+  //회원 정보 삭제
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Boolean)
+  async deleteLoginUser(@Context() context: IContext) {
+    return await this.userService.delete(context.req.user.id);
   }
 
   //전체 유저 조회

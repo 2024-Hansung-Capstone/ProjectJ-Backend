@@ -28,6 +28,8 @@ type Query {
 
 type Mutation {
   signUp(createUserInput: CreateUserInput!): User!
+  updateLoginUserInfo(updateUserInput: UpdateUserInput!): User!
+  deleteLoginUser: Boolean!
   makeToken(phone_number: String!): String!
   authPhone(phone_number: String!, token: String!): Boolean!
   login(email: String!, password: String!): String!
@@ -45,4 +47,15 @@ input CreateUserInput {
   phone_number: String!
   password: String!
   is_find_mate: Boolean!
+}
+
+input UpdateUserInput {
+  email: String
+  name: String
+  gender: String
+  birth_year: String
+  birth_month: String
+  birth_day: String
+  mbti: String
+  is_find_mate: Boolean
 }

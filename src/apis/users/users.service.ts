@@ -10,11 +10,13 @@ import {
   IContext,
   IUserContext,
   IUserServiceCreate,
+  IUserServiceUpdate,
 } from './interfaces/user-service.interface';
 import * as bcrypt from 'bcrypt';
 import { Token } from './entities/token.entity';
 import { sendTokenToSMS } from '../../utils/phone';
 import { JwtService } from '@nestjs/jwt';
+import { setDateFormat } from 'src/utils/date';
 
 @Injectable()
 export class UserService {
@@ -37,12 +39,7 @@ export class UserService {
       createUserInput;
     //inputUser dto에서 엔티티와의 형태가 다른 생년월일 관련 값만 따로 변수로 가져오고,
     //나머지는 rest로 저장한다.(웹워크1 때 배움)
-
-    const birthDateString = `${birth_year}-${birth_month.padStart(
-      2,
-      '0',
-    )}-${birth_day.padStart(2, '0')}T00:00:00.000Z`;
-    const birthDate = new Date(birthDateString);
+    const birthDate = setDateFormat(birth_year, birth_month, birth_day);
 
     //bcrypt: hash를 도와주는 패키지
     //hash(password, salt)
@@ -55,6 +52,40 @@ export class UserService {
       password: hashedPassword,
       ...rest,
     }); //스프레드 연산자를 통해 한번에 값을 넣음.(웹워크1 때 배움)
+  }
+
+  //회원 정보 수정
+  //id값은 context를 통해 로그인 된 사용자의 id를 가져올거라서 사용자의 입력값과 분리해서 인자값으로 받음.
+  async update(id, { updateUserInput }: IUserServiceUpdate): Promise<User> {
+    const { birth_year, birth_month, birth_day, ...rest } = updateUserInput;
+    let result = null;
+    //날짜에 대한 수정이 들어오면, date타입으로 전환하는 메커니즘을 실행한 후, update를 진행
+    if (birth_year && birth_month && birth_day) {
+      const birthDate = setDateFormat(birth_year, birth_month, birth_day);
+      result = await this.userRepository.update(
+        { id: id },
+        { birth_at: birthDate, ...rest },
+      );
+    }
+    //날짜에 대한 수정이 없을 때, 날짜 변환 없이 전부 update 진행
+    else {
+      result = await this.userRepository.update({ id: id }, { ...rest });
+    }
+    //수정 성공
+    if (result.affected > 0) {
+      return await this.findById(id);
+    }
+    //수정 실패
+    else {
+      return null;
+    }
+  }
+
+  //회원 정보 삭제
+  //레포지토리를 delete 할 때는 boolean 타입이 아니라 DeleteResult 타입으로 리턴된다.
+  async delete(user_id: string): Promise<boolean> {
+    const result = await this.userRepository.delete({ id: user_id });
+    return result.affected > 0; //DeleteResult 타입 안의 affected는 성공했을 때 1, 실패했을 때 0을 리턴
   }
 
   async findAll(): Promise<User[]> {
