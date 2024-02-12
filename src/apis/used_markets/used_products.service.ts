@@ -6,7 +6,6 @@ import { Used_product } from './entities/used_product.entity';
 import { UpdateUsed_ProductInput } from './dto/update-used_products.input';
 import { User } from '../users/entities/user.entity';
 import { Serach_ProductInput } from './dto/serach-used_products.input';
-import { serialize } from 'v8';
 
 @Injectable()
 export class UsedProductService {

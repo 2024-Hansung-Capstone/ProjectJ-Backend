@@ -9,4 +9,4 @@ import { UsedProductService } from './used_products.service';
   imports: [TypeOrmModule.forFeature([Used_product, Like_user])],
   providers: [UsedProductResolver, UsedProductService],
 })
-export class UserModule {}
+export class Used_productModule {}
