@@ -1,7 +1,6 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-
 @InputType()
-export class Serach_ProductInput {
+export class CreateProductInput {
   @Field(() => String)
   title: string;
 
@@ -16,4 +15,7 @@ export class Serach_ProductInput {
 
   @Field(() => String)
   state: string;
+
+  @Field(() => String)
+  user_id: string;
 }

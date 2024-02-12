@@ -6,10 +6,10 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
   JoinColumn,
-  OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Like_user } from './like_user.entity';
+import { Like_user_record } from './like_user_record.entity';
 @Entity()
 @ObjectType()
 export class Used_product {
@@ -24,6 +24,10 @@ export class Used_product {
   @Column({ length: 100 })
   @Field(() => String)
   title: string;
+
+  @Column({ default: 0 })
+  @Field(() => Int)
+  view: number;
 
   @Column({ default: 0 })
   @Field(() => Int)
@@ -46,6 +50,9 @@ export class Used_product {
   create_at: Date;
 
   @JoinColumn()
-  @OneToOne(() => Like_user)
-  Like_users: Like_user;
+  @OneToMany(
+    () => Like_user_record,
+    (Like_user_record) => Like_user_record.users,
+  )
+  Like_users: Like_user_record;
 }
