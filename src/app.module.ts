@@ -4,14 +4,19 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './apis/users/users.module';
+import { Used_productModule } from './apis/used_markets/used_products.module';
+import { AreaModule } from './apis/area/area.module';
 
 @Module({
   imports: [
     UserModule,
+    Used_productModule,
+    AreaModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'src/commons/graphql/schema.gql',
+      context: ({ req, res }) => ({ req, res }),
     }),
     TypeOrmModule.forRoot({
       type: process.env.DATABASE_TYPE as 'mysql',

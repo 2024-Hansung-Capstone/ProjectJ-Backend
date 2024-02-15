@@ -2,17 +2,15 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type User {
+type Used_product {
   id: String!
-  email: String!
-  name: String!
-  gender: String!
-  birth_at: DateTime!
-  mbti: String!
-  phone_number: String!
-  password: String!
-  is_find_mate: Boolean!
-  point: Int!
+  user_id: User!
+  title: String!
+  view: Int!
+  price: Int!
+  detail: String!
+  category: String!
+  state: String!
   create_at: DateTime!
 }
 
@@ -21,13 +19,72 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type User {
+  id: String!
+  email: String!
+  name: String!
+  gender: String!
+  birth_at: DateTime!
+  mbti: String!
+  phone_number: String!
+  is_find_mate: Boolean!
+  point: Int!
+  create_at: DateTime!
+  used_product: [Used_product!]!
+}
+
+type Sido {
+  id: String!
+  name: String!
+  crtr_at: DateTime!
+}
+
+type Sgng {
+  id: String!
+  sido: Sido!
+  name: String!
+  crtr_at: DateTime!
+}
+
+type Dong {
+  id: String!
+  sgng: Sgng!
+  name: String!
+  crtr_at: DateTime!
+}
+
 type Query {
   fetchUsers: [User!]!
   fetchUserById(user_id: String!): User!
+  whoAmI: User!
+  usedProducts: [Used_product!]!
+  usedProductById(id: String!): Used_product!
+  usedProductByuser_Id(user_id: String!): [Used_product!]!
+  getPosts(SerachUsed_ProductInput: SearchProductInput!): [Used_product!]!
+  fetchSidoNameByDongName(dongName: String!): String!
+  fetchDongByName(dongName: String!): Dong!
+}
+
+input SearchProductInput {
+  title: String!
+  price: Int!
+  detail: String!
+  category: String!
+  state: String!
 }
 
 type Mutation {
   signUp(createUserInput: CreateUserInput!): User!
+  updateLoginUserInfo(updateUserInput: UpdateUserInput!): User!
+  deleteLoginUser: Boolean!
+  makeToken(phone_number: String!): String!
+  authPhone(phone_number: String!, token: String!): Boolean!
+  login(email: String!, password: String!): String!
+  restoreAccessToken: String!
+  createUsedProduct(CreateUsed_ProductInput: CreateProductInput!): Used_product!
+  updateUsedProduct(id: String!, UpdateUsed_ProductInput: UpdateUsedProductInput!): Used_product!
+  deleteUsedProduct(id: String!): Boolean!
+  addViewToPost(AddViewProductsInput: AddViewProductsInput!): Used_product!
 }
 
 input CreateUserInput {
@@ -41,4 +98,36 @@ input CreateUserInput {
   phone_number: String!
   password: String!
   is_find_mate: Boolean!
+}
+
+input UpdateUserInput {
+  email: String
+  name: String
+  gender: String
+  birth_year: String
+  birth_month: String
+  birth_day: String
+  mbti: String
+  is_find_mate: Boolean
+}
+
+input CreateProductInput {
+  title: String!
+  price: Int!
+  detail: String!
+  category: String!
+  state: String!
+  user_id: String!
+}
+
+input UpdateUsedProductInput {
+  title: String!
+  price: Int!
+  detail: String!
+  category: String!
+  state: String!
+}
+
+input AddViewProductsInput {
+  id: String!
 }
