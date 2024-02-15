@@ -2,6 +2,22 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Used_product {
+  id: String!
+  user_id: User!
+  title: String!
+  price: Int!
+  detail: String!
+  category: String!
+  state: String!
+  create_at: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type User {
   id: String!
   email: String!
@@ -13,17 +29,25 @@ type User {
   is_find_mate: Boolean!
   point: Int!
   create_at: DateTime!
+  used_product: [Used_product!]!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Query {
   fetchUsers: [User!]!
   fetchUserById(user_id: String!): User!
   whoAmI: User!
+  usedProducts: [Used_product!]!
+  usedProductById(id: String!): Used_product!
+  usedProductByuser_Id(user_id: String!): [Used_product!]!
+  getPosts(SerachUsed_ProductInput: SearchProductInput!): [Used_product!]!
+}
+
+input SearchProductInput {
+  title: String!
+  price: Int!
+  detail: String!
+  category: String!
+  state: String!
 }
 
 type Mutation {
@@ -34,6 +58,9 @@ type Mutation {
   authPhone(phone_number: String!, token: String!): Boolean!
   login(email: String!, password: String!): String!
   restoreAccessToken: String!
+  createUsedProduct(CreateUsed_ProductInput: CreateProductInput!): Used_product!
+  updateUsedProduct(id: String!, UpdateUsed_ProductInput: UpdateUsedProductInput!): Used_product!
+  deleteUsedProduct(id: String!): Boolean!
 }
 
 input CreateUserInput {
@@ -58,4 +85,21 @@ input UpdateUserInput {
   birth_day: String
   mbti: String
   is_find_mate: Boolean
+}
+
+input CreateProductInput {
+  title: String!
+  price: Int!
+  detail: String!
+  category: String!
+  state: String!
+  user_id: String!
+}
+
+input UpdateUsedProductInput {
+  title: String!
+  price: Int!
+  detail: String!
+  category: String!
+  state: String!
 }
