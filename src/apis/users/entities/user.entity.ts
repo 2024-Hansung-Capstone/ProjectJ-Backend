@@ -42,7 +42,6 @@ export class User {
   phone_number: string;
 
   @Column()
-  @Field(() => String)
   password: string;
 
   @Column({ default: false })
