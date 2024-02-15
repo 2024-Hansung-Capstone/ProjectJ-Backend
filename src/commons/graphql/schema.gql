@@ -28,11 +28,30 @@ type User {
   birth_at: DateTime!
   mbti: String!
   phone_number: String!
-  password: String!
   is_find_mate: Boolean!
   point: Int!
   create_at: DateTime!
   used_product: [Used_product!]!
+}
+
+type Sido {
+  id: String!
+  name: String!
+  crtr_at: DateTime!
+}
+
+type Sgng {
+  id: String!
+  sido: Sido!
+  name: String!
+  crtr_at: DateTime!
+}
+
+type Dong {
+  id: String!
+  sgng: Sgng!
+  name: String!
+  crtr_at: DateTime!
 }
 
 type Query {
@@ -43,6 +62,8 @@ type Query {
   usedProductById(id: String!): Used_product!
   usedProductByuser_Id(user_id: String!): [Used_product!]!
   getPosts(SerachUsed_ProductInput: SearchProductInput!): [Used_product!]!
+  fetchSidoNameByDongName(dongName: String!): String!
+  fetchDongByName(dongName: String!): Dong!
 }
 
 input SearchProductInput {

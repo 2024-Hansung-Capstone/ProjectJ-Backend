@@ -14,7 +14,7 @@ import {
 } from './interfaces/user-service.interface';
 import * as bcrypt from 'bcrypt';
 import { Token } from './entities/token.entity';
-import { sendTokenToSMS } from 'src/utils/phone';
+import { sendTokenToSMS } from '../../utils/phone';
 import { JwtService } from '@nestjs/jwt';
 import { setDateFormat } from 'src/utils/date';
 

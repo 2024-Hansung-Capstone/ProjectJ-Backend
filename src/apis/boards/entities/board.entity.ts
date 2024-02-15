@@ -3,28 +3,34 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
+  UpdateDateColumn,
+} from 'typeorm'; //typeorm: 데이터베이스 관련
 import { User } from '../../users/entities/user.entity';
-import { Like_user_record } from './like_user_record.entity';
+
 @Entity()
 @ObjectType()
-export class Used_product {
+export class Board {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => String)
   id: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn()
-  @Field(() => User)
   user_id: User;
+
+  @Column({ length: 50 })
+  @Field(() => String)
+  category: string;
 
   @Column({ length: 100 })
   @Field(() => String)
   title: string;
+
+  @Column('text')
+  @Field(() => String)
+  detail: string;
 
   @Column({ default: 0 })
   @Field(() => Int)
@@ -34,30 +40,11 @@ export class Used_product {
   @Field(() => Int)
   like: number;
 
-  @Column({ default: 0 })
-  @Field(() => Int)
-  price: number;
-
-  @Column('text')
-  @Field(() => String)
-  detail: string;
-
-  @Column({ length: 50 })
-  @Field(() => String)
-  category: string;
-
-  @Column({ length: 50 })
-  @Field(() => String)
-  state: string;
-
   @CreateDateColumn({ type: 'timestamp' })
   @Field(() => Date)
   create_at: Date;
 
-  @JoinColumn()
-  @OneToMany(
-    () => Like_user_record,
-    (Like_user_record) => Like_user_record.user,
-  )
-  Like_users: Like_user_record[];
+  @UpdateDateColumn({ type: 'timestamp' })
+  @Field(() => Date)
+  updated_at: Date;
 }
