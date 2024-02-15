@@ -31,6 +31,10 @@ export class Used_product {
 
   @Column({ default: 0 })
   @Field(() => Int)
+  like: number;
+
+  @Column({ default: 0 })
+  @Field(() => Int)
   price: number;
 
   @Column('text')
@@ -52,7 +56,7 @@ export class Used_product {
   @JoinColumn()
   @OneToMany(
     () => Like_user_record,
-    (Like_user_record) => Like_user_record.users,
+    (Like_user_record) => Like_user_record.user,
   )
-  Like_users: Like_user_record;
+  Like_users: Like_user_record[];
 }

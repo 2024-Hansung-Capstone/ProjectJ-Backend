@@ -15,7 +15,4 @@ export class CreateProductInput {
 
   @Field(() => String)
   state: string;
-
-  @Field(() => String)
-  user_id: string;
 }

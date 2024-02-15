@@ -61,7 +61,7 @@ export class User {
 
   @OneToMany(
     () => Like_user_record,
-    (Like_user_record) => Like_user_record.users,
+    (Like_user_record) => Like_user_record.user,
   )
   like_user: Like_user_record[];
 

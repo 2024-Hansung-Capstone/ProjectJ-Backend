@@ -6,6 +6,7 @@ import { Like_user_record } from './entities/like_user_record.entity';
 import { UsedProductResolver } from './used_products.resolver';
 import { UsedProductService } from './used_products.service';
 import { UsedProductRepository } from './used_products.repository';
+import { gqlAccessGuard } from '../users/guards/gql-auth.guard';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -14,6 +15,6 @@ import { UsedProductRepository } from './used_products.repository';
       Like_user_record,
     ]),
   ],
-  providers: [UsedProductResolver, UsedProductService],
+  providers: [UsedProductResolver, UsedProductService, gqlAccessGuard],
 })
 export class Used_productModule {}

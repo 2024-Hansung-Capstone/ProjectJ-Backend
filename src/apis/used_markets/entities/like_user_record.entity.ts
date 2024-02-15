@@ -10,8 +10,8 @@ export class Like_user_record {
   id: string;
 
   @ManyToOne(() => User, (users) => users.like_user)
-  users: User[];
+  user: User;
 
   @ManyToOne(() => Used_product, (Used_products) => Used_products.Like_users)
-  Used_products: Used_product[];
+  used_product: Used_product;
 }

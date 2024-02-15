@@ -6,6 +6,8 @@ type Used_product {
   id: String!
   user_id: User!
   title: String!
+  view: Int!
+  like: Int!
   price: Int!
   detail: String!
   category: String!
@@ -36,6 +38,7 @@ type User {
 type Query {
   fetchUsers: [User!]!
   fetchUserById(user_id: String!): User!
+  whoAmI: User!
   usedProducts: [Used_product!]!
   usedProductById(id: String!): Used_product!
   usedProductByuser_Id(user_id: String!): [Used_product!]!
@@ -52,9 +55,19 @@ input SearchProductInput {
 
 type Mutation {
   signUp(createUserInput: CreateUserInput!): User!
+  updateLoginUserInfo(updateUserInput: UpdateUserInput!): User!
+  deleteLoginUser: Boolean!
+  makeToken(phone_number: String!): String!
+  authPhone(phone_number: String!, token: String!): Boolean!
+  login(email: String!, password: String!): String!
+  restoreAccessToken: String!
   createUsedProduct(CreateUsed_ProductInput: CreateProductInput!): Used_product!
   updateUsedProduct(id: String!, UpdateUsed_ProductInput: UpdateUsedProductInput!): Used_product!
+  updateDealState(UpdateUsed_ProductStateInput: UpdateUsedProductStateInput!): Used_product!
   deleteUsedProduct(id: String!): Boolean!
+  addViewToPost(AddViewProductsInput: AddViewProductInput!): Used_product!
+  addLikeTopost(AddLikeProductsInput: AddLikeProductInput!): Used_product!
+  removeLikeTopost(id: String!): Used_product!
 }
 
 input CreateUserInput {
@@ -70,13 +83,23 @@ input CreateUserInput {
   is_find_mate: Boolean!
 }
 
+input UpdateUserInput {
+  email: String
+  name: String
+  gender: String
+  birth_year: String
+  birth_month: String
+  birth_day: String
+  mbti: String
+  is_find_mate: Boolean
+}
+
 input CreateProductInput {
   title: String!
   price: Int!
   detail: String!
   category: String!
   state: String!
-  user_id: String!
 }
 
 input UpdateUsedProductInput {
@@ -85,4 +108,17 @@ input UpdateUsedProductInput {
   detail: String!
   category: String!
   state: String!
+}
+
+input UpdateUsedProductStateInput {
+  id: String!
+  state: String!
+}
+
+input AddViewProductInput {
+  id: String!
+}
+
+input AddLikeProductInput {
+  id: String!
 }
