@@ -6,6 +6,7 @@ type Used_product {
   id: String!
   user_id: User!
   title: String!
+  view: Int!
   price: Int!
   detail: String!
   category: String!
@@ -31,11 +32,6 @@ type User {
   create_at: DateTime!
   used_product: [Used_product!]!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type Sido {
   id: String!
@@ -88,6 +84,7 @@ type Mutation {
   createUsedProduct(CreateUsed_ProductInput: CreateProductInput!): Used_product!
   updateUsedProduct(id: String!, UpdateUsed_ProductInput: UpdateUsedProductInput!): Used_product!
   deleteUsedProduct(id: String!): Boolean!
+  addViewToPost(AddViewProductsInput: AddViewProductsInput!): Used_product!
 }
 
 input CreateUserInput {
@@ -129,4 +126,8 @@ input UpdateUsedProductInput {
   detail: String!
   category: String!
   state: String!
+}
+
+input AddViewProductsInput {
+  id: String!
 }
