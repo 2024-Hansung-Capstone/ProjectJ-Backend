@@ -28,7 +28,7 @@ export class UsedProductResolver {
   async usedProductByuser_Id(
     @Args('user_id') user_id: string,
   ): Promise<Used_product[]> {
-    return this.usedProductService.findByuser_Id(user_id);
+    return await this.usedProductService.findByuser_Id(user_id);
   }
 
   @Query(() => [Used_product])
@@ -44,7 +44,10 @@ export class UsedProductResolver {
     @Args('CreateUsed_ProductInput') createUsed_ProductDto: CreateProductInput,
     @Context() context: IContext,
   ): Promise<Used_product> {
-    return this.usedProductService.create(createUsed_ProductDto, context);
+    return this.usedProductService.create(
+      context.req.user.id,
+      createUsed_ProductDto,
+    );
   }
 
   @UseGuards(gqlAccessGuard)

@@ -15,11 +15,13 @@ import { AddLikeProductInput } from './dto/addlike_used_products.inpput';
 import { IContext } from '../users/interfaces/user-service.interface';
 import { UpdateUsedProductStateInput } from './dto/update-used_products.state.input';
 import { Like_user_record } from './entities/like_user_record.entity';
+import { UserService } from '../users/users.service';
 @Injectable()
 export class UsedProductService {
   constructor(
     @InjectRepository(Used_product)
     private usedProductRepository: Repository<Used_product>,
+    private readonly userService: UserService,
   ) {}
 
   async findAll(): Promise<Used_product[]> {
@@ -31,11 +33,10 @@ export class UsedProductService {
   }
   //유저이름으로 검색 즉 상점이름으로 검색하는 방법
   async findByuser_Id(user_id: string): Promise<Used_product[]> {
-    const userRepository = getRepository(User);
-
-    // 사용자 조회
-    const user = await userRepository.findOne({ where: { id: user_id } });
-    return this.usedProductRepository.find({ where: { user_id: user } });
+    return await this.usedProductRepository.find({
+      where: { user: { id: user_id } },
+      relations: ['user'],
+    });
   }
   // 종합적인 조건으로 검색하는 방법
   async findBySerach(
@@ -63,11 +64,11 @@ export class UsedProductService {
   }
 
   async create(
+    user_id: string,
     usedProduct: CreateProductInput,
-    context: IContext,
   ): Promise<Used_product> {
     const { title, price, detail, category, state } = usedProduct;
-    const user = await this.findUserById(context);
+    const user = await this.userService.findById(user_id);
 
     const Used_Product = new Used_product();
     Used_Product.title = title;
@@ -75,7 +76,7 @@ export class UsedProductService {
     Used_Product.detail = detail;
     Used_Product.category = category;
     Used_Product.state = state;
-    Used_Product.user_id = user;
+    Used_Product.user = user;
     Used_Product.create_at = new Date(); // DTO에서 받은 create_at 할당
     return await this.usedProductRepository.save(Used_Product);
   }
@@ -90,7 +91,7 @@ export class UsedProductService {
       throw new NotFoundException(`Id가 ${id}인 것을 찾을 수 없습니다.`);
     }
     const user = await this.findUserById(context);
-    if (used_product.user_id.id !== user.id) {
+    if (used_product.user.id !== user.id) {
       throw new ForbiddenException(
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
@@ -105,7 +106,7 @@ export class UsedProductService {
   ): Promise<Used_product> {
     const used_product = await this.findById(UpdateUsed_ProductStateInput.id);
     const user = await this.findUserById(context);
-    if (used_product.user_id.id !== user.id) {
+    if (used_product.user.id !== user.id) {
       throw new ForbiddenException(
         `본인이 작성한 게시글만 상태를 수정할 수 있습니다.`,
       );
@@ -122,7 +123,7 @@ export class UsedProductService {
 
     // 사용자 조회
     const user = await this.findUserById(context);
-    if (used_product.user_id.id !== user.id) {
+    if (used_product.user.id !== user.id) {
       throw new ForbiddenException(
         `본인이 작성한 게시글만 삭제할 수 있습니다.`,
       );

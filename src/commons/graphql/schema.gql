@@ -2,16 +2,36 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""중고거래 데이터 엔티티"""
 type Used_product {
+  """중고물품 고유 식별번호"""
   id: String!
-  user_id: User!
+
+  """판매자 정보"""
+  user: User!
+
+  """중고물품 제목"""
   title: String!
+
+  """중고물품 조회수"""
   view: Int!
+
+  """중고물품 좋아요 수"""
   like: Int!
+
+  """중고물품 가격"""
   price: Int!
+
+  """중고물품 상세설명"""
   detail: String!
+
+  """중고물품 카테고리"""
   category: String!
+
+  """중고물품 판매상태"""
   state: String!
+
+  """중고물품 생성시간"""
   create_at: DateTime!
 }
 
@@ -31,7 +51,6 @@ type User {
   is_find_mate: Boolean!
   point: Int!
   create_at: DateTime!
-  used_product: [Used_product!]!
 }
 
 type Sido {
