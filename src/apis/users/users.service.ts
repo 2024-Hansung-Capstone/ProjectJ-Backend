@@ -35,6 +35,21 @@ export class UserService {
       throw new BadRequestException('이미 가입된 사용자입니다.');
     }
 
+    //토큰 인증이 완료가 되어 있는지 확인
+    const myToken = await this.tokenRepository.findOne({
+      where: { phone_number: createUserInput.phone_number },
+    });
+    if (!myToken) {
+      throw new BadRequestException(
+        '아직 휴대폰 인증이 되지 않은 사용자 입니다.',
+      );
+    }
+    if (myToken.is_auth == false) {
+      throw new BadRequestException(
+        '아직 휴대폰 인증이 되지 않은 사용자 입니다.',
+      );
+    }
+
     const { birth_year, birth_month, birth_day, password, ...rest } =
       createUserInput;
     //inputUser dto에서 엔티티와의 형태가 다른 생년월일 관련 값만 따로 변수로 가져오고,
@@ -47,11 +62,18 @@ export class UserService {
 
     //date 타입으로 연산한 birthDate를 데이터베이스의 birth_at 컬럼으로 넣어주고,
     //나머지는 받은 그대로 rest로 저장한다.
-    return await this.userRepository.save({
+    const newUser = await this.userRepository.save({
       birth_at: birthDate,
       password: hashedPassword,
       ...rest,
     }); //스프레드 연산자를 통해 한번에 값을 넣음.(웹워크1 때 배움)
+
+    //Token에 user 정보 업데이트 해주기
+    await this.tokenRepository.update(
+      { phone_number: createUserInput.phone_number },
+      { user: newUser },
+    );
+    return newUser;
   }
 
   //회원 정보 수정

@@ -18,7 +18,7 @@ export class Token {
   @OneToOne(() => User, { nullable: true })
   @JoinColumn()
   @Field(() => User, { nullable: true })
-  user_id: User;
+  user: User;
 
   @Column()
   @Field(() => String)
