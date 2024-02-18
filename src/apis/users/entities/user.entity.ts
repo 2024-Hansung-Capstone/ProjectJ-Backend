@@ -8,9 +8,12 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm'; //typeorm: 데이터베이스 관련
 import { Like_user_record } from 'src/apis/used_markets/entities/like_user_record.entity';
 import { Used_product } from 'src/apis/used_markets/entities/used_product.entity';
+import { Dong } from 'src/apis/area/entities/dong.entity';
 @Entity() //@ 들어간거 다 decorator  |  Entity: typeorm
 @ObjectType() //graphql
 export class User {
@@ -18,6 +21,11 @@ export class User {
   @PrimaryGeneratedColumn('uuid') //기본키, 자동으로 만들어주는 기능(원래는 @PrimaryColumn)
   @Field(() => String) //graphql, graphql은 괄호 안에 type을 지정해줘야함
   id: string;
+
+  @OneToOne(() => Dong)
+  @JoinColumn()
+  @Field(() => Dong)
+  dong: Dong;
 
   @Column()
   @Field(() => String)
