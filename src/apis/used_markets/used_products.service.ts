@@ -31,6 +31,7 @@ export class UsedProductService {
   async findById(id: string): Promise<Used_product> {
     return await this.usedProductRepository.findOne({
       where: { id: id },
+      relations: ['user'],
     });
   }
   //유저이름으로 검색 즉 상점이름으로 검색하는 방법
@@ -94,8 +95,8 @@ export class UsedProductService {
       throw new NotFoundException(`Id가 ${id}인 것을 찾을 수 없습니다.`);
     }
     const user = await this.userService.findById(user_id);
-    const now_user = await this.userService.findById(used_product.user.id);
-    if (now_user.id !== user.id) {
+
+    if (used_product.user.id !== user.id) {
       throw new ForbiddenException(
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
@@ -115,8 +116,8 @@ export class UsedProductService {
   ): Promise<Used_product> {
     const used_product = await this.findById(UpdateUsed_ProductStateInput.id);
     const user = await this.userService.findById(user_id);
-    const now_user = await this.userService.findById(used_product.user.id);
-    if (now_user.id !== user.id) {
+
+    if (used_product.user.id !== user.id) {
       throw new ForbiddenException(
         `본인이 작성한 게시글만 상태를 수정할 수 있습니다.`,
       );
@@ -134,8 +135,8 @@ export class UsedProductService {
 
     // 사용자 조회
     const user = await this.userService.findById(user_id);
-    const now_user = await this.userService.findById(used_product.user.id);
-    if (now_user.id !== user.id) {
+
+    if (used_product.user.id !== user.id) {
       throw new ForbiddenException(
         `본인이 작성한 게시글만 삭제할 수 있습니다.`,
       );
