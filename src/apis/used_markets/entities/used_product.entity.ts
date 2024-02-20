@@ -12,7 +12,7 @@ import { User } from '../../users/entities/user.entity';
 import { Like_user_record } from './like_user_record.entity';
 @Entity()
 @ObjectType({ description: '중고거래 데이터 엔티티' })
-export class Used_product {
+export class UsedProduct {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => String, { description: '중고물품 고유 식별번호' })
   id: string;
