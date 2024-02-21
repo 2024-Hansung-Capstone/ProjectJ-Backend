@@ -22,20 +22,22 @@ export class UsedProductService {
   ) {}
 
   async findAll(): Promise<UsedProduct[]> {
-    return await this.usedProductRepository.find({ relations: ['user'] });
+    return await this.usedProductRepository.find({
+      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
+    });
   }
 
   async findById(id: string): Promise<UsedProduct> {
     return await this.usedProductRepository.findOne({
       where: { id: id },
-      relations: ['user'],
+      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
     });
   }
   //유저이름으로 검색 즉 상점이름으로 검색하는 방법
   async findByuser_Id(user_id: string): Promise<UsedProduct[]> {
     return await this.usedProductRepository.find({
       where: { user: { id: user_id } },
-      relations: ['user'],
+      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
     });
   }
   // 종합적인 조건으로 검색하는 방법
@@ -78,7 +80,8 @@ export class UsedProductService {
     Used_Product.state = state;
     Used_Product.user = user;
     Used_Product.create_at = new Date(); // DTO에서 받은 create_at 할당
-    return await this.usedProductRepository.save(Used_Product);
+    const newProduct = await this.usedProductRepository.save(Used_Product);
+    return await this.findById(newProduct.id);
   }
 
   async update(
@@ -100,7 +103,7 @@ export class UsedProductService {
     await this.usedProductRepository.update({ id: id }, { ...rest });
     return await this.usedProductRepository.findOne({
       where: { id: id },
-      relations: ['user'],
+      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
     });
   }
 
@@ -139,7 +142,13 @@ export class UsedProductService {
     const user = await this.userService.findById(user_id);
     const checkuser = await this.likeUserRecordRepository.findOne({
       where: { used_product: { id: used_product.id }, user: { id: user.id } },
-      relations: ['user', 'used_product'],
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'used_product',
+      ],
     });
 
     if (checkuser) {
@@ -159,7 +168,13 @@ export class UsedProductService {
     const user = await this.userService.findById(user_id);
     const checkuser = await this.likeUserRecordRepository.findOne({
       where: { used_product: { id: used_product.id }, user: { id: user.id } },
-      relations: ['user', 'used_product'],
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'used_product',
+      ],
     });
     if (!checkuser) {
       throw new NotFoundException('찜을 하지 않았습니다.');

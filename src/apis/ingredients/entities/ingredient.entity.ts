@@ -11,7 +11,7 @@ import { User } from '../../users/entities/user.entity';
 
 @Entity()
 @ObjectType()
-export class Cooking_ingredient {
+export class Ingredient {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => String)
   id: string;
