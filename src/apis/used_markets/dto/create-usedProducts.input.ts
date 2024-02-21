@@ -1,7 +1,6 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-
 @InputType()
-export class UpdateUsedProductInput {
+export class CreateUsedProductInput {
   @Field(() => String)
   title: string;
 

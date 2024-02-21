@@ -2,15 +2,36 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Used_product {
+"""중고거래 데이터 엔티티"""
+type UsedProduct {
+  """중고물품 고유 식별번호"""
   id: String!
-  user_id: User!
+
+  """판매자 정보"""
+  user: User!
+
+  """중고물품 제목"""
   title: String!
+
+  """중고물품 조회수"""
   view: Int!
+
+  """중고물품 좋아요 수"""
+  like: Int!
+
+  """중고물품 가격"""
   price: Int!
+
+  """중고물품 상세설명"""
   detail: String!
+
+  """중고물품 카테고리"""
   category: String!
+
+  """중고물품 판매상태"""
   state: String!
+
+  """중고물품 생성시간"""
   create_at: DateTime!
 }
 
@@ -30,7 +51,6 @@ type User {
   is_find_mate: Boolean!
   point: Int!
   create_at: DateTime!
-  used_product: [Used_product!]!
 }
 
 type Sido {
@@ -57,10 +77,18 @@ type Query {
   fetchUsers: [User!]!
   fetchUserById(user_id: String!): User!
   whoAmI: User!
-  usedProducts: [Used_product!]!
-  usedProductById(id: String!): Used_product!
-  usedProductByuser_Id(user_id: String!): [Used_product!]!
-  getPosts(SerachUsed_ProductInput: SearchProductInput!): [Used_product!]!
+
+  """전체 중고 물품 정보를 확인합니다."""
+  fetchUsedProducts: [UsedProduct!]!
+
+  """입력된 id값을 가진 중고 물품의 정보를 확인합니다."""
+  fetchUsedProductById(id: String!): UsedProduct!
+
+  """입력된 user_id를 가진 사용자가 작성한 중고 물품의 정보를 확인합니다."""
+  fetchUsedProductByUserId(user_id: String!): [UsedProduct!]!
+
+  """종합검색 기능으로 가격은 검색한 가격보다 낮게 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계"""
+  getPosts(SerachUsedProductInput: SearchProductInput!): [UsedProduct!]!
   fetchSidoNameByDongName(dongName: String!): String!
   fetchDongByName(dongName: String!): Dong!
 }
@@ -81,10 +109,28 @@ type Mutation {
   authPhone(phone_number: String!, token: String!): Boolean!
   login(email: String!, password: String!): String!
   restoreAccessToken: String!
-  createUsedProduct(CreateUsed_ProductInput: CreateProductInput!): Used_product!
-  updateUsedProduct(id: String!, UpdateUsed_ProductInput: UpdateUsedProductInput!): Used_product!
+
+  """
+  createUsedProductInput의 입력값을 바탕으로 새 중고 물품을 추가합니다. (user는 현재 로그인 된 사용자의 정보로 자동으로 등록되고, 로그인이 되어 있어야지만 추가 가능)
+  """
+  createUsedProduct(createUsedProductInput: CreateUsedProductInput!): UsedProduct!
+
+  """
+  updateUsedProductInput의 입력값을 바탕으로 업데이트합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 업데이트 가능)
+  """
+  updateUsedProduct(updateUsedProductInput: UpdateUsedProductInput!): UsedProduct!
+
+  """입력된 id값을 가진 중고물품을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)"""
   deleteUsedProduct(id: String!): Boolean!
-  addViewToPost(AddViewProductsInput: AddViewProductsInput!): Used_product!
+
+  """게시글의 조회수를 1 증가시킵니다."""
+  addViewToPost(id: String!): UsedProduct!
+
+  """게시글의 찜 수(Like)를 올려주고 Like_user_record에 찜한 회원과 중고물품을 저장"""
+  addLikeTopost(id: String!): UsedProduct!
+
+  """게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작"""
+  removeLikeTopost(id: String!): UsedProduct!
 }
 
 input CreateUserInput {
@@ -111,23 +157,19 @@ input UpdateUserInput {
   is_find_mate: Boolean
 }
 
-input CreateProductInput {
+input CreateUsedProductInput {
   title: String!
   price: Int!
   detail: String!
   category: String!
   state: String!
-  user_id: String!
 }
 
 input UpdateUsedProductInput {
-  title: String!
-  price: Int!
-  detail: String!
-  category: String!
-  state: String!
-}
-
-input AddViewProductsInput {
   id: String!
+  title: String
+  price: Int
+  detail: String
+  category: String
+  state: String
 }

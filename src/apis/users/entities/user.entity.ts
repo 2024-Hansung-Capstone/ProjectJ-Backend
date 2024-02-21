@@ -10,7 +10,6 @@ import {
   OneToMany,
 } from 'typeorm'; //typeorm: 데이터베이스 관련
 import { Like_user_record } from 'src/apis/used_markets/entities/like_user_record.entity';
-import { Used_product } from 'src/apis/used_markets/entities/used_product.entity';
 @Entity() //@ 들어간거 다 decorator  |  Entity: typeorm
 @ObjectType() //graphql
 export class User {
@@ -60,11 +59,7 @@ export class User {
 
   @OneToMany(
     () => Like_user_record,
-    (Like_user_record) => Like_user_record.users,
+    (Like_user_record) => Like_user_record.user,
   )
   like_user: Like_user_record[];
-
-  @OneToMany(() => Used_product, (used_product) => used_product.user_id)
-  @Field(() => [Used_product])
-  used_product: Used_product[];
 }
