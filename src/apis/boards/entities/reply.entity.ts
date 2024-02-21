@@ -1,7 +1,15 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'; //typeorm: 데이터베이스 관련
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm'; //typeorm: 데이터베이스 관련
 import { User } from '../../users/entities/user.entity';
 import { Board } from './board.entity';
+import { Like_user_record } from 'src/apis/used_markets/entities/like_user_record.entity';
 @Entity()
 @ObjectType()
 export class Reply {
@@ -10,10 +18,10 @@ export class Reply {
   id: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  user_id: User;
+  user: User;
 
   @ManyToOne(() => Board, { onDelete: 'CASCADE' })
-  board_id: Board;
+  board: Board;
 
   @Column('text')
   @Field(() => String)
@@ -22,4 +30,11 @@ export class Reply {
   @Column({ default: 0 })
   @Field(() => Int)
   like: number;
+
+  @JoinColumn()
+  @OneToMany(
+    () => Like_user_record,
+    (Like_user_record) => Like_user_record.user,
+  )
+  likeUsers: Like_user_record[];
 }
