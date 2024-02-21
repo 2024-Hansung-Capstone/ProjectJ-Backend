@@ -3,10 +3,12 @@ import { Repository } from 'typeorm';
 import { Ingredient } from './entities/ingredient.entity';
 import { IIngredientServiceCreate } from './interfaces/ingredient-service.interface';
 import { UserService } from '../users/users.service';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class IngredientService {
   constructor(
+    @InjectRepository(Ingredient)
     private readonly ingredientRepository: Repository<Ingredient>,
     private readonly userService: UserService,
   ) {}
