@@ -9,10 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { gqlAccessGuard, gqlAuthRefreshGuard } from './guards/gql-auth.guard';
-import {
-  IContext,
-  IUserServiceUpdate,
-} from './interfaces/user-service.interface';
+import { IContext } from './interfaces/user-service.interface';
 import { UpdateUserInput } from './dto/update-user-input';
 
 @Resolver()
@@ -103,6 +100,19 @@ export class UserResolver {
     //에러가 모두 나지 않았을 경우
     this.userService.getRefreshToken(user, context); //refreshToken 생성
     return this.userService.getAccessToken(user);
+  }
+
+  //로그아웃
+  @Mutation(() => Boolean)
+  logout(@Context() context: IContext): boolean {
+    try {
+      context.res.setHeader('Set-Cookie', [
+        'refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure;',
+      ]); //유효기간을 과거로 해서 쿠키를 삭제
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   //현재 로그인 되어있는 사용자의 정보를 가져오는 함수(JWT)

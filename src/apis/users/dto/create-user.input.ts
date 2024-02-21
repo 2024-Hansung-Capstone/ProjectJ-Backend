@@ -24,6 +24,9 @@ export class CreateUserInput {
   mbti: string;
 
   @Field(() => String)
+  dong_nm: string;
+
+  @Field(() => String)
   phone_number: string;
 
   @Field(() => String)

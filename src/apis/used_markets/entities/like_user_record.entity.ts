@@ -1,7 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Used_product } from './used_product.entity';
+import { UsedProduct } from './used_product.entity';
 @Entity()
 @ObjectType()
 export class Like_user_record {
@@ -10,8 +10,10 @@ export class Like_user_record {
   id: string;
 
   @ManyToOne(() => User, (users) => users.like_user)
-  users: User[];
+  @JoinColumn()
+  user: User;
 
-  @ManyToOne(() => Used_product, (Used_products) => Used_products.Like_users)
-  Used_products: Used_product[];
+  @ManyToOne(() => UsedProduct, (Used_products) => Used_products.Like_users)
+  @JoinColumn()
+  used_product: UsedProduct;
 }

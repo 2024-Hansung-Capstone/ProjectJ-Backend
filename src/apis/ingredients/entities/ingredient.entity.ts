@@ -18,23 +18,23 @@ export class Cooking_ingredient {
 
   @Field(() => User)
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  user_id: User;
+  user: User;
 
   @Column()
   @Field(() => String)
   name: string;
 
-  @Column({ default: 0 })
-  @Field(() => Int)
-  count: number;
+  @Column({ nullable: true })
+  @Field(() => Int, { nullable: true })
+  count?: number;
 
-  @Column({ type: 'double precision', default: 0 })
-  @Field(() => Float)
-  volume: number;
+  @Column({ type: 'double precision', nullable: true })
+  @Field(() => Float, { nullable: true })
+  volume?: number;
 
-  @Column({ type: 'double precision', default: 0 })
-  @Field(() => Float)
-  volume_unit: string;
+  @Column({ nullable: true })
+  @Field(() => String, { nullable: true })
+  volume_unit?: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   @Field(() => Date)
