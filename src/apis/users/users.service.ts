@@ -17,6 +17,7 @@ import { Token } from './entities/token.entity';
 import { sendTokenToSMS } from '../../utils/phone';
 import { JwtService } from '@nestjs/jwt';
 import { setDateFormat } from 'src/utils/date';
+import { AreaService } from '../area/area.service';
 
 @Injectable()
 export class UserService {
@@ -25,6 +26,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Token)
     private readonly tokenRepository: Repository<Token>,
+    private readonly areaService: AreaService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -35,7 +37,22 @@ export class UserService {
       throw new BadRequestException('이미 가입된 사용자입니다.');
     }
 
-    const { birth_year, birth_month, birth_day, password, ...rest } =
+    //토큰 인증이 완료가 되어 있는지 확인
+    const myToken = await this.tokenRepository.findOne({
+      where: { phone_number: createUserInput.phone_number },
+    });
+    if (!myToken) {
+      throw new BadRequestException(
+        '아직 휴대폰 인증이 되지 않은 사용자 입니다.',
+      );
+    }
+    if (myToken.is_auth == false) {
+      throw new BadRequestException(
+        '아직 휴대폰 인증이 되지 않은 사용자 입니다.',
+      );
+    }
+
+    const { birth_year, birth_month, birth_day, password, dong_nm, ...rest } =
       createUserInput;
     //inputUser dto에서 엔티티와의 형태가 다른 생년월일 관련 값만 따로 변수로 가져오고,
     //나머지는 rest로 저장한다.(웹워크1 때 배움)
@@ -45,13 +62,27 @@ export class UserService {
     //hash(password, salt)
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    //행정동 데이터 불러오기
+    const dong = await this.areaService.findDongByName(dong_nm);
+
     //date 타입으로 연산한 birthDate를 데이터베이스의 birth_at 컬럼으로 넣어주고,
     //나머지는 받은 그대로 rest로 저장한다.
-    return await this.userRepository.save({
+    const newUser = await this.userRepository.save({
       birth_at: birthDate,
       password: hashedPassword,
+      dong: dong,
       ...rest,
     }); //스프레드 연산자를 통해 한번에 값을 넣음.(웹워크1 때 배움)
+
+    //Token에 user 정보 업데이트 해주기
+    await this.tokenRepository.update(
+      { phone_number: createUserInput.phone_number },
+      { user: newUser },
+    );
+    return await this.userRepository.findOne({
+      where: { id: newUser.id },
+      relations: ['dong', 'dong.sgng', 'dong.sgng.sido'],
+    });
   }
 
   //회원 정보 수정
@@ -89,16 +120,24 @@ export class UserService {
   }
 
   async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+    return await this.userRepository.find({
+      relations: ['dong', 'dong.sgng', 'dong.sgng.sido'],
+    });
   }
 
   async findById(user_id: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { id: user_id } });
+    return await this.userRepository.findOne({
+      where: { id: user_id },
+      relations: ['dong', 'dong.sgng', 'dong.sgng.sido'],
+    });
     //fineOne은 값을 찾는 여러 가지 기준이 있는데, 그 중에서 같은 값을 매칭해서 찾는게 where이다.
   }
 
   async findByEmail(email: string): Promise<User> {
-    return await this.userRepository.findOne({ where: { email: email } });
+    return await this.userRepository.findOne({
+      where: { email: email },
+      relations: ['dong', 'dong.sgng', 'dong.sgng.sido'],
+    });
   }
 
   async createToken(phone_number: string): Promise<string> {
