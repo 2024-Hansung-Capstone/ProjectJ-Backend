@@ -13,7 +13,9 @@ export class Like_user_record {
   @JoinColumn()
   user: User;
 
-  @ManyToOne(() => UsedProduct, (Used_products) => Used_products.Like_users)
+  @ManyToOne(() => UsedProduct, (Used_products) => Used_products.Like_users, {
+    nullable: true,
+  })
   @JoinColumn()
-  used_product: UsedProduct;
+  used_product: UsedProduct | null;
 }
