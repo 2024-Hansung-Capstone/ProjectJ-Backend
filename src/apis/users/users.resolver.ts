@@ -58,10 +58,10 @@ export class UserResolver {
     description: '현재 로그인 된 사용자의 정보를 수정하는 기능입니다.',
   })
   async updateUser(
-    @Context() Context: IContext,
+    @Context() context: IContext,
     @Args('updateUserInput') updateUserInput: UpdateUserInput,
   ): Promise<User> {
-    const result = await this.userService.update(Context.req.user.id, {
+    const result = await this.userService.update(context.req.user.id, {
       updateUserInput,
     });
     //회원 정보 수정 실패

@@ -87,7 +87,10 @@ export class UserService {
 
   //회원 정보 수정
   //id값은 context를 통해 로그인 된 사용자의 id를 가져올거라서 사용자의 입력값과 분리해서 인자값으로 받음.
-  async update(id, { updateUserInput }: IUserServiceUpdate): Promise<User> {
+  async update(
+    id: string,
+    { updateUserInput }: IUserServiceUpdate,
+  ): Promise<User> {
     const { birth_year, birth_month, birth_day, ...rest } = updateUserInput;
     let result = null;
     //날짜에 대한 수정이 들어오면, date타입으로 전환하는 메커니즘을 실행한 후, update를 진행

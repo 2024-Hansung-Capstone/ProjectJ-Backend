@@ -86,8 +86,13 @@ type Ingredient {
 }
 
 type Query {
+  """전체 사용자 정보 조회 기능입니다."""
   fetchUsers: [User!]!
+
+  """특정 사용자 id값을 기준으로 사용자 정보 조회 기능입니다."""
   fetchUserById(user_id: String!): User!
+
+  """현재 로그인된 사용자 정보를 조회하는 기능입니다."""
   whoAmI: User!
 
   """전체 중고 물품 정보를 확인합니다."""
@@ -103,6 +108,8 @@ type Query {
   getPosts(SerachUsedProductInput: SearchProductInput!): [UsedProduct!]!
   fetchSidoNameByDongName(dongName: String!): String!
   fetchDongByName(dongName: String!): Dong!
+  fetchIngredients: [Ingredient!]!
+  fetchMyIngredients: [Ingredient!]!
 }
 
 input SearchProductInput {
@@ -114,13 +121,28 @@ input SearchProductInput {
 }
 
 type Mutation {
+  """신규 회원 가입 기능입니다. (이메일 중복이 없고 휴대폰 인증이 완료되어야 가능)"""
   signUp(createUserInput: CreateUserInput!): User!
-  updateLoginUserInfo(updateUserInput: UpdateUserInput!): User!
-  deleteLoginUser: Boolean!
-  makeToken(phone_number: String!): String!
+
+  """현재 로그인 된 사용자의 정보를 수정하는 기능입니다."""
+  updateUser(updateUserInput: UpdateUserInput!): User!
+
+  """현재 로그인 된 사용자의 탈퇴 기능입니다."""
+  deleteUser: Boolean!
+
+  """휴대폰 인증을 위해 인증번호를 생성하는 기능입니다."""
+  createToken(phone_number: String!): String!
+
+  """인증 토큰을 통해 휴대폰 인증을 진행하는 기능입니다."""
   authPhone(phone_number: String!, token: String!): Boolean!
+
+  """로그인을 하는 기능입니다. (JWT 토큰을 return하여 발급, cookie에 재발급용 JWT 토큰 발급)"""
   login(email: String!, password: String!): String!
+
+  """로그아웃 기능입니다. (재발급용 JWT 토큰을 삭제)"""
   logout: Boolean!
+
+  """JWT 토큰이 만료되었을 때 cookie에 저장된 토큰으로 로그인 토큰을 재발급하는 기능입니다."""
   restoreAccessToken: String!
 
   """
