@@ -17,17 +17,15 @@ export class BoardResolver {
   }
 
   @Query(() => Board)
-  async fetchUsedProductById(@Args('id') id: string): Promise<Board> {
+  async fetchBoardById(@Args('id') id: string): Promise<Board> {
     return this.boardService.findById(id);
   }
 
   @Query(() => [Board], {
     description:
-      '입력된 user_id를 가진 사용자가 작성한 중고 물품의 정보를 확인합니다.',
+      '입력된 user_id를 가진 사용자가 작성한 게시글의 정보를 확인합니다.',
   })
-  async fetchUsedProductByUserId(
-    @Args('user_id') user_id: string,
-  ): Promise<Board[]> {
+  async fetchBoardByUserId(@Args('user_id') user_id: string): Promise<Board[]> {
     return await this.boardService.findByuser_Id(user_id);
   }
 
@@ -35,12 +33,20 @@ export class BoardResolver {
     description:
       '종합검색 기능으로 가격은 검색한 가격보다 낮게 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계',
   })
-  async getPosts(
+  async fetchBoardsBySerach(
     @Args('SerachUsedProductInput') searchBoardInput: SearchBoardDto,
   ): Promise<Board[]> {
     return this.boardService.findBySerach(searchBoardInput);
   }
 
+  @Query(() => [Board], {
+    description: '조회수가 많은 게시글 5개를 리턴',
+  })
+  async fetchBoardsByView(
+    @Args('category') category: string,
+  ): Promise<Board[]> {
+    return this.boardService.findByView(category);
+  }
   @UseGuards(gqlAccessGuard)
   @Mutation(() => Board)
   async createBoard(
@@ -62,9 +68,9 @@ export class BoardResolver {
   @UseGuards(gqlAccessGuard)
   @Mutation(() => Boolean, {
     description:
-      '입력된 id값을 가진 중고물품을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)',
+      '입력된 id값을 가진 게시글을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)',
   })
-  async deleteUsedProduct(
+  async deleteBoard(
     @Args('id') id: string,
     @Context() context: IContext,
   ): Promise<boolean> {
@@ -99,5 +105,28 @@ export class BoardResolver {
     @Context() context: IContext,
   ): Promise<Board> {
     return this.boardService.removeLikeToPost(context.req.user.id, id);
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Board, {
+    description: '게시글에 댓글을 달 수 있는 기능',
+  })
+  addReply(
+    @Args('id') id: string,
+    @Args('detail') detail: string,
+    @Context() context: IContext,
+  ): Promise<Board> {
+    return this.boardService.addReply(context.req.user.id, detail, id);
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Board, {
+    description: '게시글에 댓글을 달 수 있는 기능',
+  })
+  removeReply(
+    @Args('id') id: string,
+    @Context() context: IContext,
+  ): Promise<Board> {
+    return this.boardService.removeReply(context.req.user.id, id);
   }
 }

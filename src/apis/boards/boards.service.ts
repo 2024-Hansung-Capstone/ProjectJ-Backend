@@ -4,7 +4,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { PessimisticLockTransactionRequiredError, Repository } from 'typeorm';
 import { Board } from './entities/board.entity';
 import { UpdateBoardDto } from './dto/update-board.input';
 import { Like } from 'typeorm';
@@ -12,6 +12,7 @@ import { SearchBoardDto } from './dto/search_board.input';
 import { CreateBoardDto } from './dto/create-board.input';
 import { UserService } from '../users/users.service';
 import { Like_user_record } from '../used_markets/entities/like_user_record.entity';
+import { Reply } from './entities/reply.entity';
 @Injectable()
 export class BoardService {
   constructor(
@@ -19,27 +20,29 @@ export class BoardService {
     private readonly boardRepository: Repository<Board>,
     @InjectRepository(Like_user_record)
     private readonly likeUserRecordRepository: Repository<Like_user_record>,
+    @InjectRepository(Reply)
+    private readonly replyRepository: Repository<Reply>,
     private readonly userService: UserService,
   ) {}
 
   async findAll(category: string): Promise<Board[]> {
     return await this.boardRepository.find({
       where: { category: category },
-      relations: ['user'],
+      relations: ['user', 'reply'],
     });
   }
 
   async findById(id: string): Promise<Board> {
     return await this.boardRepository.findOne({
       where: { id: id },
-      relations: ['user'],
+      relations: ['user', 'reply', 'likeUsers'],
     });
   }
 
   async findByuser_Id(user_id: string): Promise<Board[]> {
     return await this.boardRepository.find({
       where: { user: { id: user_id } },
-      relations: ['user'],
+      relations: ['user', 'reply'],
     });
   }
 
@@ -59,6 +62,14 @@ export class BoardService {
     }
 
     return await this.boardRepository.find({ where: searchConditions });
+  }
+
+  async findByView(category: string): Promise<Board[]> {
+    return await this.boardRepository.find({
+      where: { category: category },
+      order: { like: 'DESC' },
+      take: 5,
+    });
   }
 
   async create(
@@ -89,7 +100,6 @@ export class BoardService {
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
     }
-    rest.createat = new Date();
     await this.boardRepository.update({ id: id }, { ...rest });
     return await this.boardRepository.findOne({
       where: { id: id },
@@ -129,7 +139,7 @@ export class BoardService {
     const user = await this.userService.findById(user_id);
     const checkuser = await this.likeUserRecordRepository.findOne({
       where: { board: { id: board.id }, user: { id: user.id } },
-      relations: ['user', 'used_product'],
+      relations: ['user', 'board'],
     });
 
     if (checkuser) {
@@ -138,10 +148,10 @@ export class BoardService {
     board.like = board.like + 1;
     like_user_record.board = board;
     like_user_record.user = user;
-
+    board.likeUsers.push(like_user_record);
     await this.likeUserRecordRepository.save(like_user_record);
     await this.boardRepository.save(board);
-    return this.findById(id);
+    return await this.findById(id);
   }
 
   async removeLikeToPost(user_id: string, id: string): Promise<Board> {
@@ -149,16 +159,49 @@ export class BoardService {
     const user = await this.userService.findById(user_id);
     const checkuser = await this.likeUserRecordRepository.findOne({
       where: { board: { id: board.id }, user: { id: user.id } },
-      relations: ['user', 'used_product'],
+      relations: ['user', 'board'],
     });
     if (!checkuser) {
       throw new NotFoundException('찜을 하지 않았습니다.');
     }
 
     board.like = board.like - 1;
-
+    const likeIndex = board.likeUsers.findIndex(
+      (likeUsers) => likeUsers.id === checkuser.id,
+    );
+    board.likeUsers.splice(likeIndex, 1);
     await this.likeUserRecordRepository.delete(checkuser.id);
     await this.boardRepository.save(board);
-    return this.findById(id);
+    return await this.findById(id);
+  }
+  async addReply(user_id: string, detail: string, id: string): Promise<Board> {
+    const board = await this.findById(id);
+    const user = await this.userService.findById(user_id);
+    const reply = new Reply();
+    reply.user = user;
+    reply.board = board;
+    reply.detail = detail;
+    board.reply.push(reply);
+    await this.replyRepository.save(reply);
+    await this.boardRepository.save(board);
+    return await this.findById(id);
+  }
+  async removeReply(user_id: string, id: string): Promise<Board> {
+    const board = await this.findById(id);
+    const user = await this.userService.findById(user_id);
+    const checkreply = await this.replyRepository.findOne({
+      where: { board: { id: board.id }, user: { id: user.id } },
+      relations: ['user', 'board'],
+    });
+    if (!checkreply) {
+      throw new NotFoundException('댓글이 존재하지 않습니다.');
+    }
+    const replyIndex = board.reply.findIndex(
+      (reply) => reply.id === checkreply.id,
+    );
+    board.likeUsers.splice(replyIndex, 1);
+    await this.replyRepository.delete(checkreply.id);
+    await this.boardRepository.save(board);
+    return await this.findById(id);
   }
 }

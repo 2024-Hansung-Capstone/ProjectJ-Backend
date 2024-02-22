@@ -10,6 +10,7 @@ import {
 } from 'typeorm'; //typeorm: 데이터베이스 관련
 import { User } from '../../users/entities/user.entity';
 import { Like_user_record } from 'src/apis/used_markets/entities/like_user_record.entity';
+import { Reply } from './reply.entity';
 @Entity()
 @ObjectType()
 export class Board {
@@ -48,6 +49,15 @@ export class Board {
   @OneToMany(
     () => Like_user_record,
     (Like_user_record) => Like_user_record.user,
+    {
+      nullable: true,
+    },
   )
-  likeUsers: Like_user_record[];
+  likeUsers: Like_user_record[] | null;
+
+  @JoinColumn()
+  @OneToMany(() => Reply, (Reply) => Reply.board, {
+    nullable: true,
+  })
+  reply: Reply[] | null;
 }

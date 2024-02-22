@@ -35,6 +35,9 @@ export class Reply {
   @OneToMany(
     () => Like_user_record,
     (Like_user_record) => Like_user_record.user,
+    {
+      nullable: true,
+    },
   )
-  likeUsers: Like_user_record[];
+  likeUsers: Like_user_record[] | null;
 }
