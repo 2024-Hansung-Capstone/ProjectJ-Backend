@@ -9,10 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { gqlAccessGuard, gqlAuthRefreshGuard } from './guards/gql-auth.guard';
-import {
-  IContext,
-  IUserServiceUpdate,
-} from './interfaces/user-service.interface';
+import { IContext } from './interfaces/user-service.interface';
 import { UpdateUserInput } from './dto/update-user-input';
 
 @Resolver()
@@ -21,7 +18,10 @@ export class UserResolver {
 
   //Mutation: 추가, 삭제, 변경, 생성
   //Query: 조회
-  @Mutation(() => User)
+  @Mutation(() => User, {
+    description:
+      '신규 회원 가입 기능입니다. (이메일 중복이 없고 휴대폰 인증이 완료되어야 가능)',
+  })
   async signUp(
     @Args('createUserInput') createUserInput: CreateUserInput,
   ): Promise<User> {
@@ -29,10 +29,35 @@ export class UserResolver {
     return await this.userService.create({ createUserInput });
   }
 
+  //전체 유저 조회
+  @Query(() => [User], { description: '전체 사용자 정보 조회 기능입니다.' }) //graphql에서 배열을 지정할 때는 단어의 좌우로 대괄호를 넣어줘야 함.
+  async fetchUsers(): Promise<User[]> {
+    return await this.userService.findAll();
+  }
+
+  //특정 id를 갖고 있는 유저만 조회
+  @Query(() => User, {
+    description: '특정 사용자 id값을 기준으로 사용자 정보 조회 기능입니다.',
+  })
+  async fetchUserById(@Args('user_id') user_id: string): Promise<User> {
+    return await this.userService.findById(user_id);
+  }
+
+  //현재 로그인 되어있는 사용자의 정보를 가져오는 함수(JWT)
+  @UseGuards(gqlAccessGuard)
+  @Query(() => User, {
+    description: '현재 로그인된 사용자 정보를 조회하는 기능입니다.',
+  })
+  async whoAmI(@Context() context: IContext) {
+    return await this.userService.findById(context.req.user.id);
+  }
+
   //회원 정보 수정
   @UseGuards(gqlAccessGuard)
-  @Mutation(() => User)
-  async updateLoginUserInfo(
+  @Mutation(() => User, {
+    description: '현재 로그인 된 사용자의 정보를 수정하는 기능입니다.',
+  })
+  async updateUser(
     @Context() Context: IContext,
     @Args('updateUserInput') updateUserInput: UpdateUserInput,
   ): Promise<User> {
@@ -51,29 +76,25 @@ export class UserResolver {
 
   //회원 정보 삭제
   @UseGuards(gqlAccessGuard)
-  @Mutation(() => Boolean)
-  async deleteLoginUser(@Context() context: IContext) {
+  @Mutation(() => Boolean, {
+    description: '현재 로그인 된 사용자의 탈퇴 기능입니다.',
+  })
+  async deleteUser(@Context() context: IContext) {
     return await this.userService.delete(context.req.user.id);
   }
 
-  //전체 유저 조회
-  @Query(() => [User]) //graphql에서 배열을 지정할 때는 단어의 좌우로 대괄호를 넣어줘야 함.
-  async fetchUsers(): Promise<User[]> {
-    return await this.userService.findAll();
-  }
-
-  //특정 id를 갖고 있는 유저만 조회
-  @Query(() => User)
-  async fetchUserById(@Args('user_id') user_id: string): Promise<User> {
-    return await this.userService.findById(user_id);
-  }
-
-  @Mutation(() => String)
-  async makeToken(@Args('phone_number') phone_number: string): Promise<string> {
+  @Mutation(() => String, {
+    description: '휴대폰 인증을 위해 인증번호를 생성하는 기능입니다.',
+  })
+  async createToken(
+    @Args('phone_number') phone_number: string,
+  ): Promise<string> {
     return await this.userService.createToken(phone_number);
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => Boolean, {
+    description: '인증 토큰을 통해 휴대폰 인증을 진행하는 기능입니다.',
+  })
   async authPhone(
     @Args('phone_number') phone_number: string,
     @Args('token') token: string,
@@ -82,7 +103,10 @@ export class UserResolver {
   }
 
   //로그인
-  @Mutation(() => String)
+  @Mutation(() => String, {
+    description:
+      '로그인을 하는 기능입니다. (JWT 토큰을 return하여 발급, cookie에 재발급용 JWT 토큰 발급)',
+  })
   async login(
     @Args('email') email: string,
     @Args('password') password: string,
@@ -105,16 +129,27 @@ export class UserResolver {
     return this.userService.getAccessToken(user);
   }
 
-  //현재 로그인 되어있는 사용자의 정보를 가져오는 함수(JWT)
-  @UseGuards(gqlAccessGuard)
-  @Query(() => User)
-  async whoAmI(@Context() context: IContext) {
-    return await this.userService.findById(context.req.user.id);
+  //로그아웃
+  @Mutation(() => Boolean, {
+    description: '로그아웃 기능입니다. (재발급용 JWT 토큰을 삭제)',
+  })
+  logout(@Context() context: IContext): boolean {
+    try {
+      context.res.setHeader('Set-Cookie', [
+        'refreshToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure;',
+      ]); //유효기간을 과거로 해서 쿠키를 삭제
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   //accessToken이 만료되었을 때, refreshToken이 있다면 새 accessToken을 발급해주는 함수
   @UseGuards(gqlAuthRefreshGuard)
-  @Mutation(() => String)
+  @Mutation(() => String, {
+    description:
+      'JWT 토큰이 만료되었을 때 cookie에 저장된 토큰으로 로그인 토큰을 재발급하는 기능입니다.',
+  })
   restoreAccessToken(@Context() context: IContext): string {
     return this.userService.getRestoreToken({ id: context.req.user.id });
   }

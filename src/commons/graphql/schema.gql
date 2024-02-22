@@ -40,19 +40,6 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type User {
-  id: String!
-  email: String!
-  name: String!
-  gender: String!
-  birth_at: DateTime!
-  mbti: String!
-  phone_number: String!
-  is_find_mate: Boolean!
-  point: Int!
-  create_at: DateTime!
-}
-
 type Sido {
   id: String!
   name: String!
@@ -71,6 +58,31 @@ type Dong {
   sgng: Sgng!
   name: String!
   crtr_at: DateTime!
+}
+
+type User {
+  id: String!
+  dong: Dong!
+  email: String!
+  name: String!
+  gender: String!
+  birth_at: DateTime!
+  mbti: String!
+  phone_number: String!
+  is_find_mate: Boolean!
+  point: Int!
+  create_at: DateTime!
+}
+
+type Ingredient {
+  id: String!
+  user: User!
+  name: String!
+  count: Int
+  volume: Float
+  volume_unit: String
+  create_at: DateTime!
+  updated_at: DateTime!
 }
 
 type Query {
@@ -108,6 +120,7 @@ type Mutation {
   makeToken(phone_number: String!): String!
   authPhone(phone_number: String!, token: String!): Boolean!
   login(email: String!, password: String!): String!
+  logout: Boolean!
   restoreAccessToken: String!
 
   """
@@ -131,6 +144,7 @@ type Mutation {
 
   """게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작"""
   removeLikeTopost(id: String!): UsedProduct!
+  createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
 }
 
 input CreateUserInput {
@@ -141,6 +155,7 @@ input CreateUserInput {
   birth_month: String!
   birth_day: String!
   mbti: String!
+  dong_nm: String!
   phone_number: String!
   password: String!
   is_find_mate: Boolean!
@@ -172,4 +187,11 @@ input UpdateUsedProductInput {
   detail: String
   category: String
   state: String
+}
+
+input CreateIngredientInput {
+  name: String!
+  count: Int
+  volume: Float
+  volume_unit: String
 }
