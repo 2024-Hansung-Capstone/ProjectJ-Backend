@@ -167,6 +167,8 @@ type Mutation {
   """게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작"""
   removeLikeTopost(id: String!): UsedProduct!
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
+  updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
+  deleteIngredient(ingredient_id: String!): Boolean!
 }
 
 input CreateUserInput {
@@ -213,6 +215,14 @@ input UpdateUsedProductInput {
 
 input CreateIngredientInput {
   name: String!
+  count: Int
+  volume: Float
+  volume_unit: String
+}
+
+input UpdateIngredientInput {
+  id: String!
+  name: String
   count: Int
   volume: Float
   volume_unit: String

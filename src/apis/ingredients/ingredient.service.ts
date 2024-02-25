@@ -63,5 +63,10 @@ export class IngredientService {
     }
   }
 
-  delete() {}
+  async delete(ingredient_id: string): Promise<boolean> {
+    const result = await this.ingredientRepository.delete({
+      id: ingredient_id,
+    });
+    return result.affected > 0;
+  }
 }
