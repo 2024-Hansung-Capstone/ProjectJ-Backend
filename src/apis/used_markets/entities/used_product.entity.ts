@@ -58,6 +58,9 @@ export class UsedProduct {
   @OneToMany(
     () => Like_user_record,
     (Like_user_record) => Like_user_record.user,
+    {
+      nullable: true,
+    },
   )
-  Like_users: Like_user_record[];
+  Like_users: Like_user_record[] | null;
 }
