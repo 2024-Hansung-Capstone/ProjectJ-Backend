@@ -31,5 +31,5 @@ export class Like_user_record {
     nullable: true,
   })
   @JoinColumn()
-  Reply: Reply | null;
+  reply: Reply | null;
 }
