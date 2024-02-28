@@ -36,5 +36,5 @@ export class Reply {
     () => Like_user_record,
     (Like_user_record) => Like_user_record.user,
   )
-  likeUsers: Like_user_record[];
+  like_user: Like_user_record[];
 }
