@@ -49,6 +49,7 @@ export class BoardResolver {
   ): Promise<Board[]> {
     return this.boardService.findByView(category);
   }
+
   @UseGuards(gqlAccessGuard)
   @Mutation(() => Board, {
     description: '입력된 정보를 바탕으로 게시글을 작성합니다',

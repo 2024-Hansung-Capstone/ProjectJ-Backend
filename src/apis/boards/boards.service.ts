@@ -30,21 +30,21 @@ export class BoardService {
   async findAll(category: string): Promise<Board[]> {
     return await this.boardRepository.find({
       where: { category: category },
-      relations: ['user', 'reply', 'likeUsers'],
+      relations: ['user', 'reply', 'like_user'],
     });
   }
 
   async findById(id: string): Promise<Board> {
     return await this.boardRepository.findOne({
       where: { id: id },
-      relations: ['user', 'reply', 'likeUsers'],
+      relations: ['user', 'reply', 'like_user'],
     });
   }
 
   async findByuser_Id(user_id: string): Promise<Board[]> {
     return await this.boardRepository.find({
       where: { user: { id: user_id } },
-      relations: ['user', 'reply'],
+      relations: ['user', 'reply', 'like_user'],
     });
   }
 
@@ -150,7 +150,7 @@ export class BoardService {
     board.like = board.like + 1;
     like_user_record.board = board;
     like_user_record.user = user;
-    board.likeUsers.push(like_user_record);
+    board.like_user.push(like_user_record);
     await this.likeUserRecordRepository.save(like_user_record);
     await this.boardRepository.save(board);
     return await this.findById(id);
@@ -168,10 +168,10 @@ export class BoardService {
     }
 
     board.like = board.like - 1;
-    const likeIndex = board.likeUsers.findIndex(
+    const likeIndex = board.like_user.findIndex(
       (likeUsers) => likeUsers.id === checkuser.id,
     );
-    board.likeUsers.splice(likeIndex, 1);
+    board.like_user.splice(likeIndex, 1);
     await this.likeUserRecordRepository.delete(checkuser.id);
     await this.boardRepository.save(board);
     return await this.findById(id);
@@ -203,7 +203,7 @@ export class BoardService {
       where: { id: reply_id },
       relations: ['user', 'board'],
     });
-    const board = checkreply.board;
+    const board = await this.findById(checkreply.board.id);
     if (checkreply.user.id !== user_id) {
       throw new ForbiddenException(`본인이 작성한 댓글만 삭제할 수 있습니다.`);
     }
@@ -254,12 +254,13 @@ export class BoardService {
   async addLikeToReply(user_id: string, reply_id: string): Promise<Board> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
+      relations: ['like_user', 'board'],
     });
     const like_user_record = new Like_user_record();
     const user = await this.userService.findById(user_id);
     const checkreply = await this.likeUserRecordRepository.findOne({
       where: { reply: { id: reply.id }, user: { id: user.id } },
-      relations: ['user', 'board'],
+      relations: ['user', 'reply'],
     });
 
     if (checkreply) {
@@ -268,7 +269,7 @@ export class BoardService {
     reply.like = reply.like + 1;
     like_user_record.reply = reply;
     like_user_record.user = user;
-    reply.likeUsers.push(like_user_record);
+    reply.like_user.push(like_user_record);
     await this.likeUserRecordRepository.save(like_user_record);
     await this.replyRepository.save(reply);
     return await this.findById(reply.board.id);
@@ -277,20 +278,21 @@ export class BoardService {
   async removeLikeToReply(user_id: string, reply_id: string): Promise<Board> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
+      relations: ['like_user', 'board'],
     });
     const checkreply = await this.likeUserRecordRepository.findOne({
       where: { reply: { id: reply_id }, user: { id: user_id } },
-      relations: ['user', 'board'],
+      relations: ['user', 'reply'],
     });
 
     if (!checkreply) {
       throw new ForbiddenException(`좋아요를 하지 않았습니다.`);
     }
     reply.like = reply.like - 1;
-    const likeIndex = reply.likeUsers.findIndex(
+    const likeIndex = reply.like_user.findIndex(
       (reply) => reply.id === checkreply.id,
     );
-    reply.likeUsers.splice(likeIndex, 1);
+    reply.like_user.splice(likeIndex, 1);
     await this.likeUserRecordRepository.delete(checkreply.id);
     await this.boardRepository.save(reply);
     return await this.findById(reply.board.id);

@@ -57,7 +57,7 @@ export class UsedProduct {
   @JoinColumn()
   @OneToMany(
     () => Like_user_record,
-    (Like_user_record) => Like_user_record.user,
+    (Like_user_record) => Like_user_record.used_product,
   )
-  Like_users: Like_user_record[];
+  like_user: Like_user_record[];
 }

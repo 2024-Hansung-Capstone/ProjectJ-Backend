@@ -48,16 +48,16 @@ export class Board {
   @JoinColumn()
   @OneToMany(
     () => Like_user_record,
-    (Like_user_record) => Like_user_record.user,
+    (Like_user_record) => Like_user_record.board,
     {
       nullable: true,
     },
   )
-  likeUsers: Like_user_record[] | null;
+  like_user: Like_user_record[];
 
   @JoinColumn()
   @OneToMany(() => Reply, (Reply) => Reply.board, {
     nullable: true,
   })
-  reply: Reply[] | null;
+  reply: Reply[];
 }
