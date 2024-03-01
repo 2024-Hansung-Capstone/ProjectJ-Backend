@@ -23,21 +23,39 @@ export class UsedProductService {
 
   async findAll(): Promise<UsedProduct[]> {
     return await this.usedProductRepository.find({
-      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'like_user',
+      ],
     });
   }
 
   async findById(id: string): Promise<UsedProduct> {
     return await this.usedProductRepository.findOne({
       where: { id: id },
-      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'like_user',
+      ],
     });
   }
   //유저이름으로 검색 즉 상점이름으로 검색하는 방법
   async findByuser_Id(user_id: string): Promise<UsedProduct[]> {
     return await this.usedProductRepository.find({
       where: { user: { id: user_id } },
-      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'like_user',
+      ],
     });
   }
   // 종합적인 조건으로 검색하는 방법
@@ -103,7 +121,13 @@ export class UsedProductService {
     await this.usedProductRepository.update({ id: id }, { ...rest });
     return await this.usedProductRepository.findOne({
       where: { id: id },
-      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'like_user',
+      ],
     });
   }
 
@@ -157,7 +181,7 @@ export class UsedProductService {
     used_product.like = used_product.like + 1;
     like_user_record.used_product = used_product;
     like_user_record.user = user;
-
+    used_product.like_user.push(like_user_record);
     await this.likeUserRecordRepository.save(like_user_record);
     await this.usedProductRepository.save(used_product);
     return this.findById(id);
@@ -179,7 +203,10 @@ export class UsedProductService {
     if (!checkuser) {
       throw new NotFoundException('찜을 하지 않았습니다.');
     }
-
+    const likeIndex = used_product.like_user.findIndex(
+      (Like_users) => Like_users.id === checkuser.id,
+    );
+    used_product.like_user.splice(likeIndex, 1);
     used_product.like = used_product.like - 1;
 
     await this.likeUserRecordRepository.delete(checkuser.id);
