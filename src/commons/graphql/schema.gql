@@ -136,11 +136,11 @@ type Query {
 }
 
 input SearchProductInput {
-  title: String!
-  price: Int!
-  detail: String!
-  category: String!
-  state: String!
+  title: String
+  price: Int
+  detail: String
+  category: String
+  state: String
 }
 
 input SearchBoardDto {
