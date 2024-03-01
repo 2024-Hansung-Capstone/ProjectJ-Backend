@@ -11,7 +11,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jaeheoga') {
             .split(';')
             .map((cookie) => cookie.trim());
           const refreshTokenCookie = cookies.find((cookie) =>
-            cookie.startWith('refreshToken='),
+            cookie.startsWith('refreshToken='),
           );
           if (refreshTokenCookie) {
             refreshToken = refreshTokenCookie.replace('refreshToken=', '');

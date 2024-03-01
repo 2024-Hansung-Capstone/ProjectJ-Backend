@@ -7,12 +7,13 @@ import { UserModule } from './apis/users/users.module';
 import { UsedProductModule } from './apis/used_markets/usedProducts.module';
 import { AreaModule } from './apis/area/area.module';
 import { IngredientModule } from './apis/ingredients/ingredient.module';
-
+import { BoardModule } from './apis/boards/boards.module';
 @Module({
   imports: [
     UserModule,
     UsedProductModule,
     AreaModule,
+    BoardModule,
     IngredientModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({

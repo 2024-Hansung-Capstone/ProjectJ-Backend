@@ -1,4 +1,4 @@
-import { Field, Int, InputType } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
 export class CreateBoardDto {
@@ -10,16 +10,4 @@ export class CreateBoardDto {
 
   @Field(() => String)
   detail: string;
-}
-
-@InputType()
-export class UpdateBoardDto {
-  @Field(() => String, { nullable: true })
-  category?: string;
-
-  @Field(() => String, { nullable: true })
-  title?: string;
-
-  @Field(() => String, { nullable: true })
-  detail?: string;
 }

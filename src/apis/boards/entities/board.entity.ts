@@ -3,13 +3,14 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  JoinColumn,
+  OneToMany,
 } from 'typeorm'; //typeorm: 데이터베이스 관련
 import { User } from '../../users/entities/user.entity';
-
+import { Like_user_record } from 'src/apis/used_markets/entities/like_user_record.entity';
+import { Reply } from './reply.entity';
 @Entity()
 @ObjectType()
 export class Board {
@@ -18,7 +19,7 @@ export class Board {
   id: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  user_id: User;
+  user: User;
 
   @Column({ length: 50 })
   @Field(() => String)
@@ -42,9 +43,21 @@ export class Board {
 
   @CreateDateColumn({ type: 'timestamp' })
   @Field(() => Date)
-  create_at: Date;
+  createat: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
-  @Field(() => Date)
-  updated_at: Date;
+  @JoinColumn()
+  @OneToMany(
+    () => Like_user_record,
+    (Like_user_record) => Like_user_record.board,
+    {
+      nullable: true,
+    },
+  )
+  like_user: Like_user_record[];
+
+  @JoinColumn()
+  @OneToMany(() => Reply, (Reply) => Reply.board, {
+    nullable: true,
+  })
+  reply: Reply[];
 }
