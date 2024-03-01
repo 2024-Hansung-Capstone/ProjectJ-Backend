@@ -40,6 +40,16 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Board {
+  id: String!
+  category: String!
+  title: String!
+  detail: String!
+  view: Int!
+  like: Int!
+  createat: DateTime!
+}
+
 type Sido {
   id: String!
   name: String!
@@ -86,8 +96,13 @@ type Ingredient {
 }
 
 type Query {
+  """전체 사용자 정보 조회 기능입니다."""
   fetchUsers: [User!]!
+
+  """특정 사용자 id값을 기준으로 사용자 정보 조회 기능입니다."""
   fetchUserById(user_id: String!): User!
+
+  """현재 로그인된 사용자 정보를 조회하는 기능입니다."""
   whoAmI: User!
 
   """전체 중고 물품 정보를 확인합니다."""
@@ -103,6 +118,19 @@ type Query {
   getPosts(SerachUsedProductInput: SearchProductInput!): [UsedProduct!]!
   fetchSidoNameByDongName(dongName: String!): String!
   fetchDongByName(dongName: String!): Dong!
+
+  """입력된 카테고리를 게시글의 정보를 확인합니다."""
+  fetchBoards(category: String!): [Board!]!
+  fetchBoardById(id: String!): Board!
+
+  """입력된 user_id를 가진 사용자가 작성한 게시글의 정보를 확인합니다."""
+  fetchBoardByUserId(user_id: String!): [Board!]!
+
+  """종합검색 기능으로 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계"""
+  fetchBoardsBySerach(SerachUsedProductInput: SearchBoardDto!): [Board!]!
+
+  """조회수가 많은 게시글 5개를 리턴"""
+  fetchBoardsByView(category: String!): [Board!]!
 }
 
 input SearchProductInput {
@@ -113,14 +141,35 @@ input SearchProductInput {
   state: String!
 }
 
+input SearchBoardDto {
+  category: String
+  title: String
+  detail: String
+}
+
 type Mutation {
+  """신규 회원 가입 기능입니다. (이메일 중복이 없고 휴대폰 인증이 완료되어야 가능)"""
   signUp(createUserInput: CreateUserInput!): User!
-  updateLoginUserInfo(updateUserInput: UpdateUserInput!): User!
-  deleteLoginUser: Boolean!
-  makeToken(phone_number: String!): String!
+
+  """현재 로그인 된 사용자의 정보를 수정하는 기능입니다."""
+  updateUser(updateUserInput: UpdateUserInput!): User!
+
+  """현재 로그인 된 사용자의 탈퇴 기능입니다."""
+  deleteUser: Boolean!
+
+  """휴대폰 인증을 위해 인증번호를 생성하는 기능입니다."""
+  createToken(phone_number: String!): String!
+
+  """인증 토큰을 통해 휴대폰 인증을 진행하는 기능입니다."""
   authPhone(phone_number: String!, token: String!): Boolean!
+
+  """로그인을 하는 기능입니다. (JWT 토큰을 return하여 발급, cookie에 재발급용 JWT 토큰 발급)"""
   login(email: String!, password: String!): String!
+
+  """로그아웃 기능입니다. (재발급용 JWT 토큰을 삭제)"""
   logout: Boolean!
+
+  """JWT 토큰이 만료되었을 때 cookie에 저장된 토큰으로 로그인 토큰을 재발급하는 기능입니다."""
   restoreAccessToken: String!
 
   """
@@ -144,6 +193,39 @@ type Mutation {
 
   """게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작"""
   removeLikeTopost(id: String!): UsedProduct!
+
+  """입력된 정보를 바탕으로 게시글을 작성합니다"""
+  createBoard(createBoardInput: CreateBoardDto!): Board!
+
+  """입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능)"""
+  updateBoard(updateBoradInput: UpdateBoardDto!): Board!
+
+  """입력된 id값을 가진 게시글을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)"""
+  deleteBoard(id: String!): Boolean!
+
+  """게시글의 조회수를 1 증가시킵니다."""
+  addViewToBoard(id: String!): Board!
+
+  """게시글의  좋아요수(Like)를 올려주고 Like_user_record에 좋아요한 회원과 게시글을 저장"""
+  addLikeToBoard(id: String!): Board!
+
+  """게시글의 좋아요를 취소하는 기능 좋아요한 게시글에게만 동작"""
+  removeLikeToBoard(id: String!): Board!
+
+  """게시글에 댓글을 달 수 있는 기능"""
+  addReply(detail: String!, id: String!): Board!
+
+  """게시글에 댓글을 삭제 할 수 있는 기능"""
+  removeReply(reply_id: String!): Board!
+
+  """게시글에 댓글을 수정 할 수 있는 기능"""
+  updateReply(detail: String!, reply_id: String!): Board!
+
+  """댓글의 좋아요 수(Like)를 올려주고 Like_user_record에 좋아요한 회원과 댓글글을 저장"""
+  addLikeToReply(reply_id: String!): Board!
+
+  """댓글의 좋아요를 취소하는 기능 좋아요한 댓글에게만 동작"""
+  reomoveLikeToReply(reply_id: String!): Board!
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
 }
 
@@ -187,6 +269,19 @@ input UpdateUsedProductInput {
   detail: String
   category: String
   state: String
+}
+
+input CreateBoardDto {
+  category: String!
+  title: String!
+  detail: String!
+}
+
+input UpdateBoardDto {
+  id: String!
+  category: String
+  title: String
+  detail: String
 }
 
 input CreateIngredientInput {

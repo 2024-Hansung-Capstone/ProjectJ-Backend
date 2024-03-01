@@ -11,7 +11,9 @@ export class Like_user_record {
   @Field(() => String)
   id: string;
 
-  @ManyToOne(() => User, (users) => users.like_user)
+  @ManyToOne(() => User, (users) => users.like_user, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   user: User;
 

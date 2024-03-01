@@ -5,9 +5,6 @@ export class UpdateBoardDto {
   @Field(() => String)
   id: string;
 
-  @Field(() => Date)
-  createat?: Date;
-
   @Field(() => String, { nullable: true })
   category?: string;
 

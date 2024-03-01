@@ -34,7 +34,10 @@ export class Reply {
   @JoinColumn()
   @OneToMany(
     () => Like_user_record,
-    (Like_user_record) => Like_user_record.user,
+    (Like_user_record) => Like_user_record.reply,
+    {
+      nullable: true,
+    },
   )
   like_user: Like_user_record[];
 }
