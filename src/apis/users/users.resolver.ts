@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { gqlAccessGuard, gqlAuthRefreshGuard } from './guards/gql-auth.guard';
 import { IContext } from './interfaces/user-service.interface';
-import { UpdateUserInput } from './dto/update-user-input';
+import { UpdateUserInput } from './dto/update-user.input';
 
 @Resolver()
 export class UserResolver {

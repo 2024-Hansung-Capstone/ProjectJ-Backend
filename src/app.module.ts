@@ -8,6 +8,7 @@ import { UsedProductModule } from './apis/used_markets/usedProducts.module';
 import { AreaModule } from './apis/area/area.module';
 import { IngredientModule } from './apis/ingredients/ingredient.module';
 import { BoardModule } from './apis/boards/boards.module';
+import { LetterModule } from './apis/letters/letters.module';
 @Module({
   imports: [
     UserModule,
@@ -15,6 +16,7 @@ import { BoardModule } from './apis/boards/boards.module';
     AreaModule,
     BoardModule,
     IngredientModule,
+    LetterModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
