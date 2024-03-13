@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { CreateUserInput } from '../dto/create-user.input';
-import { UpdateUserInput } from '../dto/update-user-input';
+import { UpdateUserInput } from '../dto/update-user.input';
 
 //회원 정보 생성
 export interface IUserServiceCreate {
