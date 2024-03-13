@@ -1,8 +1,13 @@
 import { Field, ObjectType } from '@nestjs/graphql';
+import { Board } from 'src/apis/boards/entities/board.entity';
+import { UsedProduct } from 'src/apis/used_markets/entities/used_product.entity';
+import { User } from 'src/apis/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -13,21 +18,25 @@ export class Letter {
   @Field(() => String)
   id: string;
 
-  @Column()
-  @Field(() => String)
-  sender_id: string;
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  @Field(() => User)
+  sender: User;
 
-  @Column()
-  @Field(() => String)
-  reciever_id: string;
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  @Field(() => User)
+  receiver: User;
 
-  @Column()
-  @Field(() => String)
-  product_id: string;
+  @ManyToOne(() => UsedProduct, { onDelete: 'CASCADE', nullable: true })
+  @JoinColumn()
+  @Field(() => UsedProduct, { nullable: true })
+  product?: UsedProduct;
 
-  @Column()
-  @Field(() => String)
-  board_id: string;
+  @ManyToOne(() => Board, { onDelete: 'CASCADE', nullable: true })
+  @JoinColumn()
+  @Field(() => Board, { nullable: true })
+  board?: Board;
 
   @Column()
   @Field(() => String)
