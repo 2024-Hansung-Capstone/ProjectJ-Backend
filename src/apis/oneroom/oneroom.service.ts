@@ -69,18 +69,35 @@ export class OneRoomService {
         jsonData = result;
       });
       const items: any[] = jsonData.response.item;
-      const oneRooms: OneRoom[] = items.map((item) => {
-        const oneRoom = new OneRoom();
-        oneRoom.jibun = item.지번[0];
-        oneRoom.monthly_rent = parseInt(item.월세금액[0]);
-        oneRoom.area_exclusiveUse = parseFloat(item.전용면적[0]);
-        return oneRoom;
-      });
+      const oneRooms: OneRoom[] = [];
+
+      for (const item of items) {
+        const existingOneRoom = await this.oneRoomRepository.findOne({
+          where: { name: item.연립다세대[0] },
+        });
+
+        if (!existingOneRoom) {
+          const oneRoom = new OneRoom();
+          oneRoom.jibun = item.지번[0];
+          oneRoom.name = item.연립다세대[0];
+          oneRoom.dong = item.법정동[0];
+          oneRoom.monthly_rent = parseInt(item.월세금액[0]);
+          oneRoom.area_exclusiveUse = parseFloat(item.전용면적[0]);
+
+          oneRooms.push(oneRoom);
+        }
+      }
 
       await this.oneRoomRepository.save(oneRooms);
     } catch (error) {
       throw new Error(`OpenAPI로 데이터를 가져오지 못했음: ${error.message}`);
     }
     return;
+  }
+
+  async findByName(name: string): Promise<OneRoom> {
+    return await this.oneRoomRepository.findOne({
+      where: { name: name },
+    });
   }
 }

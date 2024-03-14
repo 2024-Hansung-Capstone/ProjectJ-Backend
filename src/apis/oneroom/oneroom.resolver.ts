@@ -19,4 +19,9 @@ export class OneRoomResolver {
       throw new Error(`데이터를 가져오는데 실패했습니다.: ${error.message}`);
     }
   }
+
+  @Query(() => OneRoom)
+  async fetchOneRoomByName(@Args('name') name: string): Promise<OneRoom> {
+    return await this.oneRoomService.findByName(name);
+  }
 }
