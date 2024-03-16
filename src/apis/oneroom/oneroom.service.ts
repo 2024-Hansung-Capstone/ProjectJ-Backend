@@ -83,6 +83,42 @@ export class OneRoomService {
           oneRoom.dong = item.법정동[0];
           oneRoom.monthly_rent = parseInt(item.월세금액[0]);
           oneRoom.area_exclusiveUse = parseFloat(item.전용면적[0]);
+          const apiUrl = 'https://api.vworld.kr/req/address';
+          const queryParams =
+            '?' +
+            'service=address' +
+            '&request=getcoord' +
+            '&version=2.0' +
+            '&crs=epsg:4326' +
+            '&address=' +
+            encodeURIComponent(item.법정동[0] + ' ' + item.지번[0]) +
+            '&refine=true' +
+            '&simple=false' +
+            '&format=xml' +
+            '&type=road' +
+            '&key=' +
+            encodeURIComponent('26F627EA-4AEA-3C79-A2D8-9C1911AC03B7');
+          try {
+            const response: any = this.httpService.get(
+              apiUrl + '?' + queryParams,
+            );
+
+            const xmlData: string = response.data;
+            let jsonData: any;
+            parseString(xmlData, (err: any, result: any) => {
+              if (err) {
+                throw new Error(`Failed to parse XML response: ${err.message}`);
+              }
+              jsonData = result;
+            });
+            const item: any = jsonData.result.point;
+            oneRoom.latitude = parseInt(item.y[0]);
+            oneRoom.longitude = parseFloat(item.x[0]);
+          } catch (error) {
+            throw new Error(
+              `GeoCoderAPI로 데이터를 가져오지 못했음: ${error.message}`,
+            );
+          }
 
           oneRooms.push(oneRoom);
         }
@@ -90,7 +126,9 @@ export class OneRoomService {
 
       await this.oneRoomRepository.save(oneRooms);
     } catch (error) {
-      throw new Error(`OpenAPI로 데이터를 가져오지 못했음: ${error.message}`);
+      throw new Error(
+        `OneRoomAPI로 데이터를 가져오지 못했음: ${error.message}`,
+      );
     }
     return;
   }

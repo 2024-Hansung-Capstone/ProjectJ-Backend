@@ -35,4 +35,12 @@ export class OneRoom {
   @Column({ length: 50 })
   @Field(() => String)
   dong: string;
+
+  @Column({ default: 0 }) //y
+  @Field(() => Int)
+  latitude: number;
+
+  @Column({ default: 0 }) //x
+  @Field(() => Int)
+  longitude: number;
 }
