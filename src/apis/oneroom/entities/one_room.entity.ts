@@ -27,4 +27,12 @@ export class OneRoom {
   @Column({ default: 0 })
   @Field(() => Int)
   area_exclusiveUse: number;
+
+  @Column({ length: 50 })
+  @Field(() => String)
+  name: string;
+
+  @Column({ length: 50 })
+  @Field(() => String)
+  dong: string;
 }
