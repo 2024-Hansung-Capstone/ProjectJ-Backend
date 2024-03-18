@@ -10,6 +10,7 @@ import { CreateLetterInput } from './dto/create-letter.input';
 import { UserService } from '../users/users.service';
 import { UsedProductService } from '../used_markets/usedProducts.service';
 import { BoardService } from '../boards/boards.service';
+import { ReplyLetterInput } from './dto/reply-letter.input';
 
 @Injectable()
 export class LetterService {
@@ -53,6 +54,26 @@ export class LetterService {
 
     //쪽지 저장
     return await this.letterRepository.save(letter);
+  }
+
+  //쪽지 답장
+  async reply(
+    user_id: string,
+    letter: Letter,
+    replyLetterInput: ReplyLetterInput,
+  ): Promise<Letter> {
+    if (letter.receiver.id != user_id) {
+      throw new BadRequestException('잘못된 접근입니다.');
+    }
+    const reply = await this.letterRepository.create({
+      sender: letter.receiver,
+      receiver: letter.sender,
+      product: letter.product,
+      board: letter.board,
+      category: letter.category,
+      ...replyLetterInput,
+    });
+    return await this.letterRepository.save(reply);
   }
 
   async findById(letter_id: string): Promise<Letter> {

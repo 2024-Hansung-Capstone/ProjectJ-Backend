@@ -5,6 +5,7 @@ import { LetterService } from './letters.service';
 import { IContext } from '../users/interfaces/user-service.interface';
 import { UseGuards } from '@nestjs/common';
 import { gqlAccessGuard } from '../users/guards/gql-auth.guard';
+import { ReplyLetterInput } from './dto/reply-letter.input';
 
 @Resolver()
 export class LetterResolver {
@@ -22,6 +23,21 @@ export class LetterResolver {
       context.req.user.id,
       writing_id,
       createLetterInput,
+    );
+  }
+
+  //쪽지 답장 작성
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Letter)
+  async replyLetter(
+    @Args('letter') letter: Letter,
+    @Args('replyLetterInput') replyLetterInput: ReplyLetterInput,
+    @Context() context: IContext,
+  ): Promise<Letter> {
+    return await this.letterService.reply(
+      context.req.user.id,
+      letter,
+      replyLetterInput,
     );
   }
 
