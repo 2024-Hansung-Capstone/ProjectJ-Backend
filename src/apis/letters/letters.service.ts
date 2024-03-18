@@ -65,4 +65,19 @@ export class LetterService {
     }
     return letter;
   }
+
+  async findSendAll(user_id: string): Promise<Letter[]> {
+    const user = await this.userService.findById(user_id);
+    return await this.letterRepository.find({ where: { sender: user } });
+  }
+
+  async findReceiveAll(user_id: string): Promise<Letter[]> {
+    const user = await this.userService.findById(user_id);
+    return await this.letterRepository.find({ where: { receiver: user } });
+  }
+
+  async delete(letter_id: string): Promise<boolean> {
+    const result = await this.letterRepository.delete({ id: letter_id });
+    return result.affected > 0;
+  }
 }

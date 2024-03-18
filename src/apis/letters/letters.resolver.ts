@@ -30,4 +30,24 @@ export class LetterResolver {
   async fetchLetterById(@Args('letter_id') letter_id: string): Promise<Letter> {
     return await this.letterService.findById(letter_id);
   }
+
+  //로그인한 사용자가 보낸 쪽지 전부 조회
+  @UseGuards(gqlAccessGuard)
+  @Query(() => Letter)
+  async fetchMySendLetters(@Context() context: IContext): Promise<Letter[]> {
+    return await this.letterService.findSendAll(context.req.user.id);
+  }
+
+  //로그인한 사용자가 받은 쪽지 전부 조회
+  @UseGuards(gqlAccessGuard)
+  @Query(() => Letter)
+  async fetchMyReceiveLetters(@Context() context: IContext): Promise<Letter[]> {
+    return await this.letterService.findReceiveAll(context.req.user.id);
+  }
+
+  //쪽지 삭제
+  @Mutation(() => Boolean)
+  async deleteLetter(@Args('letter_id') letter_id: string): Promise<boolean> {
+    return await this.letterService.delete(letter_id);
+  }
 }
