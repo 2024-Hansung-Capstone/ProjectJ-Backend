@@ -9,6 +9,7 @@ import { AreaModule } from './apis/area/area.module';
 import { IngredientModule } from './apis/ingredients/ingredient.module';
 import { BoardModule } from './apis/boards/boards.module';
 import { LetterModule } from './apis/letters/letters.module';
+import { OneRoomModule } from './apis/oneroom/oneroom.module';
 @Module({
   imports: [
     UserModule,
@@ -17,6 +18,7 @@ import { LetterModule } from './apis/letters/letters.module';
     BoardModule,
     IngredientModule,
     LetterModule,
+    OneRoomModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

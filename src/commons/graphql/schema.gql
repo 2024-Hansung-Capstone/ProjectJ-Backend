@@ -95,6 +95,29 @@ type Ingredient {
   updated_at: DateTime!
 }
 
+type Letter {
+  id: String!
+  sender: User!
+  receiver: User!
+  product: UsedProduct
+  board: Board
+  category: String!
+  title: String!
+  detail: String!
+  is_read: Boolean!
+  create_at: DateTime!
+}
+
+"""중고거래 데이터 엔티티"""
+type OneRoom {
+  id: String!
+  jibun: String!
+  monthly_rent: Int!
+  area_exclusiveUse: Int!
+  name: String!
+  dong: String!
+}
+
 type Query {
   """전체 사용자 정보 조회 기능입니다."""
   fetchUsers: [User!]!
@@ -133,6 +156,7 @@ type Query {
   fetchBoardsByView(category: String!): [Board!]!
   fetchIngredients: [Ingredient!]!
   fetchMyIngredients: [Ingredient!]!
+  fetchLetterById(letter_id: String!): Letter!
 }
 
 input SearchProductInput {
@@ -231,6 +255,9 @@ type Mutation {
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
   updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
   deleteIngredient(ingredient_id: String!): Boolean!
+  writeLetter(writing_id: String!, createLetterInput: CreateLetterInput!): Letter!
+  fetchOneRoomFromOpenAPI(LAWD_CD: String!): Boolean!
+  fetchOneRoomByName(name: String!): OneRoom!
 }
 
 input CreateUserInput {
@@ -301,4 +328,10 @@ input UpdateIngredientInput {
   count: Int
   volume: Float
   volume_unit: String
+}
+
+input CreateLetterInput {
+  category: String!
+  title: String!
+  detail: String!
 }

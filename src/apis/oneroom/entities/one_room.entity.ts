@@ -16,31 +16,23 @@ export class OneRoom {
   @Field(() => String)
   id: string;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, default: '' })
   @Field(() => String)
   jibun: string;
 
-  @Column({ default: 0 })
+  @Column({ nullable: true })
   @Field(() => Int)
-  monthly_rent: number;
+  monthly_rent: number | null;
 
-  @Column({ default: 0 })
+  @Column({ nullable: true })
   @Field(() => Int)
-  area_exclusiveUse: number;
+  area_exclusiveUse: number | null;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, default: '' })
   @Field(() => String)
   name: string;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, default: '' })
   @Field(() => String)
   dong: string;
-
-  @Column({ default: 0 }) //y
-  @Field(() => Int)
-  latitude: number;
-
-  @Column({ default: 0 }) //x
-  @Field(() => Int)
-  longitude: number;
 }
