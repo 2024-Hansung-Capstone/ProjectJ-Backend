@@ -15,6 +15,23 @@ export class OneRoomResolver {
     await this.oneRoomService.fetchOneRoomFromOpenAPI(LAWD_CD);
     return true; // 변경된 부분: 뮤테이션의 작업이 성공적으로 완료되었음을 나타내기 위해 true 반환
   }
+
+  @Query(() => [OneRoom])
+  async fetchOneRoomByXY(
+    @Args('StartX') StartX: number,
+    @Args('StartY') StartY: number,
+    @Args('EndX') EndX: number,
+    @Args('EndY') EndY: number,
+  ): Promise<OneRoom[]> {
+    return await this.oneRoomService.fetchOneRoomByXY(
+      StartX,
+      StartY,
+      EndX,
+      EndY,
+    );
+    // 여기에 함수의 내용을 추가하세요
+  }
+
   @Mutation(() => OneRoom)
   async fetchOneRoomByName(@Args('name') name: string): Promise<OneRoom> {
     return await this.oneRoomService.findByName(name);

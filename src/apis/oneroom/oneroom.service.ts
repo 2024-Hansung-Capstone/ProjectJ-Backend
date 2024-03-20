@@ -103,6 +103,32 @@ export class OneRoomService {
       );
     }
   }
+  async findAll(): Promise<OneRoom[]> {
+    return await this.oneRoomRepository.find();
+  }
+  async fetchOneRoomByXY(
+    StartX: number,
+    StartY: number,
+    EndX: number,
+    EndY: number,
+  ) {
+    const geoCoderApiUrl = 'https://api.vworld.kr/req/address';
+    const apiKey = '26F627EA-4AEA-3C79-A2D8-9C1911AC03B7';
+    const OneRooms = await this.findAll();
+    for (const room of OneRooms) {
+      const queryParams = `?service=address&request=getcoord&version=2.0&crs=epsg:4326&address=${encodeURIComponent(
+        `${room.jibun} ${room.dong}`,
+      )}&refine=true&simple=false&format=json&type=road&key=${encodeURIComponent(
+        apiKey,
+      )}`;
+      const response = await this.httpService
+        .get(geoCoderApiUrl + queryParams)
+        .toPromise();
+      const jsonData = response.data;
+      console.log(jsonData);
+    }
+    return OneRooms;
+  }
 
   async findByName(name: string): Promise<OneRoom> {
     return await this.oneRoomRepository.findOne({
