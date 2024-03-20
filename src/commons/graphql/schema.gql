@@ -157,6 +157,7 @@ type Query {
   fetchIngredients: [Ingredient!]!
   fetchMyIngredients: [Ingredient!]!
   fetchLetterById(letter_id: String!): Letter!
+  fetchOneRoomByXY(StartX: Float!, StartY: Float!, EndX: Float!, EndY: Float!): [OneRoom!]!
 }
 
 input SearchProductInput {

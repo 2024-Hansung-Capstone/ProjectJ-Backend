@@ -4,6 +4,7 @@ import { parseString } from 'xml2js';
 import { OneRoom } from './entities/one_room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { BaseExplorerService } from '@nestjs/graphql';
 @Injectable()
 export class OneRoomService {
   constructor(
@@ -73,9 +74,6 @@ export class OneRoomService {
       var count = 0;
       for (const items of itemsArray) {
         for (const item of items) {
-          console.log(count);
-          count++;
-          console.log(item.constructor.name);
           const existingOneRoom = await this.oneRoomRepository.findOne({
             where: { name: item['연립다세대'] },
           });
@@ -115,6 +113,7 @@ export class OneRoomService {
     const geoCoderApiUrl = 'https://api.vworld.kr/req/address';
     const apiKey = '26F627EA-4AEA-3C79-A2D8-9C1911AC03B7';
     const OneRooms = await this.findAll();
+    let InOneRooms: OneRoom[] = [];
     for (const room of OneRooms) {
       const queryParams = `?service=address&request=getcoord&version=2.0&crs=epsg:4326&address=${encodeURIComponent(
         `${room.jibun} ${room.dong}`,
@@ -125,9 +124,30 @@ export class OneRoomService {
         .get(geoCoderApiUrl + queryParams)
         .toPromise();
       const jsonData = response.data;
-      console.log(jsonData);
+      let xValue: number;
+      let yValue: number;
+      xValue = 0;
+      yValue = 0;
+      if (
+        jsonData &&
+        jsonData.response &&
+        jsonData.response.result &&
+        jsonData.response.result.point
+      ) {
+        xValue = Math.round(jsonData.response.result.point.x);
+        yValue = Math.round(jsonData.response.result.point.y);
+      } else continue;
+      console.log(room.dong, room.jibun, xValue, yValue);
+
+      if (
+        StartX <= xValue &&
+        xValue <= EndX &&
+        StartY <= yValue &&
+        yValue <= EndY
+      )
+        InOneRooms.push(room);
     }
-    return OneRooms;
+    return InOneRooms;
   }
 
   async findByName(name: string): Promise<OneRoom> {
