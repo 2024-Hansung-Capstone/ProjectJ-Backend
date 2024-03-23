@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { parseString } from 'xml2js';
 import { OneRoom } from './entities/one_room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { BaseExplorerService } from '@nestjs/graphql';
+import { SearchOneRoomInput } from './dto/serach-oneRoom.input';
 @Injectable()
 export class OneRoomService {
   constructor(
@@ -75,7 +74,13 @@ export class OneRoomService {
       for (const items of itemsArray) {
         for (const item of items) {
           const existingOneRoom = await this.oneRoomRepository.findOne({
-            where: { name: item['연립다세대'] },
+            where: {
+              name: item['연립다세대'],
+              jibun: item['지번'],
+              monthly_rent: item['월세'] || null,
+              area_exclusiveUse: item['전용면적'] || null,
+              dong: item['동'],
+            }, //수정 필요함, name뿐만아니라 모든 속성으로 비교해야함
           });
           if (!existingOneRoom) {
             const oneRoom = new OneRoom();
@@ -154,5 +159,54 @@ export class OneRoomService {
     return await this.oneRoomRepository.findOne({
       where: { name: name },
     });
+  }
+
+  async findBySerach(searchPostDto: SearchOneRoomInput): Promise<OneRoom[]> {
+    const {
+      jibun,
+      maxmonthly_rent,
+      minmonthly_rent,
+      maxarea_exclusiveUse,
+      minarea_exclusiveUse,
+      name,
+      dong,
+    } = searchPostDto;
+    const searchConditions: any = {};
+    if (jibun) {
+      searchConditions.jibun = jibun;
+    }
+    if (maxmonthly_rent !== undefined || minmonthly_rent !== undefined) {
+      searchConditions.monthly_rent = {};
+
+      if (minmonthly_rent !== undefined) {
+        searchConditions.monthly_rent.gte = minmonthly_rent;
+      }
+
+      if (maxmonthly_rent !== undefined) {
+        searchConditions.monthly_rent.lte = maxmonthly_rent;
+      }
+    }
+
+    if (
+      minarea_exclusiveUse !== undefined ||
+      maxarea_exclusiveUse !== undefined
+    ) {
+      searchConditions.area_exclusiveUse = {};
+
+      if (minarea_exclusiveUse !== undefined) {
+        searchConditions.area_exclusiveUse.gte = minarea_exclusiveUse;
+      }
+
+      if (maxarea_exclusiveUse !== undefined) {
+        searchConditions.area_exclusiveUse.lte = maxarea_exclusiveUse;
+      }
+    }
+    if (name) {
+      searchConditions.name = name;
+    }
+    if (dong) {
+      searchConditions.dong = dong;
+    }
+    return await this.oneRoomRepository.find({ where: searchConditions });
   }
 }

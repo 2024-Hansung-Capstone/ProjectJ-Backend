@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-@ObjectType({ description: '중고거래 데이터 엔티티' })
+@ObjectType()
 export class OneRoom {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => String)

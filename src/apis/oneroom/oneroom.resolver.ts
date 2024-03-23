@@ -1,9 +1,17 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Context,
+  Float,
+} from '@nestjs/graphql';
 import { gqlAccessGuard } from '../users/guards/gql-auth.guard';
 import { UseGuards } from '@nestjs/common';
 import { IContext } from '../users/interfaces/user-service.interface';
 import { OneRoomService } from './oneroom.service';
 import { OneRoom } from './entities/one_room.entity';
+import { SearchOneRoomInput } from './dto/serach-oneRoom.input';
 @Resolver('OneRoom')
 export class OneRoomResolver {
   constructor(private readonly oneRoomService: OneRoomService) {}
@@ -18,10 +26,10 @@ export class OneRoomResolver {
 
   @Query(() => [OneRoom])
   async fetchOneRoomByXY(
-    @Args('StartX') StartX: number,
-    @Args('StartY') StartY: number,
-    @Args('EndX') EndX: number,
-    @Args('EndY') EndY: number,
+    @Args('StartX', { type: () => Float }) StartX: number,
+    @Args('StartY', { type: () => Float }) StartY: number,
+    @Args('EndX', { type: () => Float }) EndX: number,
+    @Args('EndY', { type: () => Float }) EndY: number,
   ): Promise<OneRoom[]> {
     return await this.oneRoomService.fetchOneRoomByXY(
       StartX,
@@ -35,5 +43,12 @@ export class OneRoomResolver {
   @Mutation(() => OneRoom)
   async fetchOneRoomByName(@Args('name') name: string): Promise<OneRoom> {
     return await this.oneRoomService.findByName(name);
+  }
+
+  @Query(() => [OneRoom])
+  async getPosts(
+    @Args('SerachUsedProductInput') SearchOneRoomInput: SearchOneRoomInput,
+  ): Promise<OneRoom[]> {
+    return this.oneRoomService.findBySerach(SearchOneRoomInput);
   }
 }
