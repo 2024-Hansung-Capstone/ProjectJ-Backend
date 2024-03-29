@@ -40,5 +40,5 @@ export class Notification {
 
   @Column()
   @Field(() => String)
-  text: string;
+  code: string;
 }

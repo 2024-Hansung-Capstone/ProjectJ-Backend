@@ -11,7 +11,7 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm'; //typeorm: 데이터베이스 관련
-import { Like_user_record } from 'src/apis/used_markets/entities/like_user_record.entity';
+import { LikeUserRecord } from 'src/apis/like/entities/like_user_record.entity';
 import { Dong } from 'src/apis/area/entities/dong.entity';
 @Entity() //@ 들어간거 다 decorator  |  Entity: typeorm
 @ObjectType() //graphql
@@ -65,9 +65,6 @@ export class User {
   @Field(() => Date)
   create_at: Date;
 
-  @OneToMany(
-    () => Like_user_record,
-    (Like_user_record) => Like_user_record.user,
-  )
-  like_user: Like_user_record[];
+  @OneToMany(() => LikeUserRecord, (Like_user_record) => Like_user_record.user)
+  like_user: LikeUserRecord[];
 }

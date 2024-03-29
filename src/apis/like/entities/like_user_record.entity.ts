@@ -1,12 +1,12 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Entity, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { UsedProduct } from './used_product.entity';
+import { UsedProduct } from '../../used_markets/entities/used_product.entity';
 import { Board } from 'src/apis/boards/entities/board.entity';
 import { Reply } from 'src/apis/boards/entities/reply.entity';
 @Entity()
 @ObjectType()
-export class Like_user_record {
+export class LikeUserRecord {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => String)
   id: string;

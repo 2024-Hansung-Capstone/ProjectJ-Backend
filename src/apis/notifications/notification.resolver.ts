@@ -8,16 +8,13 @@ import { IContext } from '../users/interfaces/user-service.interface';
 export class NotificationResolver {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @UseGuards(gqlAccessGuard)
-  @Query(() => [Notification])
-  async getNotifications(
-    @Context() context: IContext,
-  ): Promise<Notification[]> {
-    return await this.notificationService.findNotificationById(
-      context.req.user.id,
-    );
-  }
-
-  @UseGuards(gqlAccessGuard)
-  
+  // @UseGuards(gqlAccessGuard)
+  // @Query(() => [Notification])
+  // async getNotifications(
+  //   @Context() context: IContext,
+  // ): Promise<Notification[]> {
+  //   return await this.notificationService.findNotificationById(
+  //     context.req.user.id,
+  //   );
+  // }
 }
