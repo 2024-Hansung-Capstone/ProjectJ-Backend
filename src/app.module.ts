@@ -20,7 +20,7 @@ import { NotificationModule } from './apis/notifications/notifications.module';
     IngredientModule,
     LetterModule,
     OneRoomModule,
-    NotificationModule,
+    //NotificationModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

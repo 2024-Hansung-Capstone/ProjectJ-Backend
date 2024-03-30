@@ -28,7 +28,7 @@ export class UserService {
     @InjectRepository(Token)
     private readonly tokenRepository: Repository<Token>,
     private readonly areaService: AreaService,
-    private readonly notificationService: NotificationService,
+    //private readonly notificationService: NotificationService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -82,7 +82,7 @@ export class UserService {
       { user: newUser },
     );
 
-    await this.notificationService.create(newUser.id, '100');
+    //await this.notificationService.create(newUser.id, '100');
 
     return await this.userRepository.findOne({
       where: { id: newUser.id },

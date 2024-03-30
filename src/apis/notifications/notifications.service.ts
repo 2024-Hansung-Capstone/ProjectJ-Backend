@@ -20,7 +20,7 @@ export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
-    private readonly letterService: LetterService,
+    //private readonly letterService: LetterService,
     private readonly userService: UserService,
     private readonly boardService: BoardService,
     private readonly likeUserRecordService: LikeUserRecordService,
@@ -44,10 +44,10 @@ export class NotificationService {
         likeUserRecordService,
         notificationRepository,
       ),
-      '400': new LetterNotificationStrategy(
-        letterService,
-        notificationRepository,
-      ),
+      // '400': new LetterNotificationStrategy(
+      //   letterService,
+      //   notificationRepository,
+      // ),
     };
   }
 
