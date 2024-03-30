@@ -3,7 +3,7 @@ import { NotificationStrategy } from './notification.strategy.interface';
 import { Repository } from 'typeorm';
 import { Notification } from '../entities/notification.entity';
 
-export class BoardNotificationStrategy implements NotificationStrategy {
+export class ReplyNotificationStrategy implements NotificationStrategy {
   constructor(
     private boardService: BoardService,
     private notificationRepository: Repository<Notification>,
@@ -13,11 +13,11 @@ export class BoardNotificationStrategy implements NotificationStrategy {
     entity_id: string,
     code: string,
   ): Promise<Notification> {
-    const board = await this.boardService.findById(entity_id);
+    const reply = await this.boardService.findReplyById(entity_id);
     return await this.notificationRepository.save({
-      user: board.user,
+      user: reply.board.user,
       code: code,
-      board: board,
+      board: reply.board,
     });
   }
 }

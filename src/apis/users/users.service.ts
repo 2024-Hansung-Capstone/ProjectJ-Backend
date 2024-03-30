@@ -18,6 +18,7 @@ import { sendTokenToSMS } from '../../utils/phone';
 import { JwtService } from '@nestjs/jwt';
 import { setDateFormat } from 'src/utils/date';
 import { AreaService } from '../area/area.service';
+import { NotificationService } from '../notifications/notification.service';
 
 @Injectable()
 export class UserService {
@@ -27,6 +28,7 @@ export class UserService {
     @InjectRepository(Token)
     private readonly tokenRepository: Repository<Token>,
     private readonly areaService: AreaService,
+    private readonly notificationService: NotificationService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -79,6 +81,9 @@ export class UserService {
       { phone_number: createUserInput.phone_number },
       { user: newUser },
     );
+
+    await this.notificationService.create(newUser.id, '100');
+
     return await this.userRepository.findOne({
       where: { id: newUser.id },
       relations: ['dong', 'dong.sgng', 'dong.sgng.sido'],

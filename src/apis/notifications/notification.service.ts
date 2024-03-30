@@ -9,9 +9,9 @@ import { Notification } from './entities/notification.entity';
 import { NotificationStrategy } from './strategies/notification.strategy.interface';
 import { UserNotificationStrategy } from './strategies/user.notification.strategy';
 import { LikeNotificationStrategy } from './strategies/like.notification.strategy';
-import { BoardNotificationStrategy } from './strategies/board.notification.strategy';
 import { LetterNotificationStrategy } from './strategies/letter.notification.strategy';
 import { NotificationMessages } from './notification.messages';
+import { ReplyNotificationStrategy } from './strategies/reply.notification.strategy';
 
 @Injectable()
 export class NotificationService {
@@ -36,7 +36,7 @@ export class NotificationService {
         likeUserRecordService,
         notificationRepository,
       ),
-      '300': new BoardNotificationStrategy(
+      '300': new ReplyNotificationStrategy(
         boardService,
         notificationRepository,
       ),

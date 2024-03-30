@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   JoinColumn,
   OneToMany,
+  CreateDateColumn,
 } from 'typeorm'; //typeorm: 데이터베이스 관련
 import { User } from '../../users/entities/user.entity';
 import { Board } from './board.entity';
@@ -40,4 +41,8 @@ export class Reply {
     },
   )
   like_user: LikeUserRecord[];
+
+  @CreateDateColumn({ type: 'timestamp' }) // 기본값으로 현재시간을 가져오려면 이렇게 하면 됩니다
+  @Field(() => Date)
+  create_at: Date;
 }

@@ -297,4 +297,11 @@ export class BoardService {
     await this.boardRepository.save(reply);
     return await this.findById(reply.board.id);
   }
+
+  async findReplyById(reply_id: string): Promise<Reply> {
+    return await this.replyRepository.findOne({
+      where: { id: reply_id },
+      relations: ['user', 'board'],
+    });
+  }
 }

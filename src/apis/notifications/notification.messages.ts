@@ -11,6 +11,10 @@ export class NotificationMessages {
           break;
         case '201':
           message = `내가 찜한 ${entity.used_product.title}의 가격이 ${entity.used_product.price}원으로 변동되었습니다.`;
+        case '300':
+          message = `게시글 '${entity.board.title}에 ${entity.user.name}님이 댓글을 남겼습니다.`;
+        case '301':
+          message = `게시글 '${entity.board.title}에 ${entity.user.name}님이 좋아요를 눌렀습니다.`;
         default:
           message = '알 수 없는 알림입니다.';
           break;
