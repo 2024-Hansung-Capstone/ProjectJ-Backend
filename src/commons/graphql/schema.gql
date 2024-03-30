@@ -95,6 +95,29 @@ type Ingredient {
   updated_at: DateTime!
 }
 
+type Letter {
+  id: String!
+  sender: User!
+  receiver: User!
+  product: UsedProduct
+  board: Board
+  category: String!
+  title: String!
+  detail: String!
+  is_read: Boolean!
+  create_at: DateTime!
+}
+
+"""중고거래 데이터 엔티티"""
+type OneRoom {
+  id: String!
+  jibun: String!
+  monthly_rent: Int!
+  area_exclusiveUse: Int!
+  name: String!
+  dong: String!
+}
+
 type Query {
   """전체 사용자 정보 조회 기능입니다."""
   fetchUsers: [User!]!
@@ -133,6 +156,8 @@ type Query {
   fetchBoardsByView(category: String!): [Board!]!
   fetchIngredients: [Ingredient!]!
   fetchMyIngredients: [Ingredient!]!
+  fetchLetterById(letter_id: String!): Letter!
+  fetchOneRoomByXY(StartX: Float!, StartY: Float!, EndX: Float!, EndY: Float!): [OneRoom!]!
 }
 
 input SearchProductInput {
@@ -185,16 +210,16 @@ type Mutation {
   updateUsedProduct(updateUsedProductInput: UpdateUsedProductInput!): UsedProduct!
 
   """입력된 id값을 가진 중고물품을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)"""
-  deleteUsedProduct(id: String!): Boolean!
+  deleteUsedProduct(product_id: String!): Boolean!
 
   """게시글의 조회수를 1 증가시킵니다."""
-  addViewToPost(id: String!): UsedProduct!
+  addViewToPost(product_id: String!): UsedProduct!
 
   """게시글의 찜 수(Like)를 올려주고 Like_user_record에 찜한 회원과 중고물품을 저장"""
-  addLikeTopost(id: String!): UsedProduct!
+  addLikeTopost(product_id: String!): UsedProduct!
 
   """게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작"""
-  removeLikeTopost(id: String!): UsedProduct!
+  removeLikeTopost(product_id: String!): UsedProduct!
 
   """입력된 정보를 바탕으로 게시글을 작성합니다"""
   createBoard(createBoardInput: CreateBoardDto!): Board!
@@ -231,6 +256,9 @@ type Mutation {
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
   updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
   deleteIngredient(ingredient_id: String!): Boolean!
+  writeLetter(writing_id: String!, createLetterInput: CreateLetterInput!): Letter!
+  fetchOneRoomFromOpenAPI(LAWD_CD: String!): Boolean!
+  fetchOneRoomByName(name: String!): OneRoom!
 }
 
 input CreateUserInput {
@@ -301,4 +329,10 @@ input UpdateIngredientInput {
   count: Int
   volume: Float
   volume_unit: String
+}
+
+input CreateLetterInput {
+  category: String!
+  title: String!
+  detail: String!
 }

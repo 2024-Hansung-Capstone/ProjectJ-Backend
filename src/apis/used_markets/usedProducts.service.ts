@@ -9,16 +9,20 @@ import { CreateUsedProductInput } from './dto/create-usedProducts.input';
 import { UsedProduct } from './entities/used_product.entity';
 import { UpdateUsedProductInput } from './dto/update-usedProducts.input';
 import { SearchProductInput } from './dto/search-usedProducts.input';
-import { Like_user_record } from './entities/like_user_record.entity';
+import { LikeUserRecord } from '../like/entities/like_user_record.entity';
 import { UserService } from '../users/users.service';
+import { LikeUserRecordService } from '../like/like_user_record.service';
+import { NotificationService } from '../notifications/notification.service';
 @Injectable()
 export class UsedProductService {
   constructor(
     @InjectRepository(UsedProduct)
     private usedProductRepository: Repository<UsedProduct>,
-    @InjectRepository(Like_user_record)
-    private likeUserRecordRepository: Repository<Like_user_record>,
+    @InjectRepository(LikeUserRecord)
+    private likeUserRecordRepository: Repository<LikeUserRecord>,
     private readonly userService: UserService,
+    private readonly likeUserRecordService: LikeUserRecordService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   async findAll(): Promise<UsedProduct[]> {
@@ -118,7 +122,16 @@ export class UsedProductService {
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
     }
+
+    if (used_product.price !== rest.price) {
+      const likes = await this.likeUserRecordService.findByUsedProductId(id);
+      for (const like of likes) {
+        await this.notificationService.create(like.id, '201');
+      }
+    }
+
     await this.usedProductRepository.update({ id: id }, { ...rest });
+
     return await this.usedProductRepository.findOne({
       where: { id: id },
       relations: [
@@ -150,6 +163,22 @@ export class UsedProductService {
     return result.affected ? true : false;
   }
 
+  async like(user_id: string, product_id: string): Promise<UsedProduct> {
+    const used_product = await this.findById(product_id);
+    const user = await this.userService.findById(user_id);
+    const like_user_record = new LikeUserRecord();
+
+    const checkuser = await this.likeUserRecordRepository.findOne({
+      where: { used_product: { id: used_product.id }, user: { id: user.id } },
+    });
+    if (checkuser) {
+      throw new ForbiddenException(`이미 찜한 게시글 입니다.`);
+    }
+
+    // TODO: 찜하기 기능 생성
+    return null;
+  }
+
   async addViewToPost(id: string): Promise<UsedProduct> {
     const used_product = await this.findById(id);
     if (!used_product) {
@@ -160,9 +189,12 @@ export class UsedProductService {
     return this.usedProductRepository.save(used_product);
   }
 
-  async addLikeToPost(user_id: string, id: string): Promise<UsedProduct> {
-    const used_product = await this.findById(id);
-    const like_user_record = new Like_user_record();
+  async addLikeToPost(
+    user_id: string,
+    product_id: string,
+  ): Promise<UsedProduct> {
+    const used_product = await this.findById(product_id);
+    const like_user_record = new LikeUserRecord();
     const user = await this.userService.findById(user_id);
     const checkuser = await this.likeUserRecordRepository.findOne({
       where: { used_product: { id: used_product.id }, user: { id: user.id } },
@@ -184,11 +216,14 @@ export class UsedProductService {
     used_product.like_user.push(like_user_record);
     await this.likeUserRecordRepository.save(like_user_record);
     await this.usedProductRepository.save(used_product);
-    return this.findById(id);
+    return this.findById(product_id);
   }
 
-  async removeLikeToPost(user_id: string, id: string): Promise<UsedProduct> {
-    const used_product = await this.findById(id);
+  async removeLikeToPost(
+    user_id: string,
+    product_id: string,
+  ): Promise<UsedProduct> {
+    const used_product = await this.findById(product_id);
     const user = await this.userService.findById(user_id);
     const checkuser = await this.likeUserRecordRepository.findOne({
       where: { used_product: { id: used_product.id }, user: { id: user.id } },
@@ -211,6 +246,6 @@ export class UsedProductService {
 
     await this.likeUserRecordRepository.delete(checkuser.id);
     await this.usedProductRepository.save(used_product);
-    return this.findById(id);
+    return this.findById(product_id);
   }
 }

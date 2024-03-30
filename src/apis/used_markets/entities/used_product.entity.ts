@@ -9,7 +9,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Like_user_record } from './like_user_record.entity';
+import { LikeUserRecord } from '../../like/entities/like_user_record.entity';
 @Entity()
 @ObjectType({ description: '중고거래 데이터 엔티티' })
 export class UsedProduct {
@@ -56,11 +56,11 @@ export class UsedProduct {
 
   @JoinColumn()
   @OneToMany(
-    () => Like_user_record,
+    () => LikeUserRecord,
     (Like_user_record) => Like_user_record.used_product,
     {
       nullable: true,
     },
   )
-  like_user: Like_user_record[];
+  like_user: LikeUserRecord[];
 }
