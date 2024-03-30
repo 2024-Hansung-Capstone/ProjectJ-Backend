@@ -32,14 +32,14 @@ export class UsedProductResolver {
   async fetchUsedProductByUserId(
     @Args('user_id') user_id: string,
   ): Promise<UsedProduct[]> {
-    return await this.usedProductService.findByuser_Id(user_id);
+    return await this.usedProductService.findByUserId(user_id);
   }
 
   @Query(() => [UsedProduct], {
     description:
       '종합검색 기능으로 가격은 검색한 가격보다 낮게 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계',
   })
-  async getPosts(
+  async fetchUsedProductsBySearch(
     @Args('SerachUsedProductInput') searchUsedProductInput: SearchProductInput,
   ): Promise<UsedProduct[]> {
     return this.usedProductService.findBySerach(searchUsedProductInput);
@@ -92,8 +92,10 @@ export class UsedProductResolver {
   @Mutation(() => UsedProduct, {
     description: '게시글의 조회수를 1 증가시킵니다.',
   })
-  addViewToPost(@Args('product_id') product_id: string): Promise<UsedProduct> {
-    return this.usedProductService.addViewToPost(product_id);
+  increaseUsedProductView(
+    @Args('product_id') product_id: string,
+  ): Promise<UsedProduct> {
+    return this.usedProductService.addViewCount(product_id);
   }
 
   @UseGuards(gqlAccessGuard)
@@ -101,27 +103,21 @@ export class UsedProductResolver {
     description:
       '게시글의 찜 수(Like)를 올려주고 Like_user_record에 찜한 회원과 중고물품을 저장',
   })
-  addLikeTopost(
+  increaseUsedProductLike(
     @Args('product_id') product_id: string,
     @Context() context: IContext,
   ): Promise<UsedProduct> {
-    return this.usedProductService.addLikeToPost(
-      context.req.user.id,
-      product_id,
-    );
+    return this.usedProductService.addLike(context.req.user.id, product_id);
   }
 
   @UseGuards(gqlAccessGuard)
   @Mutation(() => UsedProduct, {
     description: '게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작',
   })
-  removeLikeTopost(
+  decreaseUsedProductLike(
     @Args('product_id') product_id: string,
     @Context() context: IContext,
   ): Promise<UsedProduct> {
-    return this.usedProductService.removeLikeToPost(
-      context.req.user.id,
-      product_id,
-    );
+    return this.usedProductService.deleteLike(context.req.user.id, product_id);
   }
 }

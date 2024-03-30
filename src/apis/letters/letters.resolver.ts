@@ -30,10 +30,11 @@ export class LetterResolver {
   @UseGuards(gqlAccessGuard)
   @Mutation(() => Letter)
   async replyLetter(
-    @Args('letter') letter: Letter,
+    @Args('letter_id') letter_id: string,
     @Args('replyLetterInput') replyLetterInput: ReplyLetterInput,
     @Context() context: IContext,
   ): Promise<Letter> {
+    const letter = await this.letterService.findById(letter_id);
     return await this.letterService.reply(
       context.req.user.id,
       letter,

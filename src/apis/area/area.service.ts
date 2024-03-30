@@ -17,13 +17,6 @@ export class AreaService {
   ) {}
 
   //Repository에서 find한 결과 내에서 조인된 테이블 정보를 타고 타면서 원하는 데이터를 가져옴
-  async findSidoByDongName(dongName: string): Promise<string> {
-    const dong = await this.dongRepository.findOne({
-      where: { name: dongName },
-      relations: ['sgng', 'sgng.sido'],
-    });
-    return dong.sgng.sido.name;
-  }
 
   async findDongByName(dongName: string): Promise<Dong> {
     return await this.dongRepository.findOne({

@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { NotificationResolver } from './notification.resolver';
+import { NotificationResolver } from './notifications.resolver';
 import { CommonModule } from '../common.module';
 import { LetterNotificationStrategy } from './strategies/letter.notification.strategy';
 import { LikeNotificationStrategy } from './strategies/like.notification.strategy';
 import { UserNotificationStrategy } from './strategies/user.notification.strategy';
-import { NotificationMessages } from './notification.messages';
+import { NotificationMessages } from './notifications.messages';
 import { ReplyNotificationStrategy } from './strategies/reply.notification.strategy';
 
 @Module({

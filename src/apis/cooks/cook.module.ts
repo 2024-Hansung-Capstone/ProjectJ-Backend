@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { BoardResolver } from './boards.resolver';
 import { CommonModule } from '../common.module';
+import { CookResolver } from './cook.resolver';
 
 @Module({
   imports: [CommonModule],
-  providers: [BoardResolver],
+  providers: [CookResolver],
 })
-export class BoardModule {}
+export class CookModule {}

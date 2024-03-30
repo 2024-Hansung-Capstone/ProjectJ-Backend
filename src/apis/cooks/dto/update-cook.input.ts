@@ -1,10 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
-export class SearchBoardInput {
-  @Field(() => String, { nullable: true })
-  category?: string;
-
+export class UpdateCookInput {
   @Field(() => String, { nullable: true })
   title?: string;
 

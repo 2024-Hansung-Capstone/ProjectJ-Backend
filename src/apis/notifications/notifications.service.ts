@@ -10,7 +10,7 @@ import { NotificationStrategy } from './strategies/notification.strategy.interfa
 import { UserNotificationStrategy } from './strategies/user.notification.strategy';
 import { LikeNotificationStrategy } from './strategies/like.notification.strategy';
 import { LetterNotificationStrategy } from './strategies/letter.notification.strategy';
-import { NotificationMessages } from './notification.messages';
+import { NotificationMessages } from './notifications.messages';
 import { ReplyNotificationStrategy } from './strategies/reply.notification.strategy';
 
 @Injectable()
@@ -60,10 +60,9 @@ export class NotificationService {
   }
 
   async findById(notification_id: string): Promise<Notification[]> {
-    // return await this.notificationRepository.find({
-    //   where: { id: user_id },
-    // });
-    return null;
+    return await this.notificationRepository.find({
+      where: { id: notification_id },
+    });
   }
 
   async delete(notification_id: string): Promise<void> {
