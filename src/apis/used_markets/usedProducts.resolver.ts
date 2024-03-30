@@ -83,17 +83,17 @@ export class UsedProductResolver {
       '입력된 id값을 가진 중고물품을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)',
   })
   async deleteUsedProduct(
-    @Args('id') id: string,
+    @Args('product_id') product: string,
     @Context() context: IContext,
   ): Promise<boolean> {
-    return await this.usedProductService.delete(context.req.user.id, id);
+    return await this.usedProductService.delete(context.req.user.id, product);
   }
 
   @Mutation(() => UsedProduct, {
     description: '게시글의 조회수를 1 증가시킵니다.',
   })
-  addViewToPost(@Args('id') id: string): Promise<UsedProduct> {
-    return this.usedProductService.addViewToPost(id);
+  addViewToPost(@Args('product_id') product_id: string): Promise<UsedProduct> {
+    return this.usedProductService.addViewToPost(product_id);
   }
 
   @UseGuards(gqlAccessGuard)
@@ -102,10 +102,13 @@ export class UsedProductResolver {
       '게시글의 찜 수(Like)를 올려주고 Like_user_record에 찜한 회원과 중고물품을 저장',
   })
   addLikeTopost(
-    @Args('id') id: string,
+    @Args('product_id') product_id: string,
     @Context() context: IContext,
   ): Promise<UsedProduct> {
-    return this.usedProductService.addLikeToPost(context.req.user.id, id);
+    return this.usedProductService.addLikeToPost(
+      context.req.user.id,
+      product_id,
+    );
   }
 
   @UseGuards(gqlAccessGuard)
@@ -113,9 +116,12 @@ export class UsedProductResolver {
     description: '게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작',
   })
   removeLikeTopost(
-    @Args('id') id: string,
+    @Args('product_id') product_id: string,
     @Context() context: IContext,
   ): Promise<UsedProduct> {
-    return this.usedProductService.removeLikeToPost(context.req.user.id, id);
+    return this.usedProductService.removeLikeToPost(
+      context.req.user.id,
+      product_id,
+    );
   }
 }

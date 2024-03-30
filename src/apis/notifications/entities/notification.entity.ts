@@ -1,9 +1,12 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Board } from 'src/apis/boards/entities/board.entity';
+import { Reply } from 'src/apis/boards/entities/reply.entity';
 import { Letter } from 'src/apis/letters/entities/letter.entity';
+import { UsedProduct } from 'src/apis/used_markets/entities/used_product.entity';
 import { User } from 'src/apis/users/entities/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -32,7 +35,16 @@ export class Notification {
   @Field(() => Board, { nullable: true })
   board?: Board;
 
+  @ManyToOne(() => UsedProduct, { cascade: true, nullable: true })
+  @JoinColumn()
+  @Field(() => UsedProduct, { nullable: true })
+  product?: UsedProduct;
+
   @Column()
   @Field(() => String)
-  text: string;
+  code: string;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  @Field(() => Date)
+  create_at: Date;
 }

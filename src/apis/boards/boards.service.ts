@@ -13,15 +13,15 @@ import { Like } from 'typeorm';
 import { SearchBoardDto } from './dto/search_board.input';
 import { CreateBoardDto } from './dto/create-board.input';
 import { UserService } from '../users/users.service';
-import { Like_user_record } from '../used_markets/entities/like_user_record.entity';
+import { LikeUserRecord } from '../like/entities/like_user_record.entity';
 import { Reply } from './entities/reply.entity';
 @Injectable()
 export class BoardService {
   constructor(
     @InjectRepository(Board)
     private readonly boardRepository: Repository<Board>,
-    @InjectRepository(Like_user_record)
-    private readonly likeUserRecordRepository: Repository<Like_user_record>,
+    @InjectRepository(LikeUserRecord)
+    private readonly likeUserRecordRepository: Repository<LikeUserRecord>,
     @InjectRepository(Reply)
     private readonly replyRepository: Repository<Reply>,
     private readonly userService: UserService,
@@ -137,7 +137,7 @@ export class BoardService {
 
   async addLikeToBoard(user_id: string, id: string): Promise<Board> {
     const board = await this.findById(id);
-    const like_user_record = new Like_user_record();
+    const like_user_record = new LikeUserRecord();
     const user = await this.userService.findById(user_id);
     const checkuser = await this.likeUserRecordRepository.findOne({
       where: { board: { id: board.id }, user: { id: user.id } },
@@ -256,7 +256,7 @@ export class BoardService {
       where: { id: reply_id },
       relations: ['like_user', 'board'],
     });
-    const like_user_record = new Like_user_record();
+    const like_user_record = new LikeUserRecord();
     const user = await this.userService.findById(user_id);
     const checkreply = await this.likeUserRecordRepository.findOne({
       where: { reply: { id: reply.id }, user: { id: user.id } },
@@ -296,5 +296,12 @@ export class BoardService {
     await this.likeUserRecordRepository.delete(checkreply.id);
     await this.boardRepository.save(reply);
     return await this.findById(reply.board.id);
+  }
+
+  async findReplyById(reply_id: string): Promise<Reply> {
+    return await this.replyRepository.findOne({
+      where: { id: reply_id },
+      relations: ['user', 'board'],
+    });
   }
 }
