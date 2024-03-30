@@ -9,7 +9,7 @@ import { AreaModule } from './apis/area/area.module';
 import { IngredientModule } from './apis/ingredients/ingredient.module';
 import { BoardModule } from './apis/boards/boards.module';
 import { LetterModule } from './apis/letters/letters.module';
-import { notificationModule } from './apis/notifications/notification.module';
+import { NotificationModule } from './apis/notifications/notification.module';
 @Module({
   imports: [
     UserModule,
@@ -18,7 +18,7 @@ import { notificationModule } from './apis/notifications/notification.module';
     BoardModule,
     IngredientModule,
     LetterModule,
-    notificationModule,
+    NotificationModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

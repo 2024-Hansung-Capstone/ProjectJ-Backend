@@ -17,4 +17,4 @@ import { ReplyNotificationStrategy } from './strategies/reply.notification.strat
     ReplyNotificationStrategy,
   ],
 })
-export class notificationModule {}
+export class NotificationModule {}
