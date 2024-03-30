@@ -12,7 +12,7 @@ import { SearchProductInput } from './dto/search-usedProducts.input';
 import { LikeUserRecord } from '../like/entities/like_user_record.entity';
 import { UserService } from '../users/users.service';
 import { LikeUserRecordService } from '../like/like_user_record.service';
-import { NotificationService } from '../notifications/notification.service';
+import { NotificationService } from '../notifications/notifications.service';
 @Injectable()
 export class UsedProductService {
   constructor(
@@ -50,7 +50,7 @@ export class UsedProductService {
     });
   }
   //유저이름으로 검색 즉 상점이름으로 검색하는 방법
-  async findByuser_Id(user_id: string): Promise<UsedProduct[]> {
+  async findByUserId(user_id: string): Promise<UsedProduct[]> {
     return await this.usedProductRepository.find({
       where: { user: { id: user_id } },
       relations: [
@@ -108,12 +108,12 @@ export class UsedProductService {
 
   async update(
     user_id: string,
-    usedProduct: UpdateUsedProductInput,
+    updateUsedProductInput: UpdateUsedProductInput,
   ): Promise<UsedProduct> {
-    const { id, ...rest } = usedProduct;
+    const { id, ...rest } = updateUsedProductInput;
     const used_product = await this.findById(id);
     if (!used_product) {
-      throw new NotFoundException(`Id가 ${id}인 것을 찾을 수 없습니다.`);
+      throw new NotFoundException(`ID가 ${id}인 상품을 찾을 수 없습니다.`);
     }
     const user = await this.userService.findById(user_id);
 
@@ -144,14 +144,15 @@ export class UsedProductService {
     });
   }
 
-  async delete(user_id: string, id: string): Promise<boolean> {
-    const used_product = await this.findById(id);
+  async delete(user_id: string, product_id: string): Promise<boolean> {
+    const used_product = await this.findById(product_id);
 
     if (!used_product) {
-      throw new NotFoundException(`Id가 ${id}인 것을 찾을 수 없습니다.`);
+      throw new NotFoundException(
+        `ID가 ${product_id}인 상품을 찾을 수 없습니다.`,
+      );
     }
 
-    // 사용자 조회
     const user = await this.userService.findById(user_id);
 
     if (used_product.user.id !== user.id) {
@@ -159,40 +160,23 @@ export class UsedProductService {
         `본인이 작성한 게시글만 삭제할 수 있습니다.`,
       );
     }
-    const result = await this.usedProductRepository.delete(id);
+    const result = await this.usedProductRepository.delete(product_id);
     return result.affected ? true : false;
   }
 
-  async like(user_id: string, product_id: string): Promise<UsedProduct> {
+  async addViewCount(product_id: string): Promise<UsedProduct> {
     const used_product = await this.findById(product_id);
-    const user = await this.userService.findById(user_id);
-    const like_user_record = new LikeUserRecord();
-
-    const checkuser = await this.likeUserRecordRepository.findOne({
-      where: { used_product: { id: used_product.id }, user: { id: user.id } },
-    });
-    if (checkuser) {
-      throw new ForbiddenException(`이미 찜한 게시글 입니다.`);
-    }
-
-    // TODO: 찜하기 기능 생성
-    return null;
-  }
-
-  async addViewToPost(id: string): Promise<UsedProduct> {
-    const used_product = await this.findById(id);
     if (!used_product) {
-      throw new NotFoundException(`Id가 ${id}인 것을 찾을 수 없습니다.`);
+      throw new NotFoundException(
+        `ID가 ${product_id}인 상품을 찾을 수 없습니다.`,
+      );
     }
     used_product.view = used_product.view + 1;
 
     return this.usedProductRepository.save(used_product);
   }
 
-  async addLikeToPost(
-    user_id: string,
-    product_id: string,
-  ): Promise<UsedProduct> {
+  async addLike(user_id: string, product_id: string): Promise<UsedProduct> {
     const used_product = await this.findById(product_id);
     const like_user_record = new LikeUserRecord();
     const user = await this.userService.findById(user_id);
@@ -219,10 +203,7 @@ export class UsedProductService {
     return this.findById(product_id);
   }
 
-  async removeLikeToPost(
-    user_id: string,
-    product_id: string,
-  ): Promise<UsedProduct> {
+  async deleteLike(user_id: string, product_id: string): Promise<UsedProduct> {
     const used_product = await this.findById(product_id);
     const user = await this.userService.findById(user_id);
     const checkuser = await this.likeUserRecordRepository.findOne({

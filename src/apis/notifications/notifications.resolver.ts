@@ -1,5 +1,5 @@
 import { Context, Query, Resolver } from '@nestjs/graphql';
-import { NotificationService } from './notification.service';
+import { NotificationService } from './notifications.service';
 import { UseGuards } from '@nestjs/common';
 import { gqlAccessGuard } from '../users/guards/gql-auth.guard';
 import { IContext } from '../users/interfaces/user-service.interface';

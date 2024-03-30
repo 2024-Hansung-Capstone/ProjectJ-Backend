@@ -19,12 +19,12 @@ import { IngredientService } from './ingredients/ingredient.service';
 import { AreaService } from './area/area.service';
 import { LetterService } from './letters/letters.service';
 import { LikeUserRecordService } from './like/like_user_record.service';
-import { NotificationService } from './notifications/notification.service';
+import { NotificationService } from './notifications/notifications.service';
 import { OneRoomService } from './oneroom/oneroom.service';
 import { UsedProductService } from './used_markets/usedProducts.service';
-import { UserService } from './users/users.service';
-import { NotificationMessages } from './notifications/notification.messages';
+import { NotificationMessages } from './notifications/notifications.messages';
 import { HttpModule } from '@nestjs/axios';
+import { UserService } from './users/users.service';
 
 @Module({
   imports: [

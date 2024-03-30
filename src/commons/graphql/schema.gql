@@ -108,7 +108,6 @@ type Letter {
   create_at: DateTime!
 }
 
-"""중고거래 데이터 엔티티"""
 type OneRoom {
   id: String!
   jibun: String!
@@ -138,8 +137,7 @@ type Query {
   fetchUsedProductByUserId(user_id: String!): [UsedProduct!]!
 
   """종합검색 기능으로 가격은 검색한 가격보다 낮게 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계"""
-  getPosts(SerachUsedProductInput: SearchProductInput!): [UsedProduct!]!
-  fetchSidoNameByDongName(dongName: String!): String!
+  fetchUsedProductsBySearch(SerachUsedProductInput: SearchProductInput!): [UsedProduct!]!
   fetchDongByName(dongName: String!): Dong!
 
   """입력된 카테고리를 게시글의 정보를 확인합니다."""
@@ -150,14 +148,17 @@ type Query {
   fetchBoardByUserId(user_id: String!): [Board!]!
 
   """종합검색 기능으로 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계"""
-  fetchBoardsBySerach(SerachUsedProductInput: SearchBoardDto!): [Board!]!
+  fetchBoardsBySerach(SerachBoardInput: SearchBoardInput!): [Board!]!
 
-  """조회수가 많은 게시글 5개를 리턴"""
-  fetchBoardsByView(category: String!): [Board!]!
+  """조회수가 많은 게시글 rank개를 리턴"""
+  fetchBoardsByViewRank(category: String!, rank: Float!): [Board!]!
   fetchIngredients: [Ingredient!]!
   fetchMyIngredients: [Ingredient!]!
   fetchLetterById(letter_id: String!): Letter!
+  fetchMySendLetters: Letter!
+  fetchMyReceiveLetters: Letter!
   fetchOneRoomByXY(StartX: Float!, StartY: Float!, EndX: Float!, EndY: Float!): [OneRoom!]!
+  getPosts(SerachUsedProductInput: SearchOneRoomInput!): [OneRoom!]!
 }
 
 input SearchProductInput {
@@ -168,10 +169,20 @@ input SearchProductInput {
   state: String
 }
 
-input SearchBoardDto {
+input SearchBoardInput {
   category: String
   title: String
   detail: String
+}
+
+input SearchOneRoomInput {
+  jibun: String
+  maxmonthly_rent: Int
+  minmonthly_rent: Int
+  maxarea_exclusiveUse: Int
+  minarea_exclusiveUse: Int
+  name: String
+  dong: String
 }
 
 type Mutation {
@@ -213,50 +224,52 @@ type Mutation {
   deleteUsedProduct(product_id: String!): Boolean!
 
   """게시글의 조회수를 1 증가시킵니다."""
-  addViewToPost(product_id: String!): UsedProduct!
+  increaseUsedProductView(product_id: String!): UsedProduct!
 
   """게시글의 찜 수(Like)를 올려주고 Like_user_record에 찜한 회원과 중고물품을 저장"""
-  addLikeTopost(product_id: String!): UsedProduct!
+  increaseUsedProductLike(product_id: String!): UsedProduct!
 
   """게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작"""
-  removeLikeTopost(product_id: String!): UsedProduct!
+  decreaseUsedProductLike(product_id: String!): UsedProduct!
 
   """입력된 정보를 바탕으로 게시글을 작성합니다"""
-  createBoard(createBoardInput: CreateBoardDto!): Board!
+  createBoard(createBoardInput: CreateBoardInput!): Board!
 
   """입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능)"""
-  updateBoard(updateBoradInput: UpdateBoardDto!): Board!
+  updateBoard(updateBoradInput: UpdateBoardInput!): Board!
 
   """입력된 id값을 가진 게시글을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)"""
-  deleteBoard(id: String!): Boolean!
+  deleteBoard(board_id: String!): Boolean!
 
   """게시글의 조회수를 1 증가시킵니다."""
-  addViewToBoard(id: String!): Board!
+  increaseBoardView(board_id: String!): Board!
 
   """게시글의  좋아요수(Like)를 올려주고 Like_user_record에 좋아요한 회원과 게시글을 저장"""
-  addLikeToBoard(id: String!): Board!
+  increaseBoardLike(board_id: String!): Board!
 
   """게시글의 좋아요를 취소하는 기능 좋아요한 게시글에게만 동작"""
-  removeLikeToBoard(id: String!): Board!
+  decreaseBoardLike(board_id: String!): Board!
 
   """게시글에 댓글을 달 수 있는 기능"""
-  addReply(detail: String!, id: String!): Board!
+  createReply(board_id: String!, detail: String!): Board!
 
   """게시글에 댓글을 삭제 할 수 있는 기능"""
-  removeReply(reply_id: String!): Board!
+  deleteReply(reply_id: String!): Board!
 
   """게시글에 댓글을 수정 할 수 있는 기능"""
-  updateReply(detail: String!, reply_id: String!): Board!
+  updateReply(reply_id: String!, detail: String!): Board!
 
   """댓글의 좋아요 수(Like)를 올려주고 Like_user_record에 좋아요한 회원과 댓글글을 저장"""
-  addLikeToReply(reply_id: String!): Board!
+  increaseReplyLike(reply_id: String!): Board!
 
   """댓글의 좋아요를 취소하는 기능 좋아요한 댓글에게만 동작"""
-  reomoveLikeToReply(reply_id: String!): Board!
+  decreaseReplyLike(reply_id: String!): Board!
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
   updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
   deleteIngredient(ingredient_id: String!): Boolean!
   writeLetter(writing_id: String!, createLetterInput: CreateLetterInput!): Letter!
+  replyLetter(letter_id: String!, replyLetterInput: ReplyLetterInput!): Letter!
+  deleteLetter(letter_id: String!): Boolean!
   fetchOneRoomFromOpenAPI(LAWD_CD: String!): Boolean!
   fetchOneRoomByName(name: String!): OneRoom!
 }
@@ -303,13 +316,13 @@ input UpdateUsedProductInput {
   state: String
 }
 
-input CreateBoardDto {
+input CreateBoardInput {
   category: String!
   title: String!
   detail: String!
 }
 
-input UpdateBoardDto {
+input UpdateBoardInput {
   id: String!
   category: String
   title: String
@@ -333,6 +346,11 @@ input UpdateIngredientInput {
 
 input CreateLetterInput {
   category: String!
+  title: String!
+  detail: String!
+}
+
+input ReplyLetterInput {
   title: String!
   detail: String!
 }
