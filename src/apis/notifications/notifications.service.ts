@@ -10,7 +10,7 @@ import { NotificationStrategy } from './strategies/notification.strategy.interfa
 import { UserNotificationStrategy } from './strategies/user.notification.strategy';
 import { LikeNotificationStrategy } from './strategies/like.notification.strategy';
 import { LetterNotificationStrategy } from './strategies/letter.notification.strategy';
-import { NotificationMessages } from './notification.messages';
+import { NotificationMessages } from './notifications.messages';
 import { ReplyNotificationStrategy } from './strategies/reply.notification.strategy';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
-    //private readonly letterService: LetterService,
+    private readonly letterService: LetterService,
     private readonly userService: UserService,
     private readonly boardService: BoardService,
     private readonly likeUserRecordService: LikeUserRecordService,
@@ -44,10 +44,10 @@ export class NotificationService {
         likeUserRecordService,
         notificationRepository,
       ),
-      // '400': new LetterNotificationStrategy(
-      //   letterService,
-      //   notificationRepository,
-      // ),
+      '400': new LetterNotificationStrategy(
+        letterService,
+        notificationRepository,
+      ),
     };
   }
 
@@ -60,10 +60,9 @@ export class NotificationService {
   }
 
   async findById(notification_id: string): Promise<Notification[]> {
-    // return await this.notificationRepository.find({
-    //   where: { id: user_id },
-    // });
-    return null;
+    return await this.notificationRepository.find({
+      where: { id: notification_id },
+    });
   }
 
   async delete(notification_id: string): Promise<void> {

@@ -18,7 +18,7 @@ import { sendTokenToSMS } from '../../utils/phone';
 import { JwtService } from '@nestjs/jwt';
 import { setDateFormat } from 'src/utils/date';
 import { AreaService } from '../area/area.service';
-import { NotificationService } from '../notifications/notification.service';
+import { NotificationService } from '../notifications/notifications.service';
 
 @Injectable()
 export class UserService {
@@ -93,7 +93,7 @@ export class UserService {
   //회원 정보 수정
   //id값은 context를 통해 로그인 된 사용자의 id를 가져올거라서 사용자의 입력값과 분리해서 인자값으로 받음.
   async update(
-    id: string,
+    user_id: string,
     { updateUserInput }: IUserServiceUpdate,
   ): Promise<User> {
     const { birth_year, birth_month, birth_day, ...rest } = updateUserInput;
@@ -102,17 +102,17 @@ export class UserService {
     if (birth_year && birth_month && birth_day) {
       const birthDate = setDateFormat(birth_year, birth_month, birth_day);
       result = await this.userRepository.update(
-        { id: id },
+        { id: user_id },
         { birth_at: birthDate, ...rest },
       );
     }
     //날짜에 대한 수정이 없을 때, 날짜 변환 없이 전부 update 진행
     else {
-      result = await this.userRepository.update({ id: id }, { ...rest });
+      result = await this.userRepository.update({ id: user_id }, { ...rest });
     }
     //수정 성공
     if (result.affected > 0) {
-      return await this.findById(id);
+      return await this.findById(user_id);
     }
     //수정 실패
     else {

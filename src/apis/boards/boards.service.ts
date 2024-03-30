@@ -8,10 +8,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Board } from './entities/board.entity';
-import { UpdateBoardDto } from './dto/update-board.input';
+import { UpdateBoardInput } from './dto/update-board.input';
 import { Like } from 'typeorm';
-import { SearchBoardDto } from './dto/search_board.input';
-import { CreateBoardDto } from './dto/create-board.input';
+import { SearchBoardInput } from './dto/search_board.input';
+import { CreateBoardInput } from './dto/create-board.input';
 import { UserService } from '../users/users.service';
 import { LikeUserRecord } from '../like/entities/like_user_record.entity';
 import { Reply } from './entities/reply.entity';
@@ -41,14 +41,14 @@ export class BoardService {
     });
   }
 
-  async findByuser_Id(user_id: string): Promise<Board[]> {
+  async findByUserId(user_id: string): Promise<Board[]> {
     return await this.boardRepository.find({
       where: { user: { id: user_id } },
       relations: ['user', 'reply', 'like_user'],
     });
   }
 
-  async findBySerach(searchBoardInput: SearchBoardDto): Promise<Board[]> {
+  async findBySerach(searchBoardInput: SearchBoardInput): Promise<Board[]> {
     const { title, detail, category } = searchBoardInput;
     const searchConditions: any = {};
     if (category) {
@@ -66,17 +66,17 @@ export class BoardService {
     return await this.boardRepository.find({ where: searchConditions });
   }
 
-  async findByView(category: string): Promise<Board[]> {
+  async findTopBoards(category: string, rank: number): Promise<Board[]> {
     return await this.boardRepository.find({
       where: { category: category },
       order: { like: 'DESC' },
-      take: 5,
+      take: rank,
     });
   }
 
   async create(
     user_id: string,
-    createBoardInput: CreateBoardDto,
+    createBoardInput: CreateBoardInput,
   ): Promise<Board> {
     const { title, detail, category } = createBoardInput;
     const user = await this.userService.findById(user_id);
@@ -90,12 +90,12 @@ export class BoardService {
   }
   async update(
     user_id: string,
-    updateBoradInput: UpdateBoardDto,
+    updateBoradInput: UpdateBoardInput,
   ): Promise<Board> {
     const { id, ...rest } = updateBoradInput;
     const board = await this.findById(id);
     if (!board) {
-      throw new NotFoundException(`Id가 ${id}인 것을 찾을 수 없습니다.`);
+      throw new NotFoundException(`ID가 ${id}인 게시글을 찾을 수 없습니다.`);
     }
     if (board.user.id !== user_id) {
       throw new ForbiddenException(
@@ -108,20 +108,22 @@ export class BoardService {
       relations: ['user'],
     });
   }
-  async delete(user_id: string, id: string): Promise<boolean> {
-    const board = await this.findById(id);
+  async delete(user_id: string, board_id: string): Promise<boolean> {
+    const board = await this.findById(board_id);
     if (!board) {
-      throw new NotFoundException(`Id가 ${id}인 것을 찾을 수 없습니다.`);
+      throw new NotFoundException(
+        `ID가 ${board_id}인 게시글을 찾을 수 없습니다.`,
+      );
     }
     if (board.user.id !== user_id) {
       throw new ForbiddenException(
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
     }
-    const result = await this.boardRepository.delete(id);
+    const result = await this.boardRepository.delete(board_id);
     return result.affected ? true : false;
   }
-  async addViewToBoard(id: string): Promise<Board> {
+  async addViewCount(id: string): Promise<Board> {
     const board = await this.findById(id);
     if (!board) {
       throw new NotFoundException(`Id가 ${id}인 것을 찾을 수 없습니다.`);
@@ -135,7 +137,7 @@ export class BoardService {
     });
   }
 
-  async addLikeToBoard(user_id: string, id: string): Promise<Board> {
+  async addLike(user_id: string, id: string): Promise<Board> {
     const board = await this.findById(id);
     const like_user_record = new LikeUserRecord();
     const user = await this.userService.findById(user_id);
@@ -156,7 +158,7 @@ export class BoardService {
     return await this.findById(id);
   }
 
-  async removeLikeToBoard(user_id: string, id: string): Promise<Board> {
+  async deleteLike(user_id: string, id: string): Promise<Board> {
     const board = await this.findById(id);
     const user = await this.userService.findById(user_id);
     const checkuser = await this.likeUserRecordRepository.findOne({
@@ -198,7 +200,7 @@ export class BoardService {
     await this.boardRepository.save(board);
     return await this.findById(id);
   }
-  async removeReply(user_id: string, reply_id: string): Promise<Board> {
+  async deleteReply(user_id: string, reply_id: string): Promise<Board> {
     const checkreply = await this.replyRepository.findOne({
       where: { id: reply_id },
       relations: ['user', 'board'],
@@ -251,7 +253,7 @@ export class BoardService {
     return await this.findById(checkreply.board.id);
   }
 
-  async addLikeToReply(user_id: string, reply_id: string): Promise<Board> {
+  async addReplyLike(user_id: string, reply_id: string): Promise<Board> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
       relations: ['like_user', 'board'],
@@ -275,7 +277,7 @@ export class BoardService {
     return await this.findById(reply.board.id);
   }
 
-  async removeLikeToReply(user_id: string, reply_id: string): Promise<Board> {
+  async deleteReplyLike(user_id: string, reply_id: string): Promise<Board> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
       relations: ['like_user', 'board'],

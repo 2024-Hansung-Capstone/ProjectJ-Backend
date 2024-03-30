@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 
 @InputType()
-export class SearchBoardDto {
+export class SearchBoardInput {
   @Field(() => String, { nullable: true })
   category?: string;
 
