@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cook } from './entities/cook.entity';
 import { UserService } from '../users/users.service';
-import { ICookServiceCreate } from './interfaces/cook-service.interface';
 import { CreateCookInput } from './dto/create-cook.input';
 import { UpdateCookInput } from './dto/update-cook.input';
 
