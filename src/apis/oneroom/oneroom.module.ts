@@ -10,10 +10,11 @@ import { OneRoomResolver } from './oneroom.resolver';
 import { OneRoomService } from './oneroom.service';
 import { OneRoomScheduler } from './oneroom.scheduler';
 import { HttpModule } from '@nestjs/axios';
+import { OneRoom } from './entities/one_room.entity';
 @Module({
   imports: [
     HttpModule,
-    TypeOrmModule.forFeature([User, Token, Sido, Sgng, Dong]),
+    TypeOrmModule.forFeature([User, Token, Sido, Sgng, Dong, OneRoom]),
     JwtModule.register({}),
   ],
   providers: [OneRoomResolver, OneRoomService, OneRoomScheduler],

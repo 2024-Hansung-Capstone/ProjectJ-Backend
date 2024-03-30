@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { parseString } from 'xml2js';
 import { OneRoom } from './entities/one_room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { SearchOneRoomInput } from './dto/serach-oneRoom.input';
 @Injectable()
 export class OneRoomService {
   constructor(
@@ -49,55 +49,164 @@ export class OneRoomService {
   async fetchOneRoomFromOpenAPI(LAWD_CD: string): Promise<void> {
     const apiUrl =
       'http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcRHRent';
-    var queryParams =
+    const queryParams =
       '?' +
       encodeURIComponent('serviceKey') +
-      '=OFnJLWtAPRyGRjRKBV%2FKNzwcpO20mUhwbUsVZrALLP%2FXOHQxpztDN0womM7gXTn9XPFHkLB%2BYMZBWxoQLN9CKA%3D%3D'; /* Service Key*/
-    queryParams +=
-      '&' + encodeURIComponent('LAWD_CD') + '=' + encodeURIComponent(LAWD_CD);
-    queryParams +=
-      '&' + encodeURIComponent('DEAL_YMD') + '=' + encodeURIComponent('201512');
+      '=OFnJLWtAPRyGRjRKBV%2FKNzwcpO20mUhwbUsVZrALLP%2FXOHQxpztDN0womM7gXTn9XPFHkLB%2BYMZBWxoQLN9CKA%3D%3D' +
+      '&' +
+      encodeURIComponent('LAWD_CD') +
+      '=' +
+      encodeURIComponent(LAWD_CD) +
+      '&' +
+      encodeURIComponent('DEAL_YMD') +
+      '=' +
+      encodeURIComponent('201512');
+
     try {
-      const response: any = this.httpService.get(apiUrl + '?' + queryParams);
+      const response = await this.httpService
+        .get(apiUrl + queryParams)
+        .toPromise();
+      const jsonData = response.data;
 
-      const xmlData: string = response.data;
-      let jsonData: any;
-      parseString(xmlData, (err: any, result: any) => {
-        if (err) {
-          throw new Error(`Failed to parse XML response: ${err.message}`);
-        }
-        jsonData = result;
-      });
-      const items: any[] = jsonData.response.item;
-      const oneRooms: OneRoom[] = [];
+      const items = jsonData.response.body.items || {};
+      const itemsArray: any[] = Object.values(items);
+      var count = 0;
+      for (const items of itemsArray) {
+        for (const item of items) {
+          const existingOneRoom = await this.oneRoomRepository.findOne({
+            where: {
+              name: item['연립다세대'],
+              jibun: item['지번'],
+              monthly_rent: item['월세'] || null,
+              area_exclusiveUse: item['전용면적'] || null,
+              dong: item['동'],
+            }, //수정 필요함, name뿐만아니라 모든 속성으로 비교해야함
+          });
+          if (!existingOneRoom) {
+            const oneRoom = new OneRoom();
+            const monthlyRent = isNaN(parseInt(item['월세금액']))
+              ? 0
+              : parseInt(item['월세금액']);
+            const areaExclusiveUse = isNaN(parseFloat(item['전용면적']))
+              ? 0
+              : parseFloat(item['전용면적']);
+            oneRoom.jibun = item['지번'];
+            oneRoom.name = item['연립다세대'];
+            oneRoom.dong = item['법정동'];
+            oneRoom.monthly_rent = monthlyRent;
+            oneRoom.area_exclusiveUse = areaExclusiveUse;
 
-      for (const item of items) {
-        const existingOneRoom = await this.oneRoomRepository.findOne({
-          where: { name: item.연립다세대[0] },
-        });
-
-        if (!existingOneRoom) {
-          const oneRoom = new OneRoom();
-          oneRoom.jibun = item.지번[0];
-          oneRoom.name = item.연립다세대[0];
-          oneRoom.dong = item.법정동[0];
-          oneRoom.monthly_rent = parseInt(item.월세금액[0]);
-          oneRoom.area_exclusiveUse = parseFloat(item.전용면적[0]);
-
-          oneRooms.push(oneRoom);
+            await this.oneRoomRepository.save(oneRoom);
+          }
         }
       }
-
-      await this.oneRoomRepository.save(oneRooms);
     } catch (error) {
-      throw new Error(`OpenAPI로 데이터를 가져오지 못했음: ${error.message}`);
+      throw new Error(
+        `OneRoomAPI로 데이터를 가져오지 못했음: ${error.message}`,
+      );
     }
-    return;
+  }
+  async findAll(): Promise<OneRoom[]> {
+    return await this.oneRoomRepository.find();
+  }
+  async fetchOneRoomByXY(
+    StartX: number,
+    StartY: number,
+    EndX: number,
+    EndY: number,
+  ) {
+    const geoCoderApiUrl = 'https://api.vworld.kr/req/address';
+    const apiKey = '26F627EA-4AEA-3C79-A2D8-9C1911AC03B7';
+    const OneRooms = await this.findAll();
+    let InOneRooms: OneRoom[] = [];
+    for (const room of OneRooms) {
+      const queryParams = `?service=address&request=getcoord&version=2.0&crs=epsg:4326&address=${encodeURIComponent(
+        `${room.jibun} ${room.dong}`,
+      )}&refine=true&simple=false&format=json&type=road&key=${encodeURIComponent(
+        apiKey,
+      )}`;
+      const response = await this.httpService
+        .get(geoCoderApiUrl + queryParams)
+        .toPromise();
+      const jsonData = response.data;
+      let xValue: number;
+      let yValue: number;
+      xValue = 0;
+      yValue = 0;
+      if (
+        jsonData &&
+        jsonData.response &&
+        jsonData.response.result &&
+        jsonData.response.result.point
+      ) {
+        xValue = Math.round(jsonData.response.result.point.x);
+        yValue = Math.round(jsonData.response.result.point.y);
+      } else continue;
+      console.log(room.dong, room.jibun, xValue, yValue);
+
+      if (
+        StartX <= xValue &&
+        xValue <= EndX &&
+        StartY <= yValue &&
+        yValue <= EndY
+      )
+        InOneRooms.push(room);
+    }
+    return InOneRooms;
   }
 
   async findByName(name: string): Promise<OneRoom> {
     return await this.oneRoomRepository.findOne({
       where: { name: name },
     });
+  }
+
+  async findBySerach(searchPostDto: SearchOneRoomInput): Promise<OneRoom[]> {
+    const {
+      jibun,
+      maxmonthly_rent,
+      minmonthly_rent,
+      maxarea_exclusiveUse,
+      minarea_exclusiveUse,
+      name,
+      dong,
+    } = searchPostDto;
+    const searchConditions: any = {};
+    if (jibun) {
+      searchConditions.jibun = jibun;
+    }
+    if (maxmonthly_rent !== undefined || minmonthly_rent !== undefined) {
+      searchConditions.monthly_rent = {};
+
+      if (minmonthly_rent !== undefined) {
+        searchConditions.monthly_rent.gte = minmonthly_rent;
+      }
+
+      if (maxmonthly_rent !== undefined) {
+        searchConditions.monthly_rent.lte = maxmonthly_rent;
+      }
+    }
+
+    if (
+      minarea_exclusiveUse !== undefined ||
+      maxarea_exclusiveUse !== undefined
+    ) {
+      searchConditions.area_exclusiveUse = {};
+
+      if (minarea_exclusiveUse !== undefined) {
+        searchConditions.area_exclusiveUse.gte = minarea_exclusiveUse;
+      }
+
+      if (maxarea_exclusiveUse !== undefined) {
+        searchConditions.area_exclusiveUse.lte = maxarea_exclusiveUse;
+      }
+    }
+    if (name) {
+      searchConditions.name = name;
+    }
+    if (dong) {
+      searchConditions.dong = dong;
+    }
+    return await this.oneRoomRepository.find({ where: searchConditions });
   }
 }
