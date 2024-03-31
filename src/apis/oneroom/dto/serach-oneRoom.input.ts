@@ -1,4 +1,4 @@
-import { Field, InputType, Int } from '@nestjs/graphql';
+import { Field, InputType, Int, Float } from '@nestjs/graphql';
 
 @InputType()
 export class SearchOneRoomInput {
@@ -22,4 +22,13 @@ export class SearchOneRoomInput {
 
   @Field(() => String, { nullable: true })
   dong?: string;
+
+  @Field(() => Boolean, { nullable: true })
+  is_monthly_rent?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  maxdeposit?: number;
+
+  @Field(() => Float, { nullable: true })
+  mindeposit?: number;
 }

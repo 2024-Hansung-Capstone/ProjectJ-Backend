@@ -70,23 +70,28 @@ export class OneRoomService {
 
       const items = jsonData.response.body.items || {};
       const itemsArray: any[] = Object.values(items);
-      var count = 0;
       for (const items of itemsArray) {
         for (const item of items) {
+          console.log(item);
           const existingOneRoom = await this.oneRoomRepository.findOne({
             where: {
               name: item['연립다세대'],
-              jibun: item['지번'],
-              monthly_rent: item['월세'] || null,
-              area_exclusiveUse: item['전용면적'] || null,
-              dong: item['동'],
-            }, //수정 필요함, name뿐만아니라 모든 속성으로 비교해야함
+              area_exclusiveUse: isNaN(parseFloat(item['전용면적']))
+                ? 0
+                : parseFloat(item['전용면적']),
+            },
           });
           if (!existingOneRoom) {
             const oneRoom = new OneRoom();
             const monthlyRent = isNaN(parseInt(item['월세금액']))
               ? 0
               : parseInt(item['월세금액']);
+            var deposit = isNaN(parseFloat(item['보증금액']))
+              ? 0
+              : parseFloat(item['보증금액']);
+            if (deposit >= 100) deposit /= 1000; // openapi에서 보증금이 백만원인 원룸은 100 천만원인 원룸은 1.000이렇게 저장되어 있어서 이것을 고치기 위해사용
+            var is_monthly_rent: boolean = false;
+            if (monthlyRent !== 0) is_monthly_rent = true;
             const areaExclusiveUse = isNaN(parseFloat(item['전용면적']))
               ? 0
               : parseFloat(item['전용면적']);
@@ -95,7 +100,8 @@ export class OneRoomService {
             oneRoom.dong = item['법정동'];
             oneRoom.monthly_rent = monthlyRent;
             oneRoom.area_exclusiveUse = areaExclusiveUse;
-
+            oneRoom.is_monthly_rent = is_monthly_rent;
+            oneRoom.deposit = deposit;
             await this.oneRoomRepository.save(oneRoom);
           }
         }
@@ -119,10 +125,12 @@ export class OneRoomService {
     const apiKey = '26F627EA-4AEA-3C79-A2D8-9C1911AC03B7';
     const OneRooms = await this.findAll();
     let InOneRooms: OneRoom[] = [];
+    var count = 0;
     for (const room of OneRooms) {
+      count++;
       const queryParams = `?service=address&request=getcoord&version=2.0&crs=epsg:4326&address=${encodeURIComponent(
-        `${room.jibun} ${room.dong}`,
-      )}&refine=true&simple=false&format=json&type=road&key=${encodeURIComponent(
+        `${room.dong} ${room.jibun}`,
+      )}&refine=true&simple=false&format=json&type=parcel&key=${encodeURIComponent(
         apiKey,
       )}`;
       const response = await this.httpService
@@ -133,17 +141,20 @@ export class OneRoomService {
       let yValue: number;
       xValue = 0;
       yValue = 0;
+
       if (
         jsonData &&
         jsonData.response &&
         jsonData.response.result &&
         jsonData.response.result.point
       ) {
-        xValue = Math.round(jsonData.response.result.point.x);
-        yValue = Math.round(jsonData.response.result.point.y);
-      } else continue;
-      console.log(room.dong, room.jibun, xValue, yValue);
-
+        xValue = parseFloat(jsonData.response.result.point.x);
+        yValue = parseFloat(jsonData.response.result.point.y);
+      } else {
+        console.log('sorry');
+        continue;
+      }
+      console.log(room.dong, room.jibun, xValue, yValue, count);
       if (
         StartX <= xValue &&
         xValue <= EndX &&
@@ -155,12 +166,6 @@ export class OneRoomService {
     return InOneRooms;
   }
 
-  async findByName(name: string): Promise<OneRoom> {
-    return await this.oneRoomRepository.findOne({
-      where: { name: name },
-    });
-  }
-
   async findBySerach(searchPostDto: SearchOneRoomInput): Promise<OneRoom[]> {
     const {
       jibun,
@@ -170,10 +175,27 @@ export class OneRoomService {
       minarea_exclusiveUse,
       name,
       dong,
+      is_monthly_rent,
+      maxdeposit,
+      mindeposit,
     } = searchPostDto;
     const searchConditions: any = {};
     if (jibun) {
       searchConditions.jibun = jibun;
+    }
+    if (is_monthly_rent) {
+      searchConditions.is_monthly_rent = is_monthly_rent;
+    }
+    if (maxdeposit !== undefined || mindeposit !== undefined) {
+      searchConditions.monthly_rent = {};
+
+      if (mindeposit !== undefined) {
+        searchConditions.monthly_rent.gte = mindeposit;
+      }
+
+      if (maxdeposit !== undefined) {
+        searchConditions.monthly_rent.lte = maxdeposit;
+      }
     }
     if (maxmonthly_rent !== undefined || minmonthly_rent !== undefined) {
       searchConditions.monthly_rent = {};
