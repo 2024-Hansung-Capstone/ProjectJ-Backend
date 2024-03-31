@@ -120,10 +120,11 @@ export class OneRoomService {
     StartY: number,
     EndX: number,
     EndY: number,
+    OneRooms: OneRoom[],
   ) {
     const geoCoderApiUrl = 'https://api.vworld.kr/req/address';
     const apiKey = '26F627EA-4AEA-3C79-A2D8-9C1911AC03B7';
-    const OneRooms = await this.findAll();
+    if (!OneRooms) OneRooms = await this.findAll();
     let InOneRooms: OneRoom[] = [];
     var count = 0;
     for (const room of OneRooms) {
@@ -151,7 +152,6 @@ export class OneRoomService {
         xValue = parseFloat(jsonData.response.result.point.x);
         yValue = parseFloat(jsonData.response.result.point.y);
       } else {
-        console.log('sorry');
         continue;
       }
       console.log(room.dong, room.jibun, xValue, yValue, count);

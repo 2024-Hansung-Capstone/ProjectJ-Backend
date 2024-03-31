@@ -16,8 +16,8 @@ export class OneRoom {
   @Field(() => Int)
   monthly_rent: number | null;
 
-  @Column({ type: 'decimal', precision: 15, scale: 4, nullable: true }) // 15자리 정밀도와 소수점 4자리까지 허용
-  @Field(() => Float, { nullable: true }) // GraphQL 스키마에서 타입 지정
+  @Column({ type: 'decimal', precision: 15, scale: 4, nullable: true })
+  @Field(() => Float, { nullable: true })
   area_exclusiveUse: number | null;
 
   @Column({ length: 50, default: '' })
@@ -32,7 +32,7 @@ export class OneRoom {
   @Field(() => Boolean)
   is_monthly_rent: boolean;
 
-  @Column({ type: 'decimal', precision: 15, scale: 3, nullable: true }) // 15자리 정밀도와 소수점 2자리까지 허용
-  @Field(() => Float, { nullable: true }) // GraphQL 스키마에서 타입 지정
+  @Column({ type: 'decimal', precision: 15, scale: 3, nullable: true })
+  @Field(() => Float, { nullable: true })
   deposit: number | null;
 }
