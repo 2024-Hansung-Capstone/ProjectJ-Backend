@@ -27,7 +27,7 @@ export class CookResolver {
     return this.cookService.findByUserId(user_id);
   }
 
-  //
+  //수정
   @Mutation(() => Cook)
   async updateCook(
     @Args('cook_id') cook_id: string,
@@ -42,8 +42,15 @@ export class CookResolver {
     return result;
   }
 
+  //삭제
   @Mutation(() => Boolean)
   async deleteCook(@Args('cook_id') cook_id: string): Promise<boolean> {
     return await this.cookService.delete(cook_id);
+  }
+
+  //조회수 증가
+  @Query(() => Cook)
+  async viewIncrement(@Args('id') id: string): Promise<Cook> {
+    return await this.cookService.incrementView(id);
   }
 }

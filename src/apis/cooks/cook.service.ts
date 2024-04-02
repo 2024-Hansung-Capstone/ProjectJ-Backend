@@ -64,4 +64,13 @@ export class CookService {
       relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
     });
   }
+
+  async incrementView(cook_id: string): Promise<Cook> {
+    const cook = await this.cookRepository.findOneBy({ id: cook_id });
+    if (!cook) {
+      throw new BadRequestException('');
+    }
+    cook.view += 1;
+    return await this.cookRepository.save(cook);
+  }
 }
