@@ -50,8 +50,8 @@ export class CookResolver {
 
   //조회수 증가
   @Query(() => Cook)
-  async viewIncrement(@Args('id') id: string): Promise<Cook> {
-    return await this.cookService.incrementView(id);
+  async increaseCookView(@Args('id') id: string): Promise<Cook> {
+    return await this.cookService.increaseView(id);
   }
 
   //검색 기능

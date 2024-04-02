@@ -5,7 +5,6 @@ import { Cook } from './entities/cook.entity';
 import { UserService } from '../users/users.service';
 import { CreateCookInput } from './dto/create-cook.input';
 import { UpdateCookInput } from './dto/update-cook.input';
-import { Query } from '@nestjs/graphql';
 
 @Injectable()
 export class CookService {
@@ -66,7 +65,7 @@ export class CookService {
     });
   }
 
-  async incrementView(cook_id: string): Promise<Cook> {
+  async increaseView(cook_id: string): Promise<Cook> {
     const cook = await this.cookRepository.findOneBy({ id: cook_id });
     if (!cook) {
       throw new BadRequestException('게시글을 찾을 수 없습니다.');
