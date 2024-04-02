@@ -53,4 +53,10 @@ export class CookResolver {
   async viewIncrement(@Args('id') id: string): Promise<Cook> {
     return await this.cookService.incrementView(id);
   }
+
+  //검색 기능
+  @Query(() => [Cook])
+  async searchCook(@Args('keyword') keyword: string): Promise<Cook[]> {
+    return this.cookService.search(keyword);
+  }
 }
