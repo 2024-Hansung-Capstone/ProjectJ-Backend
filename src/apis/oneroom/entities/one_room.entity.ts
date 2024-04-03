@@ -35,4 +35,8 @@ export class OneRoom {
   @Column({ type: 'decimal', precision: 15, scale: 3, nullable: true })
   @Field(() => Float, { nullable: true })
   deposit: number | null;
+
+  @Column({ default: 0 })
+  @Field(() => Int)
+  view: number;
 }

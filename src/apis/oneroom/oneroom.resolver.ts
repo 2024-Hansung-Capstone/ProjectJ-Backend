@@ -1,4 +1,11 @@
-import { Resolver, Query, Mutation, Args, Float } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Float,
+  Context,
+} from '@nestjs/graphql';
 
 import { OneRoomService } from './oneroom.service';
 import { OneRoom } from './entities/one_room.entity';
@@ -32,15 +39,12 @@ export class OneRoomResolver {
     @Args('StartY', { type: () => Float }) StartY: number,
     @Args('EndX', { type: () => Float }) EndX: number,
     @Args('EndY', { type: () => Float }) EndY: number,
-    @Args('OneRooms', { type: () => [OneRoom], nullable: 'itemsAndList' })
-    OneRooms: OneRoom[],
   ): Promise<OneRoom[]> {
     return await this.oneRoomService.fetchOneRoomByXY(
       StartX,
       StartY,
       EndX,
       EndY,
-      OneRooms,
     );
   }
 
@@ -50,8 +54,12 @@ export class OneRoomResolver {
   })
   async fetchOneRoomBySerach(
     @Args('SerachUsedProductInput') SearchOneRoomInput: SearchOneRoomInput,
+    @Context('oneRooms') oneRooms: OneRoom[],
   ): Promise<OneRoom[]> {
-    return this.oneRoomService.findBySerach(SearchOneRoomInput);
+    if (!oneRooms) {
+      oneRooms = [];
+    }
+    return this.oneRoomService.findBySerach(SearchOneRoomInput, oneRooms);
   }
 
   @Query(() => [OneRoom], {
@@ -59,5 +67,26 @@ export class OneRoomResolver {
   })
   async fetchOneRooms(): Promise<OneRoom[]> {
     return this.oneRoomService.findAll();
+  }
+
+  @Query(() => OneRoom)
+  async fetchOneRoomById(@Args('id') id: string): Promise<OneRoom> {
+    return this.oneRoomService.findById(id);
+  }
+
+  @Mutation(() => OneRoom, {
+    description: '원룸의 조회수를 1 증가시킵니다.',
+  })
+  inceaseOneRoomView(@Args('oneRoom_id') oneRoom_id: string): Promise<OneRoom> {
+    return this.oneRoomService.addViewCount(oneRoom_id);
+  }
+
+  @Query(() => [OneRoom], {
+    description: '조회수가 많은 원룸 rank개를 리턴',
+  })
+  async fetchOneRoomsByViewRank(
+    @Args('rank') rank: number,
+  ): Promise<OneRoom[]> {
+    return this.oneRoomService.findTopOneRooms(rank);
   }
 }

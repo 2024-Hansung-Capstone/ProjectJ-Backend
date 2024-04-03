@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { OneRoom } from './entities/one_room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -120,11 +120,10 @@ export class OneRoomService {
     StartY: number,
     EndX: number,
     EndY: number,
-    OneRooms: OneRoom[],
   ) {
     const geoCoderApiUrl = 'https://api.vworld.kr/req/address';
     const apiKey = '26F627EA-4AEA-3C79-A2D8-9C1911AC03B7';
-    if (!OneRooms) OneRooms = await this.findAll();
+    const OneRooms = await this.findAll();
     let InOneRooms: OneRoom[] = [];
     var count = 0;
     for (const room of OneRooms) {
@@ -166,7 +165,10 @@ export class OneRoomService {
     return InOneRooms;
   }
 
-  async findBySerach(searchPostDto: SearchOneRoomInput): Promise<OneRoom[]> {
+  async findBySerach(
+    searchPostDto: SearchOneRoomInput,
+    OneRooms: OneRoom[],
+  ): Promise<OneRoom[]> {
     const {
       jibun,
       maxmonthly_rent,
@@ -179,6 +181,10 @@ export class OneRoomService {
       maxdeposit,
       mindeposit,
     } = searchPostDto;
+    let oneRooms = OneRooms;
+    if (!oneRooms || oneRooms.length === 0) {
+      oneRooms = await this.findAll();
+    }
     const searchConditions: any = {};
     if (jibun) {
       searchConditions.jibun = jibun;
@@ -230,5 +236,32 @@ export class OneRoomService {
       searchConditions.dong = dong;
     }
     return await this.oneRoomRepository.find({ where: searchConditions });
+  }
+  async findById(id: string): Promise<OneRoom> {
+    return await this.oneRoomRepository.findOne({
+      where: { id: id },
+    });
+  }
+
+  async addViewCount(oneRoom_id: string): Promise<OneRoom> {
+    const OneRoom = await this.findById(oneRoom_id);
+    if (!OneRoom) {
+      throw new NotFoundException(
+        `Id가 ${oneRoom_id}인 것을 찾을 수 없습니다.`,
+      );
+    }
+    OneRoom.view = OneRoom.view + 1;
+
+    await this.oneRoomRepository.save(OneRoom);
+    return await this.oneRoomRepository.findOne({
+      where: { id: oneRoom_id },
+    });
+  }
+
+  async findTopOneRooms(rank: number): Promise<OneRoom[]> {
+    return await this.oneRoomRepository.find({
+      order: { view: 'DESC' },
+      take: rank,
+    });
   }
 }
