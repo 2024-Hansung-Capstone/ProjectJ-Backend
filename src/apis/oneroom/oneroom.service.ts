@@ -4,6 +4,7 @@ import { OneRoom } from './entities/one_room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SearchOneRoomInput } from './dto/serach-oneRoom.input';
+
 @Injectable()
 export class OneRoomService {
   constructor(
@@ -165,10 +166,7 @@ export class OneRoomService {
     return InOneRooms;
   }
 
-  async findBySerach(
-    searchPostDto: SearchOneRoomInput,
-    OneRooms: OneRoom[],
-  ): Promise<OneRoom[]> {
+  async findBySerach(searchPostDto: SearchOneRoomInput): Promise<OneRoom[]> {
     const {
       jibun,
       maxmonthly_rent,
@@ -181,10 +179,7 @@ export class OneRoomService {
       maxdeposit,
       mindeposit,
     } = searchPostDto;
-    let oneRooms = OneRooms;
-    if (!oneRooms || oneRooms.length === 0) {
-      oneRooms = await this.findAll();
-    }
+
     const searchConditions: any = {};
     if (jibun) {
       searchConditions.jibun = jibun;

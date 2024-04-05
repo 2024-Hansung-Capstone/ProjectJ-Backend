@@ -1,11 +1,4 @@
-import {
-  Resolver,
-  Query,
-  Mutation,
-  Args,
-  Float,
-  Context,
-} from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Float } from '@nestjs/graphql';
 
 import { OneRoomService } from './oneroom.service';
 import { OneRoom } from './entities/one_room.entity';
@@ -49,17 +42,12 @@ export class OneRoomResolver {
   }
 
   @Query(() => [OneRoom], {
-    description:
-      '검색조건으로 지도좌표에 있는 원룸 검색이나 전체 원룸 검색하는 기능',
+    description: '검색조건으로 원룸 검색하는 기능',
   })
   async fetchOneRoomBySerach(
     @Args('SerachUsedProductInput') SearchOneRoomInput: SearchOneRoomInput,
-    @Context('oneRooms') oneRooms: OneRoom[],
   ): Promise<OneRoom[]> {
-    if (!oneRooms) {
-      oneRooms = [];
-    }
-    return this.oneRoomService.findBySerach(SearchOneRoomInput, oneRooms);
+    return this.oneRoomService.findBySerach(SearchOneRoomInput);
   }
 
   @Query(() => [OneRoom], {
