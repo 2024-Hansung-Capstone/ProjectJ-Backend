@@ -25,7 +25,8 @@ import { UsedProductService } from './used_markets/usedProducts.service';
 import { NotificationMessages } from './notifications/notifications.messages';
 import { HttpModule } from '@nestjs/axios';
 import { UserService } from './users/users.service';
-
+import { Point } from './point/entity/point.entity';
+import { PointService } from './point/point.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -42,6 +43,7 @@ import { UserService } from './users/users.service';
       UsedProduct,
       User,
       Token,
+      Point,
     ]),
     JwtModule.register({}),
     HttpModule,
@@ -57,6 +59,7 @@ import { UserService } from './users/users.service';
     UsedProductService,
     UserService,
     NotificationMessages,
+    PointService,
   ],
   exports: [
     AreaService,
@@ -69,6 +72,7 @@ import { UserService } from './users/users.service';
     UsedProductService,
     UserService,
     NotificationMessages,
+    PointService,
   ],
 })
 export class CommonModule {}

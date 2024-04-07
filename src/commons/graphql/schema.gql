@@ -117,6 +117,19 @@ type OneRoom {
   dong: String!
 }
 
+type Point {
+  id: String!
+
+  """포인트 값"""
+  value: Int!
+
+  """포인트 값에 따른 호칭"""
+  title: String!
+
+  """출석한 날짜"""
+  attendanceDates: [DateTime!]
+}
+
 type Query {
   """전체 사용자 정보 조회 기능입니다."""
   fetchUsers: [User!]!
@@ -272,6 +285,8 @@ type Mutation {
   deleteLetter(letter_id: String!): Boolean!
   fetchOneRoomFromOpenAPI(LAWD_CD: String!): Boolean!
   fetchOneRoomByName(name: String!): OneRoom!
+  increasePoint(id: String!, additionalPoint: Float!): Point!
+  checkAttendance(id: String!): Boolean!
 }
 
 input CreateUserInput {
