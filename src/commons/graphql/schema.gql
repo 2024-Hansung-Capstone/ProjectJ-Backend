@@ -133,9 +133,12 @@ type OneRoom {
   id: String!
   jibun: String!
   monthly_rent: Int!
-  area_exclusiveUse: Int!
+  area_exclusiveUse: Float
   name: String!
   dong: String!
+  is_monthly_rent: Boolean!
+  deposit: Float
+  view: Int!
 }
 
 type Point {
@@ -191,8 +194,19 @@ type Query {
   fetchLetterById(letter_id: String!): Letter!
   fetchMySendLetters: Letter!
   fetchMyReceiveLetters: Letter!
+
+  """해당 X,Y좌표에 포함되어 있는 원룸들을 리턴(X,Y좌표는 소수점 14자리수 까지)"""
   fetchOneRoomByXY(StartX: Float!, StartY: Float!, EndX: Float!, EndY: Float!): [OneRoom!]!
-  getPosts(SerachUsedProductInput: SearchOneRoomInput!): [OneRoom!]!
+
+  """검색조건으로 지도좌표에 있는 원룸 검색이나 전체 원룸 검색하는 기능"""
+  fetchOneRoomBySerach(SerachUsedProductInput: SearchOneRoomInput!): [OneRoom!]!
+
+  """모든 원룸을 가져오는 기능."""
+  fetchOneRooms: [OneRoom!]!
+  fetchOneRoomById(id: String!): OneRoom!
+
+  """조회수가 많은 원룸 rank개를 리턴"""
+  fetchOneRoomsByViewRank(rank: Float!): [OneRoom!]!
 }
 
 input SearchProductInput {
@@ -217,6 +231,9 @@ input SearchOneRoomInput {
   minarea_exclusiveUse: Int
   name: String
   dong: String
+  is_monthly_rent: Boolean
+  maxdeposit: Int
+  mindeposit: Float
 }
 
 type Mutation {
@@ -307,10 +324,15 @@ type Mutation {
   writeLetter(writing_id: String!, createLetterInput: CreateLetterInput!): Letter!
   replyLetter(letter_id: String!, replyLetterInput: ReplyLetterInput!): Letter!
   deleteLetter(letter_id: String!): Boolean!
+
+  """해당 지역에 원룸들을 OpenApi를 통해 가져옴(중복된 원룸자료들은 DB에 저장 X)"""
   fetchOneRoomFromOpenAPI(LAWD_CD: String!): Boolean!
   fetchOneRoomByName(name: String!): OneRoom!
   increasePoint(id: String!, additionalPoint: Float!): Point!
   checkAttendance(id: String!): Boolean!
+
+  """원룸의 조회수를 1 증가시킵니다."""
+  inceaseOneRoomView(oneRoom_id: String!): OneRoom!
 }
 
 """신규 회원 가입을 위한 사용자 정보 입력 타입입니다."""
