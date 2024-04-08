@@ -198,7 +198,7 @@ type Query {
   """해당 X,Y좌표에 포함되어 있는 원룸들을 리턴(X,Y좌표는 소수점 14자리수 까지)"""
   fetchOneRoomByXY(StartX: Float!, StartY: Float!, EndX: Float!, EndY: Float!): [OneRoom!]!
 
-  """검색조건으로 지도좌표에 있는 원룸 검색이나 전체 원룸 검색하는 기능"""
+  """검색조건으로 원룸 검색하는 기능"""
   fetchOneRoomBySerach(SerachUsedProductInput: SearchOneRoomInput!): [OneRoom!]!
 
   """모든 원룸을 가져오는 기능."""
@@ -327,12 +327,11 @@ type Mutation {
 
   """해당 지역에 원룸들을 OpenApi를 통해 가져옴(중복된 원룸자료들은 DB에 저장 X)"""
   fetchOneRoomFromOpenAPI(LAWD_CD: String!): Boolean!
-  fetchOneRoomByName(name: String!): OneRoom!
-  increasePoint(id: String!, additionalPoint: Float!): Point!
-  checkAttendance(id: String!): Boolean!
 
   """원룸의 조회수를 1 증가시킵니다."""
   inceaseOneRoomView(oneRoom_id: String!): OneRoom!
+  increasePoint(id: String!, additionalPoint: Float!): Point!
+  checkAttendance(id: String!): Boolean!
 }
 
 """신규 회원 가입을 위한 사용자 정보 입력 타입입니다."""
