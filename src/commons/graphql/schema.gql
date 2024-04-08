@@ -71,28 +71,38 @@ type Dong {
 }
 
 type User {
+  """고유 ID"""
   id: String!
-  dong: Dong!
-  email: String!
-  name: String!
-  gender: String!
-  birth_at: DateTime!
-  mbti: String!
-  phone_number: String!
-  is_find_mate: Boolean!
-  point: Int!
-  create_at: DateTime!
-}
 
-type Ingredient {
-  id: String!
-  user: User!
+  """사용자 거주지역(행정동)"""
+  dong: Dong!
+
+  """이메일"""
+  email: String!
+
+  """성함"""
   name: String!
-  count: Int
-  volume: Float
-  volume_unit: String
+
+  """성별"""
+  gender: String!
+
+  """생년월일"""
+  birth_at: DateTime!
+
+  """MBTI"""
+  mbti: String!
+
+  """휴대폰 번호 ex)01012345678"""
+  phone_number: String!
+
+  """메이트 매칭 여부"""
+  is_find_mate: Boolean!
+
+  """포인트"""
+  point: Int!
+
+  """가입일"""
   create_at: DateTime!
-  updated_at: DateTime!
 }
 
 type Letter {
@@ -106,6 +116,17 @@ type Letter {
   detail: String!
   is_read: Boolean!
   create_at: DateTime!
+}
+
+type Ingredient {
+  id: String!
+  user: User!
+  name: String!
+  count: Int
+  volume: Float
+  volume_unit: String
+  create_at: DateTime!
+  updated_at: DateTime!
 }
 
 type OneRoom {
@@ -274,28 +295,66 @@ type Mutation {
   fetchOneRoomByName(name: String!): OneRoom!
 }
 
+"""신규 회원 가입을 위한 사용자 정보 입력 타입입니다."""
 input CreateUserInput {
+  """이메일"""
   email: String!
+
+  """성함"""
   name: String!
+
+  """성별"""
   gender: String!
+
+  """생년"""
   birth_year: String!
+
+  """생월"""
   birth_month: String!
+
+  """생일"""
   birth_day: String!
+
+  """MBTI"""
   mbti: String!
+
+  """행정동 지역명 ex)청운효자동"""
   dong_nm: String!
+
+  """휴대폰 번호 ex)01012345678"""
   phone_number: String!
+
+  """비밀번호"""
   password: String!
+
+  """메이트 매칭 여부"""
   is_find_mate: Boolean!
 }
 
+"""회원 정보 수정을 위한 사용자 정보 입력 타입입니다."""
 input UpdateUserInput {
+  """이메일"""
   email: String
+
+  """성함"""
   name: String
+
+  """성별"""
   gender: String
+
+  """생년"""
   birth_year: String
+
+  """생월"""
   birth_month: String
+
+  """생일"""
   birth_day: String
+
+  """MBTI"""
   mbti: String
+
+  """메이트 매칭 여부"""
   is_find_mate: Boolean
 }
 

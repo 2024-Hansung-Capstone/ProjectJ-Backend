@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   UnauthorizedException,
+  forwardRef,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -28,7 +30,8 @@ export class UserService {
     @InjectRepository(Token)
     private readonly tokenRepository: Repository<Token>,
     private readonly areaService: AreaService,
-    //private readonly notificationService: NotificationService,
+    @Inject(forwardRef(() => NotificationService))
+    private readonly notificationService: NotificationService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -82,7 +85,7 @@ export class UserService {
       { user: newUser },
     );
 
-    //await this.notificationService.create(newUser.id, '100');
+    await this.notificationService.create(newUser.id, '100');
 
     return await this.userRepository.findOne({
       where: { id: newUser.id },

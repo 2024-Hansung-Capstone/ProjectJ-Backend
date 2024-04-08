@@ -2,6 +2,8 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, LessThanOrEqual, Repository } from 'typeorm';
@@ -20,8 +22,10 @@ export class UsedProductService {
     private usedProductRepository: Repository<UsedProduct>,
     @InjectRepository(LikeUserRecord)
     private likeUserRecordRepository: Repository<LikeUserRecord>,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly likeUserRecordService: LikeUserRecordService,
+    @Inject(forwardRef(() => NotificationService))
     private readonly notificationService: NotificationService,
   ) {}
 

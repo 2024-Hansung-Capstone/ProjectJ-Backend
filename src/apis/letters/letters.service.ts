@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Letter } from './entities/letter.entity';
@@ -17,6 +19,7 @@ export class LetterService {
   constructor(
     @InjectRepository(Letter)
     private readonly letterRepository: Repository<Letter>,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly usedProductService: UsedProductService,
     private readonly boardService: BoardService,

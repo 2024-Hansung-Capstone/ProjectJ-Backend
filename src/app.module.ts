@@ -11,6 +11,7 @@ import { BoardModule } from './apis/boards/boards.module';
 import { LetterModule } from './apis/letters/letters.module';
 import { OneRoomModule } from './apis/oneroom/oneroom.module';
 import { NotificationModule } from './apis/notifications/notifications.module';
+import { DevtoolsModule } from '@nestjs/devtools-integration';
 @Module({
   imports: [
     UserModule,
@@ -20,7 +21,7 @@ import { NotificationModule } from './apis/notifications/notifications.module';
     IngredientModule,
     LetterModule,
     OneRoomModule,
-    //NotificationModule,
+    NotificationModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -37,6 +38,10 @@ import { NotificationModule } from './apis/notifications/notifications.module';
       entities: [__dirname + '/apis/**/*.entity.*'],
       synchronize: true,
       logging: true,
+    }),
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
+      port: 3001,
     }),
   ],
 })
