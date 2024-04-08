@@ -11,6 +11,7 @@ import { BoardModule } from './apis/boards/boards.module';
 import { LetterModule } from './apis/letters/letters.module';
 import { OneRoomModule } from './apis/oneroom/oneroom.module';
 import { NotificationModule } from './apis/notifications/notifications.module';
+
 @Module({
   imports: [
     UserModule,
@@ -20,7 +21,7 @@ import { NotificationModule } from './apis/notifications/notifications.module';
     IngredientModule,
     LetterModule,
     OneRoomModule,
-    //NotificationModule,
+    NotificationModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

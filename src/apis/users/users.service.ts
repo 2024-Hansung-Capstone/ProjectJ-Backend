@@ -1,7 +1,9 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   UnauthorizedException,
+  forwardRef,
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -28,7 +30,8 @@ export class UserService {
     @InjectRepository(Token)
     private readonly tokenRepository: Repository<Token>,
     private readonly areaService: AreaService,
-    //private readonly notificationService: NotificationService,
+    @Inject(forwardRef(() => NotificationService))
+    private readonly notificationService: NotificationService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -82,7 +85,7 @@ export class UserService {
       { user: newUser },
     );
 
-    //await this.notificationService.create(newUser.id, '100');
+    await this.notificationService.create(newUser.id, '100');
 
     return await this.userRepository.findOne({
       where: { id: newUser.id },
@@ -231,5 +234,37 @@ export class UserService {
 
   getRestoreToken(user: IUserContext['user']): string {
     return this.getAccessToken(user);
+  }
+
+  async createTestToken(phone_number: string): Promise<string> {
+    try {
+      //랜덤한 6자리 숫자 토큰 생성, 빈 자리는 0으로 채워줌.
+      const token = String(Math.floor(Math.random() * 1000000)).padStart(
+        6,
+        '0',
+      );
+
+      //이미 인증번호를 받은 휴대폰인지 확인
+      const existingToken = await this.tokenRepository.findOneBy({
+        phone_number,
+      });
+
+      //인증번호를 이미 받은 휴대폰인 경우
+      if (existingToken) {
+        //토큰값은 새로 만든 토큰으로 넣어주고, 인증은 되지 않은 상태로 만든 후, 데이터베이스에 업데이트해줌.
+        existingToken.token = token;
+        existingToken.is_auth = true;
+        await this.tokenRepository.save(existingToken);
+      } else {
+        await this.tokenRepository.save({
+          phone_number: phone_number,
+          token: token,
+          is_auth: true,
+        });
+      }
+      return token;
+    } catch (error) {
+      throw new BadRequestException('Token 생성에 실패하였습니다.');
+    }
   }
 }

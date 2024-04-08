@@ -153,4 +153,14 @@ export class UserResolver {
   restoreAccessToken(@Context() context: IContext): string {
     return this.userService.getRestoreToken({ id: context.req.user.id });
   }
+
+  @Mutation(() => String, {
+    description:
+      '!!테스트용!! 인증번호 전송 없이 바로 토큰 생성과 인증이 완료되는 테스트용 기능입니다.',
+  })
+  async testCreateToken(
+    @Args('phone_number') phone_number: string,
+  ): Promise<string> {
+    return await this.userService.createTestToken(phone_number);
+  }
 }
