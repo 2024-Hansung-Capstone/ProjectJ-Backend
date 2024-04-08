@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Cook } from './entities/cook.entity';
 import { UserService } from '../users/users.service';
 import { CreateCookInput } from './dto/create-cook.input';
@@ -62,6 +62,24 @@ export class CookService {
     return await this.cookRepository.findOne({
       where: { user: { id: user_id } },
       relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
+    });
+  }
+
+  async increaseView(cook_id: string): Promise<Cook> {
+    const cook = await this.cookRepository.findOneBy({ id: cook_id });
+    if (!cook) {
+      throw new BadRequestException('게시글을 찾을 수 없습니다.');
+    }
+    cook.view += 1;
+    return await this.cookRepository.save(cook);
+  }
+
+  async search(keyword: string): Promise<Cook[]> {
+    if (keyword.length < 2) {
+      throw new BadRequestException('검색어가 두 글자 이상이어야 합니다.');
+    }
+    return await this.cookRepository.find({
+      where: { title: Like(`%${keyword}%`) },
     });
   }
 }
