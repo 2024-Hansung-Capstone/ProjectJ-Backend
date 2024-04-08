@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LetterService } from '../letters/letters.service';
@@ -20,11 +20,12 @@ export class NotificationService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
-    //private readonly letterService: LetterService,
+    @Inject(forwardRef(() => LetterService))
+    private readonly letterService: LetterService,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly boardService: BoardService,
     private readonly likeUserRecordService: LikeUserRecordService,
-    private readonly notificationMessages: NotificationMessages,
   ) {
     this.strategies = {
       '100': new UserNotificationStrategy(userService, notificationRepository),
@@ -44,10 +45,10 @@ export class NotificationService {
         likeUserRecordService,
         notificationRepository,
       ),
-      // '400': new LetterNotificationStrategy(
-      //   letterService,
-      //   notificationRepository,
-      // ),
+      '400': new LetterNotificationStrategy(
+        letterService,
+        notificationRepository,
+      ),
     };
   }
 

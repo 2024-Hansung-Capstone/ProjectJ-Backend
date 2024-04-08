@@ -1,14 +1,5 @@
-import {
-  Resolver,
-  Query,
-  Mutation,
-  Args,
-  Context,
-  Float,
-} from '@nestjs/graphql';
-import { gqlAccessGuard } from '../users/guards/gql-auth.guard';
-import { UseGuards } from '@nestjs/common';
-import { IContext } from '../users/interfaces/user-service.interface';
+import { Resolver, Query, Mutation, Args, Float } from '@nestjs/graphql';
+
 import { OneRoomService } from './oneroom.service';
 import { OneRoom } from './entities/one_room.entity';
 import { SearchOneRoomInput } from './dto/serach-oneRoom.input';
@@ -16,15 +7,26 @@ import { SearchOneRoomInput } from './dto/serach-oneRoom.input';
 export class OneRoomResolver {
   constructor(private readonly oneRoomService: OneRoomService) {}
 
-  @Mutation(() => Boolean) // 변경된 부분: 뮤테이션의 반환 타입을 Boolean으로 지정
+  @Mutation(() => Boolean, {
+    description:
+      '해당 지역에 원룸들을 OpenApi를 통해 가져옴(중복된 원룸자료들은 DB에 저장 X)',
+  })
   async fetchOneRoomFromOpenAPI(
     @Args('LAWD_CD') LAWD_CD: string,
   ): Promise<boolean> {
-    await this.oneRoomService.fetchOneRoomFromOpenAPI(LAWD_CD);
-    return true; // 변경된 부분: 뮤테이션의 작업이 성공적으로 완료되었음을 나타내기 위해 true 반환
+    try {
+      await this.oneRoomService.fetchOneRoomFromOpenAPI(LAWD_CD);
+      return true;
+    } catch (error) {
+      console.error('OpenApi로 부터 데이터를 가져오는 중 오류 발생:', error);
+      return false;
+    }
   }
 
-  @Query(() => [OneRoom])
+  @Query(() => [OneRoom], {
+    description:
+      '해당 X,Y좌표에 포함되어 있는 원룸들을 리턴(X,Y좌표는 소수점 14자리수 까지)',
+  })
   async fetchOneRoomByXY(
     @Args('StartX', { type: () => Float }) StartX: number,
     @Args('StartY', { type: () => Float }) StartY: number,
@@ -37,18 +39,42 @@ export class OneRoomResolver {
       EndX,
       EndY,
     );
-    // 여기에 함수의 내용을 추가하세요
   }
 
-  @Mutation(() => OneRoom)
-  async fetchOneRoomByName(@Args('name') name: string): Promise<OneRoom> {
-    return await this.oneRoomService.findByName(name);
-  }
-
-  @Query(() => [OneRoom])
-  async getPosts(
+  @Query(() => [OneRoom], {
+    description: '검색조건으로 원룸 검색하는 기능',
+  })
+  async fetchOneRoomBySerach(
     @Args('SerachUsedProductInput') SearchOneRoomInput: SearchOneRoomInput,
   ): Promise<OneRoom[]> {
     return this.oneRoomService.findBySerach(SearchOneRoomInput);
+  }
+
+  @Query(() => [OneRoom], {
+    description: '모든 원룸을 가져오는 기능.',
+  })
+  async fetchOneRooms(): Promise<OneRoom[]> {
+    return this.oneRoomService.findAll();
+  }
+
+  @Query(() => OneRoom)
+  async fetchOneRoomById(@Args('id') id: string): Promise<OneRoom> {
+    return this.oneRoomService.findById(id);
+  }
+
+  @Mutation(() => OneRoom, {
+    description: '원룸의 조회수를 1 증가시킵니다.',
+  })
+  inceaseOneRoomView(@Args('oneRoom_id') oneRoom_id: string): Promise<OneRoom> {
+    return this.oneRoomService.addViewCount(oneRoom_id);
+  }
+
+  @Query(() => [OneRoom], {
+    description: '조회수가 많은 원룸 rank개를 리턴',
+  })
+  async fetchOneRoomsByViewRank(
+    @Args('rank') rank: number,
+  ): Promise<OneRoom[]> {
+    return this.oneRoomService.findTopOneRooms(rank);
   }
 }

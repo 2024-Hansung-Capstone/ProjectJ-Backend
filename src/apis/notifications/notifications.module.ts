@@ -8,13 +8,14 @@ import { NotificationMessages } from './notifications.messages';
 import { ReplyNotificationStrategy } from './strategies/reply.notification.strategy';
 
 @Module({
-  imports: [CommonModule, NotificationMessages],
+  imports: [CommonModule],
   providers: [
     NotificationResolver,
     LetterNotificationStrategy,
     LikeNotificationStrategy,
     UserNotificationStrategy,
     ReplyNotificationStrategy,
+    NotificationMessages,
   ],
 })
 export class NotificationModule {}

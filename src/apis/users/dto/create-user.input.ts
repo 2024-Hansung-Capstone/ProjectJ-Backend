@@ -1,37 +1,39 @@
 import { Field, InputType } from '@nestjs/graphql';
 
-@InputType()
+@InputType({
+  description: '신규 회원 가입을 위한 사용자 정보 입력 타입입니다.',
+})
 export class CreateUserInput {
-  @Field(() => String)
+  @Field(() => String, { description: '이메일' })
   email: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: '성함' })
   name: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: '성별' })
   gender: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: '생년' })
   birth_year: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: '생월' })
   birth_month: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: '생일' })
   birth_day: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: 'MBTI' })
   mbti: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: '행정동 지역명 ex)청운효자동' })
   dong_nm: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: '휴대폰 번호 ex)01012345678' })
   phone_number: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: '비밀번호' })
   password: string;
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { description: '메이트 매칭 여부' })
   is_find_mate: boolean;
 }

@@ -4,6 +4,8 @@ import {
   ForbiddenException,
   HttpException,
   HttpStatus,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -24,6 +26,7 @@ export class BoardService {
     private readonly likeUserRecordRepository: Repository<LikeUserRecord>,
     @InjectRepository(Reply)
     private readonly replyRepository: Repository<Reply>,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
   ) {}
 
