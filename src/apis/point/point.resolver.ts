@@ -1,19 +1,23 @@
-import { Resolver, Mutation, Args } from '@nestjs/graphql';
-import { Point } from './entity/point.entity';
+import { Resolver, Mutation, Query, Context } from '@nestjs/graphql';
 import { PointService } from './point.service';
-@Resolver('Point')
+import { Role } from './entity/role.entity';
+import { UseGuards } from '@nestjs/common';
+import { gqlAccessGuard } from '../users/guards/gql-auth.guard';
+import { IContext } from '../users/interfaces/user-service.interface';
+
+@Resolver()
 export class PointResolver {
   constructor(private readonly pointService: PointService) {}
-  @Mutation(() => Point)
-  async increasePoint(
-    @Args('id') id: string,
-    @Args('additionalPoint') additionalPoint: number,
-  ): Promise<Point> {
-    return await this.pointService.increasePoint(id, additionalPoint);
+
+  @Query(() => Role)
+  @UseGuards(gqlAccessGuard)
+  async fetchMyRole(@Context() context: IContext): Promise<Role> {
+    return await this.pointService.findRoleByUserId(context.req.user.id);
   }
 
   @Mutation(() => Boolean)
-  async checkAttendance(@Args('id') id: string): Promise<boolean> {
-    return await this.pointService.checkAttendance(id);
+  @UseGuards(gqlAccessGuard)
+  async dailyCheckIn(@Context() context: IContext): Promise<boolean> {
+    return await this.pointService.checkIn(context.req.user.id);
   }
 }
