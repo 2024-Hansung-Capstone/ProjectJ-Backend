@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Args, Query, Context } from '@nestjs/graphql';
+import { Resolver, Mutation, Query, Context } from '@nestjs/graphql';
 import { PointService } from './point.service';
 import { Role } from './entity/role.entity';
 import { UseGuards } from '@nestjs/common';
@@ -11,7 +11,7 @@ export class PointResolver {
 
   @Query(() => Role)
   @UseGuards(gqlAccessGuard)
-  async fetchRoleByUserId(@Context() context: IContext): Promise<Role> {
+  async fetchMyRole(@Context() context: IContext): Promise<Role> {
     return await this.pointService.findRoleByUserId(context.req.user.id);
   }
 
