@@ -17,6 +17,7 @@ import { CreateBoardInput } from './dto/create-board.input';
 import { UserService } from '../users/users.service';
 import { LikeUserRecord } from '../like/entities/like_user_record.entity';
 import { Reply } from './entities/reply.entity';
+import { NotificationService } from '../notifications/notifications.service';
 @Injectable()
 export class BoardService {
   constructor(
@@ -28,6 +29,8 @@ export class BoardService {
     private readonly replyRepository: Repository<Reply>,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
+    @Inject(forwardRef(() => NotificationService))
+    private readonly notificationService: NotificationService,
   ) {}
 
   async findAll(category: string): Promise<Board[]> {
@@ -87,7 +90,7 @@ export class BoardService {
     board.title = title;
     board.detail = detail;
     board.category = category;
-    board.createat = new Date();
+    board.create_at = new Date();
     board.user = user;
     return await this.boardRepository.save(board);
   }
@@ -156,8 +159,9 @@ export class BoardService {
     like_user_record.board = board;
     like_user_record.user = user;
     board.like_user.push(like_user_record);
-    await this.likeUserRecordRepository.save(like_user_record);
+    const like = await this.likeUserRecordRepository.save(like_user_record);
     await this.boardRepository.save(board);
+    await this.notificationService.create(like.id, '202');
     return await this.findById(id);
   }
 

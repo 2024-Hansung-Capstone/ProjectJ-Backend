@@ -74,6 +74,21 @@ export class CookService {
     return await this.cookRepository.save(cook);
   }
 
+  async getRank(): Promise<Cook[]> {
+    return await this.cookRepository
+      .createQueryBuilder('cook')
+      .orderBy('cook.view', 'DESC')
+      .getMany();
+  }
+
+  // async updateRank(): Promise<void> {
+  //   const cookRank = await this.getRank();
+  //   for (let i = 0; i < cookRank.length; i++) {
+  //     cookRank[i].rank = i + 1;
+  //     await this.cookRepository.save(cookRank[i]);
+  //   }
+  // }
+
   async search(keyword: string): Promise<Cook[]> {
     if (keyword.length < 2) {
       throw new BadRequestException('검색어가 두 글자 이상이어야 합니다.');

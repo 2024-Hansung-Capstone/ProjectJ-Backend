@@ -26,6 +26,7 @@ export class NotificationService {
     private readonly userService: UserService,
     private readonly boardService: BoardService,
     private readonly likeUserRecordService: LikeUserRecordService,
+    private readonly notificationMessages: NotificationMessages,
   ) {
     this.strategies = {
       '100': new UserNotificationStrategy(userService, notificationRepository),
@@ -37,12 +38,12 @@ export class NotificationService {
         likeUserRecordService,
         notificationRepository,
       ),
-      '300': new ReplyNotificationStrategy(
-        boardService,
+      '202': new LikeNotificationStrategy(
+        likeUserRecordService,
         notificationRepository,
       ),
-      '301': new LikeNotificationStrategy(
-        likeUserRecordService,
+      '300': new ReplyNotificationStrategy(
+        boardService,
         notificationRepository,
       ),
       '400': new LetterNotificationStrategy(
@@ -60,13 +61,59 @@ export class NotificationService {
     return await strategy.createNotification(entity_id, code);
   }
 
-  async findById(notification_id: string): Promise<Notification[]> {
-    return await this.notificationRepository.find({
+  async findById(notification_id: string): Promise<Notification> {
+    return await this.notificationRepository.findOne({
       where: { id: notification_id },
+      relations: [
+        'user',
+        'like',
+        'like.user',
+        'like.used_product',
+        'board',
+        'letter',
+      ],
     });
   }
 
   async delete(notification_id: string): Promise<void> {
     await this.notificationRepository.delete(notification_id);
+  }
+
+  async getMessage(user_id: string, notification_id: string): Promise<string> {
+    const notification = await this.findById(notification_id);
+    const strategy = this.strategies[notification.code];
+
+    if (user_id !== notification.user.id) {
+      throw new Error('해당 알림을 볼 권한이 없습니다.');
+    }
+    if (!strategy) {
+      throw new Error('알 수 없는 알림 코드입니다.');
+    }
+
+    const firstDigitOfCode = notification.code.charAt(0);
+    switch (firstDigitOfCode) {
+      case '1':
+        return await this.notificationMessages.getMessage(
+          notification.code,
+          notification.user,
+        );
+      case '2':
+        return await this.notificationMessages.getMessage(
+          notification.code,
+          notification.like,
+        );
+      case '3':
+        return await this.notificationMessages.getMessage(
+          notification.code,
+          notification.board.reply,
+        );
+      case '4':
+        return await this.notificationMessages.getMessage(
+          notification.code,
+          notification.letter,
+        );
+      default:
+        throw new Error('알 수 없는 알림 코드입니다.');
+    }
   }
 }

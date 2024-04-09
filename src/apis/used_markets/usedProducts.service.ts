@@ -202,8 +202,9 @@ export class UsedProductService {
     like_user_record.used_product = used_product;
     like_user_record.user = user;
     used_product.like_user.push(like_user_record);
-    await this.likeUserRecordRepository.save(like_user_record);
+    const like = await this.likeUserRecordRepository.save(like_user_record);
     await this.usedProductRepository.save(used_product);
+    await this.notificationService.create(like.id, '200');
     return this.findById(product_id);
   }
 

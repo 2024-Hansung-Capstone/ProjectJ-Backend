@@ -2,9 +2,9 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-"""중고거래 데이터 엔티티"""
+"""중고물품 정보"""
 type UsedProduct {
-  """중고물품 고유 식별번호"""
+  """고유 ID"""
   id: String!
 
   """판매자 정보"""
@@ -28,7 +28,7 @@ type UsedProduct {
   """중고물품 카테고리"""
   category: String!
 
-  """중고물품 판매상태"""
+  """중고물품 거래 상태(판매중/예약중/판매완료)"""
   state: String!
 
   """중고물품 생성시간"""
@@ -40,36 +40,115 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Board {
+"""댓글 정보"""
+type Reply {
+  """고유 ID"""
   id: String!
-  category: String!
-  title: String!
+
+  """작성자 정보"""
+  user: User!
+
+  """원 게시글 정보"""
+  board: Board!
+
+  """내용"""
   detail: String!
-  view: Int!
+
+  """좋아요 수"""
   like: Int!
-  createat: DateTime!
+
+  """작성일"""
+  create_at: DateTime!
 }
 
+"""게시글 정보"""
+type Board {
+  """고유 ID"""
+  id: String!
+
+  """작성자 정보"""
+  user: User!
+
+  """카테고리"""
+  category: String!
+
+  """제목"""
+  title: String!
+
+  """내용"""
+  detail: String!
+
+  """조회수"""
+  view: Int!
+
+  """좋아요 수"""
+  like: Int!
+
+  """작성일"""
+  create_at: DateTime!
+}
+
+"""좋아요 기록 정보"""
+type LikeUserRecord {
+  """고유 ID"""
+  id: String!
+
+  """좋아요 누른 사용자 정보"""
+  user: User!
+
+  """좋아요 누른 중고 상품 정보"""
+  used_product: UsedProduct
+
+  """좋아요 누른 게시글 정보"""
+  board: Board
+
+  """좋아요 누른 댓글 정보"""
+  reply: Reply
+}
+
+"""시/도 정보"""
 type Sido {
+  """시/도 코드"""
   id: String!
+
+  """시/도 이름"""
   name: String!
+
+  """기준일자"""
   crtr_at: DateTime!
 }
 
+"""시/군/구 정보"""
 type Sgng {
+  """시/군/구 코드"""
   id: String!
+
+  """시/도 정보"""
   sido: Sido!
+
+  """시/군/구 이름"""
   name: String!
+
+  """기준일자"""
   crtr_at: DateTime!
 }
 
+"""행정동 정보"""
 type Dong {
+  """행정동 코드"""
   id: String!
+
+  """시/군/구 정보"""
   sgng: Sgng!
+
+  """행정동 이름"""
   name: String!
+
+  """기준일자"""
   crtr_at: DateTime!
 }
 
+"""사용자 정보"""
 type User {
   """고유 ID"""
   id: String!
@@ -105,27 +184,63 @@ type User {
   create_at: DateTime!
 }
 
+"""쪽지 정보"""
 type Letter {
+  """고유 ID"""
   id: String!
+
+  """보낸 사람 정보"""
   sender: User!
+
+  """받는 사람 정보"""
   receiver: User!
+
+  """중고 상품 정보"""
   product: UsedProduct
+
+  """게시글 정보"""
   board: Board
+
+  """쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)"""
   category: String!
+
+  """제목"""
   title: String!
+
+  """내용"""
   detail: String!
+
+  """읽음 여부"""
   is_read: Boolean!
+
+  """작성일"""
   create_at: DateTime!
 }
 
+"""재료 정보"""
 type Ingredient {
+  """고유 ID"""
   id: String!
+
+  """사용자 정보"""
   user: User!
+
+  """재료 이름"""
   name: String!
+
+  """재료 수량"""
   count: Int
+
+  """재료 양"""
   volume: Float
+
+  """재료 양 단위"""
   volume_unit: String
+
+  """추가일"""
   create_at: DateTime!
+
+  """수정일"""
   updated_at: DateTime!
 }
 
@@ -141,17 +256,19 @@ type OneRoom {
   view: Int!
 }
 
-type Point {
-  id: String!
+"""등급 정보"""
+type Role {
+  """등급 코드"""
+  code: String!
 
-  """포인트 값"""
-  value: Int!
+  """최소 포인트"""
+  min_point: Int!
 
-  """포인트 값에 따른 호칭"""
-  title: String!
+  """최대 포인트"""
+  max_point: Int!
 
-  """출석한 날짜"""
-  attendanceDates: [DateTime!]
+  """등급 이름"""
+  name: String!
 }
 
 type Query {
@@ -175,20 +292,42 @@ type Query {
 
   """종합검색 기능으로 가격은 검색한 가격보다 낮게 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계"""
   fetchUsedProductsBySearch(SerachUsedProductInput: SearchProductInput!): [UsedProduct!]!
-  fetchDongByName(dongName: String!): Dong!
 
-  """입력된 카테고리를 게시글의 정보를 확인합니다."""
-  fetchBoards(category: String!): [Board!]!
-  fetchBoardById(id: String!): Board!
+  """행정동 이름으로 행정동 정보를 조회합니다."""
+  fetchDongByName(
+    """행정동 이름"""
+    dong_name: String!
+  ): Dong!
+
+  """입력된 카테고리에 해당하는 게시글의 정보를 확인합니다."""
+  fetchBoards(
+    """게시글 카테고리"""
+    category: String!
+  ): [Board!]!
+
+  """게시글 고유 ID로 게시글 정보를 확인합니다."""
+  fetchBoardById(
+    """게시글 고유 ID"""
+    board_id: String!
+  ): Board!
 
   """입력된 user_id를 가진 사용자가 작성한 게시글의 정보를 확인합니다."""
-  fetchBoardByUserId(user_id: String!): [Board!]!
+  fetchBoardByUserId(
+    """사용자 ID"""
+    user_id: String!
+  ): [Board!]!
 
   """종합검색 기능으로 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계"""
   fetchBoardsBySerach(SerachBoardInput: SearchBoardInput!): [Board!]!
 
-  """조회수가 많은 게시글 rank개를 리턴"""
-  fetchBoardsByViewRank(category: String!, rank: Float!): [Board!]!
+  """조회수가 많은 게시글 rank개를 가져옵니다."""
+  fetchBoardsByViewRank(
+    """게시글 카테고리"""
+    category: String!
+
+    """가져올 게시글 수"""
+    rank: Float!
+  ): [Board!]!
   fetchIngredients: [Ingredient!]!
   fetchMyIngredients: [Ingredient!]!
   fetchLetterById(letter_id: String!): Letter!
@@ -207,19 +346,42 @@ type Query {
 
   """조회수가 많은 원룸 rank개를 리턴"""
   fetchOneRoomsByViewRank(rank: Float!): [OneRoom!]!
+
+  """알림 메시지 조회"""
+  getNotificationMessage(
+    """알림 고유 ID"""
+    notification_id: String!
+  ): String!
+  fetchMyRole: Role!
 }
 
+"""중고마켓 상품 검색 입력 정보"""
 input SearchProductInput {
+  """상품 제목"""
   title: String
+
+  """상품 가격"""
   price: Int
+
+  """상품 설명"""
   detail: String
+
+  """상품 카테고리"""
   category: String
+
+  """상품 거래 상태(판매중/예약중/판매완료)"""
   state: String
 }
 
+"""게시글 검색 입력 정보"""
 input SearchBoardInput {
+  """게시판 카테고리"""
   category: String
+
+  """게시글 제목"""
   title: String
+
+  """게시글 내용"""
   detail: String
 }
 
@@ -286,38 +448,71 @@ type Mutation {
   """게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작"""
   decreaseUsedProductLike(product_id: String!): UsedProduct!
 
-  """입력된 정보를 바탕으로 게시글을 작성합니다"""
+  """입력된 정보를 바탕으로 게시글을 작성합니다."""
   createBoard(createBoardInput: CreateBoardInput!): Board!
 
   """입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능)"""
   updateBoard(updateBoradInput: UpdateBoardInput!): Board!
 
   """입력된 id값을 가진 게시글을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)"""
-  deleteBoard(board_id: String!): Boolean!
+  deleteBoard(
+    """게시글 고유 ID"""
+    board_id: String!
+  ): Boolean!
 
   """게시글의 조회수를 1 증가시킵니다."""
-  increaseBoardView(board_id: String!): Board!
+  increaseBoardView(
+    """게시글 고유 ID"""
+    board_id: String!
+  ): Board!
 
-  """게시글의  좋아요수(Like)를 올려주고 Like_user_record에 좋아요한 회원과 게시글을 저장"""
-  increaseBoardLike(board_id: String!): Board!
+  """게시글의  좋아요 수를 올려주고 좋아요한 회원과 게시글 정보를 저장합니다."""
+  increaseBoardLike(
+    """게시글 고유 ID"""
+    board_id: String!
+  ): Board!
 
-  """게시글의 좋아요를 취소하는 기능 좋아요한 게시글에게만 동작"""
-  decreaseBoardLike(board_id: String!): Board!
+  """게시글의 좋아요를 취소하는 기능입니다. (좋아요한 게시글에게만 동작)"""
+  decreaseBoardLike(
+    """게시글 고유 ID"""
+    board_id: String!
+  ): Board!
 
-  """게시글에 댓글을 달 수 있는 기능"""
-  createReply(board_id: String!, detail: String!): Board!
+  """게시글에 댓글을 생성하는 기능입니다."""
+  createReply(
+    """게시글 고유 ID"""
+    board_id: String!
 
-  """게시글에 댓글을 삭제 할 수 있는 기능"""
-  deleteReply(reply_id: String!): Board!
+    """댓글 내용"""
+    detail: String!
+  ): Board!
 
-  """게시글에 댓글을 수정 할 수 있는 기능"""
-  updateReply(reply_id: String!, detail: String!): Board!
+  """게시글에 댓글을 삭제하는 기능입니다."""
+  deleteReply(
+    """댓글 고유 ID"""
+    reply_id: String!
+  ): Board!
 
-  """댓글의 좋아요 수(Like)를 올려주고 Like_user_record에 좋아요한 회원과 댓글글을 저장"""
-  increaseReplyLike(reply_id: String!): Board!
+  """게시글에 댓글을 수정하는 기능입니다."""
+  updateReply(
+    """댓글 고유 ID"""
+    reply_id: String!
 
-  """댓글의 좋아요를 취소하는 기능 좋아요한 댓글에게만 동작"""
-  decreaseReplyLike(reply_id: String!): Board!
+    """댓글 내용"""
+    detail: String!
+  ): Board!
+
+  """댓글의 좋아요 수를 올려주고 좋아요한 회원과 댓글 정보를 저장합니다."""
+  increaseReplyLike(
+    """댓글 고유 ID"""
+    reply_id: String!
+  ): Board!
+
+  """댓글의 좋아요를 취소하는 기능입니다. (좋아요한 댓글에게만 동작)"""
+  decreaseReplyLike(
+    """댓글 고유 ID"""
+    reply_id: String!
+  ): Board!
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
   updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
   deleteIngredient(ingredient_id: String!): Boolean!
@@ -330,11 +525,10 @@ type Mutation {
 
   """원룸의 조회수를 1 증가시킵니다."""
   inceaseOneRoomView(oneRoom_id: String!): OneRoom!
-  increasePoint(id: String!, additionalPoint: Float!): Point!
-  checkAttendance(id: String!): Boolean!
+  dailyCheckIn: Boolean!
 }
 
-"""신규 회원 가입을 위한 사용자 정보 입력 타입입니다."""
+"""유저 생성 입력 정보"""
 input CreateUserInput {
   """이메일"""
   email: String!
@@ -370,7 +564,7 @@ input CreateUserInput {
   is_find_mate: Boolean!
 }
 
-"""회원 정보 수정을 위한 사용자 정보 입력 타입입니다."""
+"""유저 정보 수정 입력 정보"""
 input UpdateUserInput {
   """이메일"""
   email: String
@@ -397,58 +591,122 @@ input UpdateUserInput {
   is_find_mate: Boolean
 }
 
+"""중고마켓 상품 생성 입력 정보"""
 input CreateUsedProductInput {
+  """중고마켓 상품 제목"""
   title: String!
+
+  """중고마켓 상품 가격"""
   price: Int!
+
+  """중고마켓 상품 설명"""
   detail: String!
+
+  """중고마켓 상품 카테고리"""
   category: String!
+
+  """중고마켓 상품 거래 상태(판매중/예약중/판매완료)"""
   state: String!
 }
 
+"""중고마켓 상품 수정 입력 정보"""
 input UpdateUsedProductInput {
+  """중고마켓 상품 ID"""
   id: String!
+
+  """상품 제목"""
   title: String
+
+  """상품 가격"""
   price: Int
+
+  """상품 설명"""
   detail: String
+
+  """상품 카테고리"""
   category: String
+
+  """상품 거래 상태(판매중/예약중/판매완료)"""
   state: String
 }
 
+"""게시글 생성 입력 정보"""
 input CreateBoardInput {
+  """게시판 카테고리"""
   category: String!
+
+  """게시글 제목"""
   title: String!
+
+  """게시글 내용"""
   detail: String!
 }
 
+"""게시글 수정 입력 정보"""
 input UpdateBoardInput {
+  """고유 ID"""
   id: String!
+
+  """게시판 카테고리"""
   category: String
+
+  """게시글 제목"""
   title: String
+
+  """게시글 내용"""
   detail: String
 }
 
+"""식재료 생성 입력 정보"""
 input CreateIngredientInput {
+  """식재료 이름"""
   name: String!
+
+  """식재료 수량"""
   count: Int
+
+  """식재료 양"""
   volume: Float
+
+  """식재료 양 단위"""
   volume_unit: String
 }
 
+"""식재료 수정 입력 정보"""
 input UpdateIngredientInput {
+  """고유 ID"""
   id: String!
+
+  """식재료 이름"""
   name: String
+
+  """식재료 수량"""
   count: Int
+
+  """식재료 양"""
   volume: Float
+
+  """식재료 양 단위"""
   volume_unit: String
 }
 
+"""쪽지 생성 입력 정보"""
 input CreateLetterInput {
+  """쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)"""
   category: String!
+
+  """쪽지 제목"""
   title: String!
+
+  """쪽지 내용"""
   detail: String!
 }
 
+"""쪽지 답장 입력 정보"""
 input ReplyLetterInput {
+  """쪽지 답장 제목"""
   title: String!
+
+  """쪽지 답장 내용"""
   detail: String!
 }

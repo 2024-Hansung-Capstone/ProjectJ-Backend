@@ -7,29 +7,34 @@ import {
   JoinColumn,
   OneToMany,
   CreateDateColumn,
-} from 'typeorm'; //typeorm: 데이터베이스 관련
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Board } from './board.entity';
 import { LikeUserRecord } from 'src/apis/like/entities/like_user_record.entity';
+
 @Entity()
-@ObjectType()
+@ObjectType({ description: '댓글 정보' })
 export class Reply {
   @PrimaryGeneratedColumn('uuid')
-  @Field(() => String)
+  @Field(() => String, { description: '고유 ID' })
   id: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  @Field(() => User, { description: '작성자 정보' })
   user: User;
 
   @ManyToOne(() => Board, { onDelete: 'CASCADE' })
+  @JoinColumn()
+  @Field(() => Board, { description: '원 게시글 정보' })
   board: Board;
 
   @Column('text')
-  @Field(() => String)
+  @Field(() => String, { description: '내용' })
   detail: string;
 
   @Column({ default: 0 })
-  @Field(() => Int)
+  @Field(() => Int, { description: '좋아요 수' })
   like: number;
 
   @JoinColumn()
@@ -42,7 +47,7 @@ export class Reply {
   )
   like_user: LikeUserRecord[];
 
-  @CreateDateColumn({ type: 'timestamp' }) // 기본값으로 현재시간을 가져오려면 이렇게 하면 됩니다
-  @Field(() => Date)
+  @CreateDateColumn({ type: 'timestamp' })
+  @Field(() => Date, { description: '작성일' })
   create_at: Date;
 }

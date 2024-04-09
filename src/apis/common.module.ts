@@ -25,8 +25,9 @@ import { UsedProductService } from './used_markets/usedProducts.service';
 import { NotificationMessages } from './notifications/notifications.messages';
 import { HttpModule } from '@nestjs/axios';
 import { UserService } from './users/users.service';
-import { Point } from './point/entity/point.entity';
+import { DailyCheck } from './point/entity/dailyCheck.entity';
 import { PointService } from './point/point.service';
+import { Role } from './point/entity/role.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -43,7 +44,8 @@ import { PointService } from './point/point.service';
       UsedProduct,
       User,
       Token,
-      Point,
+      Role,
+      DailyCheck,
     ]),
     JwtModule.register({}),
     HttpModule,
