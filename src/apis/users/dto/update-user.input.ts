@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 
 @InputType({
-  description: '회원 정보 수정을 위한 사용자 정보 입력 타입입니다.',
+  description: '유저 정보 수정 입력 정보',
 })
 export class UpdateUserInput {
   @Field(() => String, { nullable: true, description: '이메일' })
