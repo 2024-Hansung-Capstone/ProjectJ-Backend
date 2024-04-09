@@ -87,7 +87,7 @@ export class BoardService {
     board.title = title;
     board.detail = detail;
     board.category = category;
-    board.createat = new Date();
+    board.create_at = new Date();
     board.user = user;
     return await this.boardRepository.save(board);
   }

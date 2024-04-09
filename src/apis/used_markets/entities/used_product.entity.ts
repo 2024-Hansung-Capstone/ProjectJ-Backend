@@ -10,11 +10,12 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { LikeUserRecord } from '../../like/entities/like_user_record.entity';
+
 @Entity()
-@ObjectType({ description: '중고거래 데이터 엔티티' })
+@ObjectType({ description: '중고물품 정보' })
 export class UsedProduct {
   @PrimaryGeneratedColumn('uuid')
-  @Field(() => String, { description: '중고물품 고유 식별번호' })
+  @Field(() => String, { description: '고유 ID' })
   id: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
@@ -47,7 +48,9 @@ export class UsedProduct {
   category: string;
 
   @Column({ length: 50 })
-  @Field(() => String, { description: '중고물품 판매상태' })
+  @Field(() => String, {
+    description: '중고물품 거래 상태(판매중/예약중/판매완료)',
+  })
   state: string;
 
   @CreateDateColumn({ type: 'timestamp' })

@@ -9,21 +9,21 @@ import {
 import { Sido } from './sido.entity';
 
 @Entity()
-@ObjectType()
+@ObjectType({ description: '시/군/구 정보' })
 export class Sgng {
   @PrimaryColumn('varchar', { length: 5 })
-  @Field(() => String)
+  @Field(() => String, { description: '시/군/구 코드' })
   id: string;
 
   @ManyToOne(() => Sido)
-  @Field(() => Sido)
+  @Field(() => Sido, { description: '시/도 정보' })
   sido: Sido;
 
   @Column({ length: 50 })
-  @Field(() => String)
+  @Field(() => String, { description: '시/군/구 이름' })
   name: string;
 
   @CreateDateColumn({ type: 'timestamp' })
-  @Field(() => Date)
+  @Field(() => Date, { description: '기준일자' })
   crtr_at: Date;
 }

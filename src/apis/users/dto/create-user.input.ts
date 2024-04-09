@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 
 @InputType({
-  description: '신규 회원 가입을 위한 사용자 정보 입력 타입입니다.',
+  description: '유저 생성 입력 정보',
 })
 export class CreateUserInput {
   @Field(() => String, { description: '이메일' })

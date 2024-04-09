@@ -4,7 +4,7 @@ import { PrimaryGeneratedColumn, Column, Entity } from 'typeorm';
 @ObjectType()
 export class Point {
   @PrimaryGeneratedColumn('uuid')
-  @Field(() => String)
+  @Field(() => String, { description: '고유 ID' })
   id: string;
 
   @Column({ default: 0 })
