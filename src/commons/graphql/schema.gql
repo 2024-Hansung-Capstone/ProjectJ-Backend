@@ -141,17 +141,18 @@ type OneRoom {
   view: Int!
 }
 
-type Point {
-  id: String!
+type Role {
+  """등급 코드"""
+  code: String!
 
-  """포인트 값"""
-  value: Int!
+  """최소 포인트"""
+  min_point: Int!
 
-  """포인트 값에 따른 호칭"""
-  title: String!
+  """최대 포인트"""
+  max_point: Int!
 
-  """출석한 날짜"""
-  attendanceDates: [DateTime!]
+  """등급 이름"""
+  name: String!
 }
 
 type Query {
@@ -207,6 +208,7 @@ type Query {
 
   """조회수가 많은 원룸 rank개를 리턴"""
   fetchOneRoomsByViewRank(rank: Float!): [OneRoom!]!
+  fetchRoleByUserId: Role!
 }
 
 input SearchProductInput {
@@ -330,8 +332,7 @@ type Mutation {
 
   """원룸의 조회수를 1 증가시킵니다."""
   inceaseOneRoomView(oneRoom_id: String!): OneRoom!
-  increasePoint(id: String!, additionalPoint: Float!): Point!
-  checkAttendance(id: String!): Boolean!
+  dailyCheckIn: Boolean!
 }
 
 """신규 회원 가입을 위한 사용자 정보 입력 타입입니다."""
