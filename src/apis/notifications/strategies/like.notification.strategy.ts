@@ -13,13 +13,33 @@ export class LikeNotificationStrategy implements NotificationStrategy {
     entity_id: string,
     code: string,
   ): Promise<Notification> {
-    const like = await this.likeUserRecordService.findById(entity_id);
-    return await this.notificationRepository.save({
-      user: like.used_product.user,
-      code: code,
-      like: like,
-      board: like.board,
-      product: like.used_product,
-    });
+    if (code === '200') {
+      const like = await this.likeUserRecordService.findById(entity_id);
+      return await this.notificationRepository.save({
+        user: like.used_product.user,
+        code: code,
+        like: like,
+        board: like.board,
+        product: like.used_product,
+      });
+    } else if (code === '201') {
+      const like = await this.likeUserRecordService.findById(entity_id);
+      return await this.notificationRepository.save({
+        user: like.user,
+        code: code,
+        like: like,
+        board: like.board,
+        product: like.used_product,
+      });
+    } else if (code === '202') {
+      const like = await this.likeUserRecordService.findById(entity_id);
+      return await this.notificationRepository.save({
+        user: like.board.user,
+        code: code,
+        like: like,
+        board: like.board,
+        product: like.used_product,
+      });
+    }
   }
 }
