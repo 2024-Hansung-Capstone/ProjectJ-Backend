@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-@ObjectType()
+@ObjectType({ description: '출석 정보' })
 export class DailyCheck {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => String, { description: '고유 ID' })

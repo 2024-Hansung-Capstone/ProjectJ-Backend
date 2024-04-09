@@ -2,7 +2,7 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity()
-@ObjectType()
+@ObjectType({ description: '등급 정보' })
 export class Role {
   @PrimaryColumn({ unique: true })
   @Field(() => String, { description: '등급 코드' })

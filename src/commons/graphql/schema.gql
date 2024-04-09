@@ -238,6 +238,7 @@ type OneRoom {
   view: Int!
 }
 
+"""등급 정보"""
 type Role {
   """등급 코드"""
   code: String!
