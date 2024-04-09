@@ -61,11 +61,11 @@ export class CookResolver {
   }
 
   //순위 업데이트
-  @Query(() => Boolean)
-  async updateRankCook(): Promise<boolean> {
-    await this.cookService.updateRank();
-    return true;
-  }
+  // @Query(() => Boolean)
+  // async updateRankCook(): Promise<boolean> {
+  //   await this.cookService.updateRank();
+  //   return true;
+  // }
 
   //검색 기능
   @Query(() => [Cook])
