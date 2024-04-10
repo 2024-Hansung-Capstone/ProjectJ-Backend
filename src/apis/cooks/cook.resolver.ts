@@ -55,17 +55,11 @@ export class CookResolver {
   }
 
   //조회수로 순위 생성
-  @Query(() => [Cook])
-  async getRankCook(): Promise<Cook[]> {
-    return await this.cookService.getRank();
+  async fetchCookByViewRank(
+    @Args('rank') rank: number,
+  ): Promise<Cook[]> {
+    return this.cookService.findTopCooks(rank);
   }
-
-  //순위 업데이트
-  // @Query(() => Boolean)
-  // async updateRankCook(): Promise<boolean> {
-  //   await this.cookService.updateRank();
-  //   return true;
-  // }
 
   //검색 기능
   @Query(() => [Cook])
