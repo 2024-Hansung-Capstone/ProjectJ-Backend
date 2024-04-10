@@ -1,22 +1,30 @@
+import { Notification } from './entities/notification.entity';
+
 export class NotificationMessages {
-  async getMessage(code: string, entity: any): Promise<string> {
+  async getMessage(notification: Notification): Promise<string> {
     let message = '';
     try {
-      switch (code) {
+      switch (notification.code) {
         case '100':
-          message = `${entity.name}님의 신규 회원가입을 환영합니다!`;
+          message = `${notification.user.name}님의 신규 회원가입을 환영합니다!`;
           break;
         case '200':
-          message = `${entity.user.name}님이 ${entity.used_product.title} 제품을 찜하였습니다.`;
+          message = `${notification.like.user.name}님이 '${notification.used_product.title}' 제품을 찜하였습니다.`;
           break;
         case '201':
-          message = `내가 찜한 ${entity.used_product.title}의 가격이 ${entity.used_product.price}원으로 변동되었습니다.`;
+          message = `내가 찜한 '${notification.used_product.title}'의 가격이 ${notification.used_product.price}원으로 변동되었습니다.`;
           break;
         case '202':
-          message = `게시글 '${entity.board.title}에 ${entity.user.name}님이 좋아요를 눌렀습니다.`;
+          message = `게시글 '${notification.board.title}'에 ${notification.like.user.name}님이 좋아요를 눌렀습니다.`;
+          break;
+        case '203':
+          message = `댓글 '${notification.board.title}'에 ${notification.like.user.name}님이 좋아요를 눌렀습니다.`;
           break;
         case '300':
-          message = `게시글 '${entity.board.title}에 ${entity.user.name}님이 댓글을 남겼습니다.`;
+          message = `게시글 '${notification.board.title}'에 ${notification.reply.user.name}님이 댓글을 남겼습니다.`;
+          break;
+        case '400':
+          message = `'${notification.letter.sender.name}님이 ${notification.letter.category} 카테고리에서 쪽지를 보냈습니다.`;
           break;
         default:
           message = '알 수 없는 알림입니다.';
