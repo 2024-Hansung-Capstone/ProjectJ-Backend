@@ -199,7 +199,7 @@ export class UserService {
       }
 
       // SMS로 토큰 전송
-      sendTokenToSMS(phone_number, token);
+      //sendTokenToSMS(phone_number, token);
       return token;
     } catch (error) {
       throw new BadRequestException('Token 생성에 실패하였습니다.');

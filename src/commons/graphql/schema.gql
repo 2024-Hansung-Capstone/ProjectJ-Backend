@@ -217,6 +217,21 @@ type Letter {
   create_at: DateTime!
 }
 
+"""등급 정보"""
+type Role {
+  """등급 코드"""
+  code: String!
+
+  """최소 포인트"""
+  min_point: Int!
+
+  """최대 포인트"""
+  max_point: Int!
+
+  """등급 이름"""
+  name: String!
+}
+
 """재료 정보"""
 type Ingredient {
   """고유 ID"""
@@ -254,21 +269,6 @@ type OneRoom {
   is_monthly_rent: Boolean!
   deposit: Float
   view: Int!
-}
-
-"""등급 정보"""
-type Role {
-  """등급 코드"""
-  code: String!
-
-  """최소 포인트"""
-  min_point: Int!
-
-  """최대 포인트"""
-  max_point: Int!
-
-  """등급 이름"""
-  name: String!
 }
 
 type Query {

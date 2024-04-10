@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DailyCheck } from './entity/dailyCheck.entity';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
@@ -15,6 +15,7 @@ export class PointService {
     private readonly roleRepository: Repository<Role>,
     @InjectRepository(DailyCheck)
     private readonly dailyCheckRepository: Repository<DailyCheck>,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
   ) {}
 
