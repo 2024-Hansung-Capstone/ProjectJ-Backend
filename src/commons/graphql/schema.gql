@@ -217,6 +217,39 @@ type Letter {
   create_at: DateTime!
 }
 
+"""알림 정보"""
+type Notification {
+  """고유 ID"""
+  id: String!
+
+  """받는 사람 정보"""
+  user: User!
+
+  """알림이 생성된 쪽지 정보"""
+  letter: Letter
+
+  """알림이 생성된 게시글 정보"""
+  board: Board
+
+  """알림이 생성된 댓글 정보"""
+  reply: Reply
+
+  """알림이 생성된 중고 물품 정보"""
+  used_product: UsedProduct
+
+  """알림이 생성된 중고 상품 정보"""
+  like: LikeUserRecord
+
+  """알림 코드(코드표 참조)"""
+  code: String!
+
+  """확인 여부"""
+  is_read: Boolean!
+
+  """알림 생성일"""
+  create_at: DateTime!
+}
+
 """재료 정보"""
 type Ingredient {
   """고유 ID"""
@@ -347,11 +380,14 @@ type Query {
   """조회수가 많은 원룸 rank개를 리턴"""
   fetchOneRoomsByViewRank(rank: Float!): [OneRoom!]!
 
-  """알림 메시지 조회"""
+  """특정 알림의 메시지를 조회합니다."""
   getNotificationMessage(
     """알림 고유 ID"""
     notification_id: String!
   ): String!
+
+  """나의 알림을 전체 조회합니다."""
+  fetchMyNotificationMessages: [Notification!]!
   fetchMyRole: Role!
 }
 
@@ -525,6 +561,15 @@ type Mutation {
 
   """원룸의 조회수를 1 증가시킵니다."""
   inceaseOneRoomView(oneRoom_id: String!): OneRoom!
+
+  """특정 알림을 삭제합니다."""
+  deleteNotificationMessage(
+    """알림 고유 ID"""
+    notification_id: String!
+  ): Boolean!
+
+  """나의 알림을 전체 삭제합니다."""
+  deleteAllMyNotificationMessages: Boolean!
   dailyCheckIn: Boolean!
 }
 

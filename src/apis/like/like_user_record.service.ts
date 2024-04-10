@@ -25,6 +25,9 @@ export class LikeUserRecordService {
         'used_product.user',
         'board',
         'reply',
+        'reply.board',
+        'reply.user',
+        'reply.board.user',
         'board.user',
       ],
     });

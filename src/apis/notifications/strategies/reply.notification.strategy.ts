@@ -18,6 +18,7 @@ export class ReplyNotificationStrategy implements NotificationStrategy {
       user: reply.board.user,
       code: code,
       board: reply.board,
+      reply: reply,
     });
   }
 }

@@ -203,8 +203,9 @@ export class BoardService {
     reply.board = board;
     reply.detail = detail;
     board.reply.push(reply);
-    await this.replyRepository.save(reply);
+    const result = await this.replyRepository.save(reply);
     await this.boardRepository.save(board);
+    await this.notificationService.create(result.id, '300');
     return await this.findById(id);
   }
   async deleteReply(user_id: string, reply_id: string): Promise<Board> {
@@ -279,8 +280,9 @@ export class BoardService {
     like_user_record.reply = reply;
     like_user_record.user = user;
     reply.like_user.push(like_user_record);
-    await this.likeUserRecordRepository.save(like_user_record);
+    const like = await this.likeUserRecordRepository.save(like_user_record);
     await this.replyRepository.save(reply);
+    await this.notificationService.create(like.id, '203');
     return await this.findById(reply.board.id);
   }
 
@@ -310,7 +312,7 @@ export class BoardService {
   async findReplyById(reply_id: string): Promise<Reply> {
     return await this.replyRepository.findOne({
       where: { id: reply_id },
-      relations: ['user', 'board'],
+      relations: ['user', 'board', 'board.user'],
     });
   }
 }
