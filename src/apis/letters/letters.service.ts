@@ -13,6 +13,7 @@ import { UserService } from '../users/users.service';
 import { UsedProductService } from '../used_markets/usedProducts.service';
 import { BoardService } from '../boards/boards.service';
 import { ReplyLetterInput } from './dto/reply-letter.input';
+import { NotificationService } from '../notifications/notifications.service';
 
 @Injectable()
 export class LetterService {
@@ -23,6 +24,8 @@ export class LetterService {
     private readonly userService: UserService,
     private readonly usedProductService: UsedProductService,
     private readonly boardService: BoardService,
+    @Inject(forwardRef(() => NotificationService))
+    private readonly notificationService: NotificationService,
   ) {}
 
   async writeLetter(
@@ -56,7 +59,9 @@ export class LetterService {
     }
 
     //쪽지 저장
-    return await this.letterRepository.save(letter);
+    const result = await this.letterRepository.save(letter);
+    await this.notificationService.create(result.id, '400');
+    return result;
   }
 
   //쪽지 답장
@@ -82,6 +87,7 @@ export class LetterService {
   async findById(letter_id: string): Promise<Letter> {
     const letter = await this.letterRepository.findOne({
       where: { id: letter_id },
+      relations: ['sender', 'receiver', 'product', 'board'],
     });
 
     if (!letter) {

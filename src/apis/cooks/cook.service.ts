@@ -73,21 +73,13 @@ export class CookService {
     cook.view += 1;
     return await this.cookRepository.save(cook);
   }
-
-  async getRank(): Promise<Cook[]> {
-    return await this.cookRepository
-      .createQueryBuilder('cook')
-      .orderBy('cook.view', 'DESC')
-      .getMany();
-  }
-
-  // async updateRank(): Promise<void> {
-  //   const cookRank = await this.getRank();
-  //   for (let i = 0; i < cookRank.length; i++) {
-  //     cookRank[i].rank = i + 1;
-  //     await this.cookRepository.save(cookRank[i]);
-  //   }
-  // }
+  
+   async findTopCooks(rank: number): Promise<Cook[]> {
+    return await this.cookRepository.find({
+      order: {view: 'DESC'},
+      take: rank,
+    })
+   }
 
   async search(keyword: string): Promise<Cook[]> {
     if (keyword.length < 2) {

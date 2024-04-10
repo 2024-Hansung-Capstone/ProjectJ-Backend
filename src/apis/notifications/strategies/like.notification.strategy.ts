@@ -20,7 +20,7 @@ export class LikeNotificationStrategy implements NotificationStrategy {
         code: code,
         like: like,
         board: like.board,
-        product: like.used_product,
+        used_product: like.used_product,
       });
     } else if (code === '201') {
       const like = await this.likeUserRecordService.findById(entity_id);
@@ -29,7 +29,7 @@ export class LikeNotificationStrategy implements NotificationStrategy {
         code: code,
         like: like,
         board: like.board,
-        product: like.used_product,
+        used_product: like.used_product,
       });
     } else if (code === '202') {
       const like = await this.likeUserRecordService.findById(entity_id);
@@ -38,7 +38,15 @@ export class LikeNotificationStrategy implements NotificationStrategy {
         code: code,
         like: like,
         board: like.board,
-        product: like.used_product,
+        used_product: like.used_product,
+      });
+    } else if (code === '203') {
+      const like = await this.likeUserRecordService.findById(entity_id);
+      return await this.notificationRepository.save({
+        user: like.reply.user,
+        code: code,
+        like: like,
+        board: like.reply.board,
       });
     }
   }

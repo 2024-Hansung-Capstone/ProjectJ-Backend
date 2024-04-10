@@ -13,6 +13,7 @@ export class LetterNotificationStrategy implements NotificationStrategy {
     entity_id: string,
     code: string,
   ): Promise<Notification> {
+    console.log('--->>', entity_id, code);
     const letter = await this.letterService.findById(entity_id);
     return await this.notificationRepository.save({
       user: letter.receiver,

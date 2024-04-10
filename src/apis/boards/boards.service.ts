@@ -18,6 +18,7 @@ import { UserService } from '../users/users.service';
 import { LikeUserRecord } from '../like/entities/like_user_record.entity';
 import { Reply } from './entities/reply.entity';
 import { NotificationService } from '../notifications/notifications.service';
+import { PointService } from '../point/point.service';
 @Injectable()
 export class BoardService {
   constructor(
@@ -31,6 +32,8 @@ export class BoardService {
     private readonly userService: UserService,
     @Inject(forwardRef(() => NotificationService))
     private readonly notificationService: NotificationService,
+    @Inject(forwardRef(() => PointService))
+    private readonly pointService: PointService,
   ) {}
 
   async findAll(category: string): Promise<Board[]> {
@@ -73,11 +76,17 @@ export class BoardService {
   }
 
   async findTopBoards(category: string, rank: number): Promise<Board[]> {
-    return await this.boardRepository.find({
+    const boards = await this.boardRepository.find({
       where: { category: category },
       order: { like: 'DESC' },
+      relations: ['user'],
       take: rank,
     });
+
+    for (const rankBoard of boards) {
+      await this.pointService.increase(rankBoard.user.id, +100);
+    }
+    return boards;
   }
 
   async create(
@@ -92,6 +101,7 @@ export class BoardService {
     board.category = category;
     board.create_at = new Date();
     board.user = user;
+    await this.pointService.increase(user.id, +10);
     return await this.boardRepository.save(board);
   }
   async update(
@@ -126,6 +136,7 @@ export class BoardService {
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
     }
+    await this.pointService.increase(board.user.id, -10);
     const result = await this.boardRepository.delete(board_id);
     return result.affected ? true : false;
   }
@@ -155,6 +166,7 @@ export class BoardService {
     if (checkuser) {
       throw new ForbiddenException(`이미 좋아요한 게시글 입니다.`);
     }
+    await this.pointService.increase(board.user.id, +5);
     board.like = board.like + 1;
     like_user_record.board = board;
     like_user_record.user = user;
@@ -175,7 +187,7 @@ export class BoardService {
     if (!checkuser) {
       throw new NotFoundException('좋아요를 하지 않았습니다.');
     }
-
+    await this.pointService.increase(board.user.id, -5);
     board.like = board.like - 1;
     const likeIndex = board.like_user.findIndex(
       (likeUsers) => likeUsers.id === checkuser.id,
@@ -199,12 +211,14 @@ export class BoardService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    await this.pointService.increase(user.id, 1);
     reply.user = user;
     reply.board = board;
     reply.detail = detail;
     board.reply.push(reply);
-    await this.replyRepository.save(reply);
+    const result = await this.replyRepository.save(reply);
     await this.boardRepository.save(board);
+    await this.notificationService.create(result.id, '300');
     return await this.findById(id);
   }
   async deleteReply(user_id: string, reply_id: string): Promise<Board> {
@@ -222,6 +236,7 @@ export class BoardService {
     const replyIndex = board.reply.findIndex(
       (reply) => reply.id === checkreply.id,
     );
+    await this.pointService.increase(user_id, -1);
     board.reply.splice(replyIndex, 1);
     await this.replyRepository.delete(checkreply.id);
     await this.boardRepository.save(board);
@@ -271,7 +286,7 @@ export class BoardService {
       where: { reply: { id: reply.id }, user: { id: user.id } },
       relations: ['user', 'reply'],
     });
-
+    await this.pointService.increase(reply.user.id, 5);
     if (checkreply) {
       throw new ForbiddenException(`이미 좋아요한 댓글 입니다.`);
     }
@@ -279,8 +294,9 @@ export class BoardService {
     like_user_record.reply = reply;
     like_user_record.user = user;
     reply.like_user.push(like_user_record);
-    await this.likeUserRecordRepository.save(like_user_record);
+    const like = await this.likeUserRecordRepository.save(like_user_record);
     await this.replyRepository.save(reply);
+    await this.notificationService.create(like.id, '203');
     return await this.findById(reply.board.id);
   }
 
@@ -293,7 +309,7 @@ export class BoardService {
       where: { reply: { id: reply_id }, user: { id: user_id } },
       relations: ['user', 'reply'],
     });
-
+    await this.pointService.increase(reply.user.id, -5);
     if (!checkreply) {
       throw new ForbiddenException(`좋아요를 하지 않았습니다.`);
     }
@@ -310,7 +326,7 @@ export class BoardService {
   async findReplyById(reply_id: string): Promise<Reply> {
     return await this.replyRepository.findOne({
       where: { id: reply_id },
-      relations: ['user', 'board'],
+      relations: ['user', 'board', 'board.user'],
     });
   }
 }
