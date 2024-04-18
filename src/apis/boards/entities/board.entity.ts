@@ -11,7 +11,7 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { LikeUserRecord } from 'src/apis/like/entities/like_user_record.entity';
 import { Reply } from './reply.entity';
-
+import { PostImage } from 'src/apis/post_image/entities/postImage.entity';
 @Entity()
 @ObjectType({ description: '게시글 정보' })
 export class Board {
@@ -63,4 +63,10 @@ export class Board {
     nullable: true,
   })
   reply: Reply[];
+
+  @JoinColumn()
+  @OneToMany(() => PostImage, (PostImage) => PostImage.board, {
+    nullable: true,
+  })
+  post_image: PostImage[];
 }

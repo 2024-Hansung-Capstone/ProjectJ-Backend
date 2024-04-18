@@ -21,7 +21,7 @@ export class PostImage {
   imagePath: string;
 
   @JoinColumn()
-  @ManyToOne(() => Board, (Board) => Board.postImages, {
+  @ManyToOne(() => Board, (Board) => Board.post_image, {
     eager: false,
     nullable: true,
     onUpdate: 'CASCADE',
@@ -30,7 +30,7 @@ export class PostImage {
   board: Board;
 
   @JoinColumn()
-  @ManyToOne(() => UsedProduct, (UsedProduct) => UsedProduct.postImages, {
+  @ManyToOne(() => UsedProduct, (UsedProduct) => UsedProduct.post_image, {
     eager: false,
     nullable: true,
     onUpdate: 'CASCADE',
