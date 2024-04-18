@@ -28,6 +28,7 @@ import { UserService } from './users/users.service';
 import { DailyCheck } from './point/entity/dailyCheck.entity';
 import { PointService } from './point/point.service';
 import { Role } from './point/entity/role.entity';
+import { PostImage } from './post_image/entities/postImage.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -46,6 +47,7 @@ import { Role } from './point/entity/role.entity';
       Token,
       Role,
       DailyCheck,
+      PostImage,
     ]),
     JwtModule.register({}),
     HttpModule,
