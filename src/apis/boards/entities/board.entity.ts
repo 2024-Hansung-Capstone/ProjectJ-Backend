@@ -68,5 +68,5 @@ export class Board {
   @OneToMany(() => PostImage, (PostImage) => PostImage.board, {
     nullable: true,
   })
-  post_image: PostImage[];
+  post_images: PostImage[];
 }
