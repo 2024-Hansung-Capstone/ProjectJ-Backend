@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { LikeUserRecord } from '../../like/entities/like_user_record.entity';
-
+import { PostImage } from 'src/apis/post_image/entities/postImage.entity';
 @Entity()
 @ObjectType({ description: '중고물품 정보' })
 export class UsedProduct {
@@ -66,4 +66,10 @@ export class UsedProduct {
     },
   )
   like_user: LikeUserRecord[];
+
+  @JoinColumn()
+  @OneToMany(() => PostImage, (PostImage) => PostImage.used_proudct, {
+    nullable: true,
+  })
+  post_images: PostImage[];
 }

@@ -57,6 +57,12 @@ export class NotificationService {
     };
   }
 
+  /**
+   * 알림 생성 서비스 메서드
+   * @param entity_id 알림 생성 대상 엔티티의 ID
+   * @param code 알림 코드 ex) 100, 200...
+   * @returns 생성된 알림 정보
+   */
   async create(entity_id: string, code: string): Promise<Notification> {
     const strategy = this.strategies[code];
     if (!strategy) {
@@ -65,6 +71,11 @@ export class NotificationService {
     return await strategy.createNotification(entity_id, code);
   }
 
+  /**
+   * 알림 ID 기준 알림 조회 서비스 메서드
+   * @param notification_id 조회할 알림 ID
+   * @returns 조회된 알림 정보
+   */
   async findById(notification_id: string): Promise<Notification> {
     return await this.notificationRepository.findOne({
       where: { id: notification_id },
@@ -87,6 +98,11 @@ export class NotificationService {
     });
   }
 
+  /**
+   * 특정 사용자의 알림 전체 조회 서비스 메서드
+   * @param user_id 조회할 사용자 ID
+   * @returns 조회된 알림 정보 리스트
+   */
   async findByUserId(user_id: string): Promise<Notification[]> {
     return await this.notificationRepository.find({
       where: { user: { id: user_id } },
@@ -105,6 +121,13 @@ export class NotificationService {
     });
   }
 
+  /**
+   * 알림 ID 기준 알림 삭제 서비스 메서드
+   * 본인의 알림인지 확인 과정을 거치고 삭제를 시도
+   * @param user_id 삭제를 시도하는 사용자 ID
+   * @param notification_id 삭제할 알림 ID
+   * @returns 삭제 성공 여부
+   */
   async delete(user_id: string, notification_id: string): Promise<boolean> {
     const notification = await this.findById(notification_id);
     if (notification.user.id !== user_id) {
@@ -114,6 +137,11 @@ export class NotificationService {
     return result.affected > 0;
   }
 
+  /**
+   * 특정 사용자의 알림 전체 삭제 서비스 메서드
+   * @param user_id 알림을 삭제할 사용자 ID
+   * @returns 삭제 성공 여부
+   */
   async deleteByUserId(user_id: string): Promise<boolean> {
     const result = await this.notificationRepository.delete({
       user: { id: user_id },
@@ -121,6 +149,13 @@ export class NotificationService {
     return result.affected > 0;
   }
 
+  /**
+   * 알림 메시지 조회 서비스 메서드
+   * 본인의 알림인지 확인 과정을 거치고 알림 ID값으로 알림 메시지를 조회
+   * @param user_id 조회할 사용자 ID
+   * @param notification_id 조회할 알림 ID
+   * @returns 조회된 알림 메시지
+   */
   async getMessage(user_id: string, notification_id: string): Promise<string> {
     const notification = await this.findById(notification_id);
     const strategy = this.strategies[notification.code];

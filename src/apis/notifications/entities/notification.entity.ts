@@ -21,7 +21,7 @@ export class Notification {
   @Field(() => String, { description: '고유 ID' })
   id: string;
 
-  @ManyToOne(() => User, { cascade: true })
+  @ManyToOne(() => User, { cascade: true, onDelete: 'CASCADE' })
   @JoinColumn()
   @Field(() => User, { description: '받는 사람 정보' })
   user: User;

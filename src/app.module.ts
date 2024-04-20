@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Post } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,6 +12,7 @@ import { LetterModule } from './apis/letters/letters.module';
 import { OneRoomModule } from './apis/oneroom/oneroom.module';
 import { NotificationModule } from './apis/notifications/notifications.module';
 import { PointModule } from './apis/point/point.module';
+import { PostImageModule } from './apis/post_image/postImage.module';
 @Module({
   imports: [
     UserModule,
@@ -23,6 +24,7 @@ import { PointModule } from './apis/point/point.module';
     OneRoomModule,
     NotificationModule,
     PointModule,
+    PostImageModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
