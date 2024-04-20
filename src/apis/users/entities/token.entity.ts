@@ -15,7 +15,7 @@ export class Token {
   @Field(() => String, { description: '고유 ID' })
   id: string;
 
-  @OneToOne(() => User, { nullable: true })
+  @OneToOne(() => User, { nullable: true, onDelete: 'CASCADE', cascade: true })
   @JoinColumn()
   @Field(() => User, { nullable: true, description: '사용자 정보' })
   user: User;

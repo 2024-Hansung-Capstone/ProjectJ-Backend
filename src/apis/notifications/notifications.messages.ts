@@ -1,6 +1,12 @@
 import { Notification } from './entities/notification.entity';
 
 export class NotificationMessages {
+  /**
+   * 알림 메시지 생성 메서드
+   * 알림 코드에 따라 알림 메시지를 생성합니다.
+   * @param notification 메시지를 조회할 알림 정보
+   * @returns 생성된 알림 메시지
+   */
   async getMessage(notification: Notification): Promise<string> {
     let message = '';
     try {
@@ -18,7 +24,7 @@ export class NotificationMessages {
           message = `게시글 '${notification.board.title}'에 ${notification.like.user.name}님이 좋아요를 눌렀습니다.`;
           break;
         case '203':
-          message = `댓글 '${notification.board.title}'에 ${notification.like.user.name}님이 좋아요를 눌렀습니다.`;
+          message = `'${notification.board.title}' 게시글에 단 내 댓글에 ${notification.like.user.name}님이 좋아요를 눌렀습니다.`;
           break;
         case '300':
           message = `게시글 '${notification.board.title}'에 ${notification.reply.user.name}님이 댓글을 남겼습니다.`;
