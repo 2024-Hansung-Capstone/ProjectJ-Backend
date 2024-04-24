@@ -2,6 +2,59 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""댓글 정보"""
+type Reply {
+  """고유 ID"""
+  id: String!
+
+  """작성자 정보"""
+  user: User!
+
+  """원 게시글 정보"""
+  board: Board!
+
+  """내용"""
+  detail: String!
+
+  """좋아요 수"""
+  like: Int!
+
+  """작성일"""
+  create_at: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""게시글 정보"""
+type Board {
+  """고유 ID"""
+  id: String!
+
+  """작성자 정보"""
+  user: User!
+
+  """카테고리"""
+  category: String!
+
+  """제목"""
+  title: String!
+
+  """내용"""
+  detail: String!
+
+  """조회수"""
+  view: Int!
+
+  """좋아요 수"""
+  like: Int!
+
+  """작성일"""
+  create_at: DateTime!
+}
+
 """중고물품 정보"""
 type UsedProduct {
   """고유 ID"""
@@ -32,59 +85,6 @@ type UsedProduct {
   state: String!
 
   """중고물품 생성시간"""
-  create_at: DateTime!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-"""댓글 정보"""
-type Reply {
-  """고유 ID"""
-  id: String!
-
-  """작성자 정보"""
-  user: User!
-
-  """원 게시글 정보"""
-  board: Board!
-
-  """내용"""
-  detail: String!
-
-  """좋아요 수"""
-  like: Int!
-
-  """작성일"""
-  create_at: DateTime!
-}
-
-"""게시글 정보"""
-type Board {
-  """고유 ID"""
-  id: String!
-
-  """작성자 정보"""
-  user: User!
-
-  """카테고리"""
-  category: String!
-
-  """제목"""
-  title: String!
-
-  """내용"""
-  detail: String!
-
-  """조회수"""
-  view: Int!
-
-  """좋아요 수"""
-  like: Int!
-
-  """작성일"""
   create_at: DateTime!
 }
 
