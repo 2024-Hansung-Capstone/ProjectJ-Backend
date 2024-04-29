@@ -21,6 +21,7 @@ import { Reply } from './entities/reply.entity';
 import { NotificationService } from '../notifications/notifications.service';
 import { PointService } from '../point/point.service';
 import { PostImage } from '../post_image/entities/postImage.entity';
+import { PostImageService } from '../post_image/postImage.service';
 @Injectable()
 export class BoardService {
   constructor(
@@ -38,6 +39,8 @@ export class BoardService {
     private readonly notificationService: NotificationService,
     @Inject(forwardRef(() => PointService))
     private readonly pointService: PointService,
+    @Inject(forwardRef(() => PostImageService))
+    private readonly postImageService: PostImageService,
   ) {}
 
   async findAll(category: string): Promise<Board[]> {
@@ -103,7 +106,10 @@ export class BoardService {
     const user = await this.userService.findById(user_id);
     const board = new Board();
 
-    const imgUrl: string | string[] = 'asd';
+    const imgUrl: string | string[] = await this.postImageService.saveImageToS3(
+      folder,
+      file,
+    );
     if (Array.isArray(imgUrl)) {
       for (const url of imgUrl) {
         const postImage = new PostImage();
