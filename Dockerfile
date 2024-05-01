@@ -6,7 +6,7 @@ COPY ./package.json /ProjectJ-Backend/
 COPY ./yarn.lock /ProjectJ-Backend/
 WORKDIR /ProjectJ-Backend/
 RUN yarn install
-
+ENV NODE_OPTIONS="--max-old-space-size=1024"
 COPY . /ProjectJ-Backend/
 
 # 3. 도커안에서 index.js 실행시키기
