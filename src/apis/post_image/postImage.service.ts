@@ -73,4 +73,26 @@ export class PostImageService {
       throw new Error('이미지 업로드에 에러 발생');
     }
   }
+
+  async deleteImageFromS3(imageUrl: string): Promise<void> {
+    try {
+      // 이미지 URL에서 키(Key)를 추출
+      const key = imageUrl.split(
+        `${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/`,
+      )[1];
+
+      // S3 객체 삭제 요청
+      await this.awsS3
+        .deleteObject({
+          Bucket: this.S3_BUCKET_NAME,
+          Key: key,
+        })
+        .promise();
+
+      console.log(`이미지 (${imageUrl}) 삭제 완료`);
+    } catch (error) {
+      console.error('이미지 삭제 중 에러사유:', error);
+      throw new Error('이미지 삭제에 에러 발생');
+    }
+  }
 }
