@@ -194,7 +194,9 @@ export class BoardService {
       where: { board: { id: board.id }, user: { id: user.id } },
       relations: ['user', 'board'],
     });
-
+    if (board.user.id === user_id) {
+      throw new ForbiddenException('자신의 게시글은 좋아요 할 수 없습니다');
+    }
     if (checkuser) {
       throw new ForbiddenException(`이미 좋아요한 게시글 입니다.`);
     }
@@ -310,7 +312,7 @@ export class BoardService {
   async addReplyLike(user_id: string, reply_id: string): Promise<Board> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
-      relations: ['like_user', 'board'],
+      relations: ['like_user', 'board', 'user'],
     });
     const like_user_record = new LikeUserRecord();
     const user = await this.userService.findById(user_id);
@@ -319,6 +321,9 @@ export class BoardService {
       relations: ['user', 'reply'],
     });
     await this.pointService.increase(reply.user.id, 5);
+    if (reply.user.id === user_id) {
+      throw new ForbiddenException('자신의 댓글은 좋아요 할 수 없습니다');
+    }
     if (checkreply) {
       throw new ForbiddenException(`이미 좋아요한 댓글 입니다.`);
     }
