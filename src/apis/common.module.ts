@@ -29,6 +29,7 @@ import { DailyCheck } from './point/entity/dailyCheck.entity';
 import { PointService } from './point/point.service';
 import { Role } from './point/entity/role.entity';
 import { PostImage } from './post_image/entities/postImage.entity';
+import { PostImageService } from './post_image/postImage.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -64,6 +65,7 @@ import { PostImage } from './post_image/entities/postImage.entity';
     UserService,
     NotificationMessages,
     PointService,
+    PostImageService,
   ],
   exports: [
     AreaService,
@@ -77,6 +79,7 @@ import { PostImage } from './post_image/entities/postImage.entity';
     UserService,
     NotificationMessages,
     PointService,
+    PostImageService,
   ],
 })
 export class CommonModule {}
