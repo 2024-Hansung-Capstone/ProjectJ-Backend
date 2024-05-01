@@ -158,9 +158,23 @@ export class BoardService {
       await this.postImageRepository.delete(post_image.id);
     }
     board.post_images = [];
+    let imgUrl: string | string[];
     if (Array.isArray(file)) {
+      for (const item of file) {
+        imgUrl = await this.postImageService.saveImageToS3(folder, item);
+        const postImage = new PostImage();
+        postImage.board = board;
+        if (!Array.isArray(imgUrl)) postImage.imagePath = imgUrl;
+        await this.postImageRepository.save(postImage);
+        board.post_images.push(postImage);
+      }
     } else {
-      await this.postImageService.saveImageToS3(folder, file);
+      imgUrl = await this.postImageService.saveImageToS3(folder, file);
+      const postImage = new PostImage();
+      postImage.board = board;
+      if (!Array.isArray(imgUrl)) postImage.imagePath = imgUrl;
+      await this.postImageRepository.save(postImage);
+      board.post_images.push(postImage);
     }
 
     await this.boardRepository.update({ id: id }, { ...rest });
