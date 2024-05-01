@@ -22,6 +22,8 @@ import { NotificationService } from '../notifications/notifications.service';
 import { PointService } from '../point/point.service';
 import { PostImage } from '../post_image/entities/postImage.entity';
 import { PostImageService } from '../post_image/postImage.service';
+import { isArray } from 'class-validator';
+import * as path from 'path';
 @Injectable()
 export class BoardService {
   constructor(
@@ -136,6 +138,8 @@ export class BoardService {
   }
 
   async update(
+    folder: string,
+    file: Express.Multer.File | Express.Multer.File[],
     user_id: string,
     updateBoradInput: UpdateBoardInput,
   ): Promise<Board> {
@@ -149,6 +153,16 @@ export class BoardService {
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
     }
+    for (const post_image of board.post_images) {
+      await this.postImageService.deleteImageFromS3(post_image.imagePath);
+      await this.postImageRepository.delete(post_image.id);
+    }
+    board.post_images = [];
+    if (Array.isArray(file)) {
+    } else {
+      await this.postImageService.saveImageToS3(folder, file);
+    }
+
     await this.boardRepository.update({ id: id }, { ...rest });
     return await this.boardRepository.findOne({
       where: { id: id },
@@ -167,6 +181,9 @@ export class BoardService {
       throw new ForbiddenException(
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
+    }
+    for (const post_image of board.post_images) {
+      await this.postImageService.deleteImageFromS3(post_image.imagePath);
     }
     await this.pointService.increase(board.user.id, -10);
     const result = await this.boardRepository.delete(board_id);

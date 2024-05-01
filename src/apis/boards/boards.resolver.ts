@@ -66,7 +66,7 @@ export class BoardResolver {
     description:
       '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 하나일 때)',
   })
-  async createBoard(
+  async createBoardWithImage(
     @UploadedFile() file: Express.Multer.File,
     @Args('createBoardInput') createBoardInput: CreateBoardInput,
     @Context() context: IContext,
@@ -99,15 +99,22 @@ export class BoardResolver {
   }
 
   @UseGuards(gqlAccessGuard)
+  @UseInterceptors(FileInterceptor('image'))
   @Mutation(() => Board, {
     description:
-      '입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능)',
+      '입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트된 게시글 사진이 한 장)',
   })
-  async updateBoard(
+  async updateBoardWithImage(
+    @UploadedFile() file: Express.Multer.File,
     @Args('updateBoradInput') updateBoradInput: UpdateBoardInput,
     @Context() context: IContext,
   ): Promise<Board> {
-    return this.boardService.update(context.req.user.id, updateBoradInput);
+    return this.boardService.update(
+      'post',
+      file,
+      context.req.user.id,
+      updateBoradInput,
+    );
   }
 
   @UseGuards(gqlAccessGuard)
