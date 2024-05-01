@@ -5,8 +5,9 @@ import { UpdateBoardInput } from './dto/update-board.input';
 import { SearchBoardInput } from './dto/search_board.input';
 import { CreateBoardInput } from './dto/create-board.input';
 import { IContext } from '../users/interfaces/user-service.interface';
-import { UseGuards } from '@nestjs/common';
+import { UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { gqlAccessGuard } from '../users/guards/gql-auth.guard';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 @Resolver('Board')
 export class BoardResolver {
   constructor(private readonly boardService: BoardService) {}
@@ -60,26 +61,60 @@ export class BoardResolver {
   }
 
   @UseGuards(gqlAccessGuard)
+  @UseInterceptors(FileInterceptor('image'))
   @Mutation(() => Board, {
-    description: '입력된 정보를 바탕으로 게시글을 작성합니다.',
+    description:
+      '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 하나일 때)',
   })
-  async createBoard(
+  async createBoardWithImage(
+    @UploadedFile() file: Express.Multer.File,
     @Args('createBoardInput') createBoardInput: CreateBoardInput,
     @Context() context: IContext,
   ): Promise<Board> {
-    return this.boardService.create(context.req.user.id, createBoardInput);
+    return this.boardService.create(
+      'post',
+      file,
+      context.req.user.id,
+      createBoardInput,
+    );
   }
 
   @UseGuards(gqlAccessGuard)
+  @UseInterceptors(FilesInterceptor('image'))
   @Mutation(() => Board, {
     description:
-      '입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능)',
+      '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 여러 장 일 때)',
   })
-  async updateBoard(
+  async createBoardWithImages(
+    @UploadedFile() files: Express.Multer.File[],
+    @Args('createBoardInput') createBoardInput: CreateBoardInput,
+    @Context() context: IContext,
+  ): Promise<Board> {
+    return this.boardService.create(
+      'post',
+      files,
+      context.req.user.id,
+      createBoardInput,
+    );
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  @Mutation(() => Board, {
+    description:
+      '입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트된 게시글 사진이 한 장)',
+  })
+  async updateBoardWithImage(
+    @UploadedFile() file: Express.Multer.File,
     @Args('updateBoradInput') updateBoradInput: UpdateBoardInput,
     @Context() context: IContext,
   ): Promise<Board> {
-    return this.boardService.update(context.req.user.id, updateBoradInput);
+    return this.boardService.update(
+      'post',
+      file,
+      context.req.user.id,
+      updateBoradInput,
+    );
   }
 
   @UseGuards(gqlAccessGuard)
