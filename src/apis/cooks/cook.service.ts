@@ -73,13 +73,13 @@ export class CookService {
     cook.view += 1;
     return await this.cookRepository.save(cook);
   }
-  
-   async findTopCooks(rank: number): Promise<Cook[]> {
+
+  async findTopCooks(rank: number): Promise<Cook[]> {
     return await this.cookRepository.find({
-      order: {view: 'DESC'},
+      order: { view: 'DESC' },
       take: rank,
-    })
-   }
+    });
+  }
 
   async search(keyword: string): Promise<Cook[]> {
     if (keyword.length < 2) {
