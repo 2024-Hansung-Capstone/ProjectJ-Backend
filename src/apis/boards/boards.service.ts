@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Inject,
   forwardRef,
+  Post,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,6 +20,8 @@ import { LikeUserRecord } from '../like/entities/like_user_record.entity';
 import { Reply } from './entities/reply.entity';
 import { NotificationService } from '../notifications/notifications.service';
 import { PointService } from '../point/point.service';
+import { PostImage } from '../post_image/entities/postImage.entity';
+import { PostImageService } from '../post_image/postImage.service';
 @Injectable()
 export class BoardService {
   constructor(
@@ -26,6 +29,8 @@ export class BoardService {
     private readonly boardRepository: Repository<Board>,
     @InjectRepository(LikeUserRecord)
     private readonly likeUserRecordRepository: Repository<LikeUserRecord>,
+    @InjectRepository(PostImage)
+    private readonly postImageRepository: Repository<PostImage>,
     @InjectRepository(Reply)
     private readonly replyRepository: Repository<Reply>,
     @Inject(forwardRef(() => UserService))
@@ -34,6 +39,8 @@ export class BoardService {
     private readonly notificationService: NotificationService,
     @Inject(forwardRef(() => PointService))
     private readonly pointService: PointService,
+    @Inject(forwardRef(() => PostImageService))
+    private readonly postImageService: PostImageService,
   ) {}
 
   async findAll(category: string): Promise<Board[]> {
@@ -90,12 +97,35 @@ export class BoardService {
   }
 
   async create(
+    folder: string,
+    file: Express.Multer.File | Express.Multer.File[],
     user_id: string,
     createBoardInput: CreateBoardInput,
   ): Promise<Board> {
     const { title, detail, category } = createBoardInput;
     const user = await this.userService.findById(user_id);
     const board = new Board();
+
+    const imgUrl: string | string[] = await this.postImageService.saveImageToS3(
+      folder,
+      file,
+    );
+    if (Array.isArray(imgUrl)) {
+      for (const url of imgUrl) {
+        const postImage = new PostImage();
+        postImage.board = board;
+        postImage.imagePath = url;
+        await this.postImageRepository.save(postImage);
+        board.post_images.push(postImage);
+      }
+    } else {
+      const postImage = new PostImage();
+      postImage.board = board;
+      postImage.imagePath = imgUrl;
+      await this.postImageRepository.save(postImage);
+      board.post_images.push(postImage);
+    }
+
     board.title = title;
     board.detail = detail;
     board.category = category;
@@ -104,6 +134,7 @@ export class BoardService {
     await this.pointService.increase(user.id, +10);
     return await this.boardRepository.save(board);
   }
+
   async update(
     user_id: string,
     updateBoradInput: UpdateBoardInput,
@@ -124,6 +155,7 @@ export class BoardService {
       relations: ['user'],
     });
   }
+
   async delete(user_id: string, board_id: string): Promise<boolean> {
     const board = await this.findById(board_id);
     if (!board) {
@@ -162,7 +194,9 @@ export class BoardService {
       where: { board: { id: board.id }, user: { id: user.id } },
       relations: ['user', 'board'],
     });
-
+    if (board.user.id === user_id) {
+      throw new ForbiddenException('자신의 게시글은 좋아요 할 수 없습니다');
+    }
     if (checkuser) {
       throw new ForbiddenException(`이미 좋아요한 게시글 입니다.`);
     }
@@ -278,7 +312,7 @@ export class BoardService {
   async addReplyLike(user_id: string, reply_id: string): Promise<Board> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
-      relations: ['like_user', 'board'],
+      relations: ['like_user', 'board', 'user'],
     });
     const like_user_record = new LikeUserRecord();
     const user = await this.userService.findById(user_id);
@@ -287,6 +321,9 @@ export class BoardService {
       relations: ['user', 'reply'],
     });
     await this.pointService.increase(reply.user.id, 5);
+    if (reply.user.id === user_id) {
+      throw new ForbiddenException('자신의 댓글은 좋아요 할 수 없습니다');
+    }
     if (checkreply) {
       throw new ForbiddenException(`이미 좋아요한 댓글 입니다.`);
     }
