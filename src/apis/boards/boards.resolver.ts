@@ -67,13 +67,13 @@ export class BoardResolver {
       '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 하나일 때)',
   })
   async createBoardWithImage(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() files: Express.Multer.File[],
     @Args('createBoardInput') createBoardInput: CreateBoardInput,
     @Context() context: IContext,
   ): Promise<Board> {
     return this.boardService.create(
       'post',
-      file,
+      files,
       context.req.user.id,
       createBoardInput,
     );
