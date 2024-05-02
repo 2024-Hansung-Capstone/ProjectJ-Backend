@@ -131,7 +131,7 @@ export class BoardService {
 
   async update(
     folder: string,
-    file: Express.Multer.File | Express.Multer.File[],
+    file: Express.Multer.File[],
     user_id: string,
     updateBoradInput: UpdateBoardInput,
   ): Promise<Board> {
@@ -145,48 +145,41 @@ export class BoardService {
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
     }
-    if (Array.isArray(file)) {
-      for (const item of file) {
-        const key = `${folder}/${Date.now()}_${path.basename(
-          item.originalname,
-        )}`.replace(/ /g, '');
-        if (
-          !board.post_images.some(
-            (postImage: PostImage) =>
-              postImage.imagePath ===
-              `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`,
-          )
-        ) {
-          const imgUrl: string | string[] =
-            await this.postImageService.saveImageToS3(folder, file);
-          const postImage = new PostImage();
-          postImage.board = board;
-          if (!Array.isArray(imgUrl)) postImage.imagePath = imgUrl;
-          await this.postImageRepository.save(postImage);
-          board.post_images.push(postImage);
-        }
-      }
-    } else {
+    const newImageUrls: string[] = [];
+    //기존 postImage에서 없는 이미지 삽입
+    for (const item of file) {
       const key = `${folder}/${Date.now()}_${path.basename(
-        file.originalname,
+        item.originalname,
       )}`.replace(/ /g, '');
+      const s3Url = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
+      newImageUrls.push(s3Url);
       if (
         !board.post_images.some(
-          (postImage: PostImage) =>
-            postImage.imagePath ===
-            `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`,
+          (postImage: PostImage) => postImage.imagePath === s3Url,
         )
       ) {
-        const imgUrl: string | string[] =
-          await this.postImageService.saveImageToS3(folder, file);
+        const imgUrl: string[] = await this.postImageService.saveImageToS3(
+          folder,
+          file,
+        );
         const postImage = new PostImage();
         postImage.board = board;
-        if (!Array.isArray(imgUrl)) postImage.imagePath = imgUrl;
+        postImage.imagePath = imgUrl[0];
         await this.postImageRepository.save(postImage);
         board.post_images.push(postImage);
       }
     }
-
+    for (let i = board.post_images.length - 1; i >= 0; i--) {
+      const post_image = board.post_images[i];
+      if (
+        !newImageUrls.some(
+          (newImageUrl: string) => newImageUrl === post_image.imagePath,
+        )
+      )
+        this.postImageService.deleteImageFromS3(post_image.imagePath);
+      this.postImageRepository.delete(post_image.id);
+      board.post_images.splice(i, 1);
+    }
     await this.boardRepository.update({ id: id }, { ...rest });
     return await this.boardRepository.findOne({
       where: { id: id },
