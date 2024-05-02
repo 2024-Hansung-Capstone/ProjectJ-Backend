@@ -7,6 +7,33 @@ import { SearchOneRoomInput } from './dto/serach-oneRoom.input';
 
 @Injectable()
 export class OneRoomService {
+  private readonly districts = [
+    { name: '종로구', LAWD_CD: '11110' },
+    { name: '중구', LAWD_CD: '11140' },
+    { name: '용산구', LAWD_CD: '11170' },
+    { name: '성동구', LAWD_CD: '11200' },
+    { name: '광진구', LAWD_CD: '11215' },
+    { name: '동대문구', LAWD_CD: '11230' },
+    { name: '중랑구', LAWD_CD: '11260' },
+    { name: '성북구', LAWD_CD: '11290' },
+    { name: '강북구', LAWD_CD: '11305' },
+    { name: '도봉구', LAWD_CD: '11320' },
+    { name: '노원구', LAWD_CD: '11350' },
+    { name: '은평구', LAWD_CD: '11380' },
+    { name: '서대문구', LAWD_CD: '11410' },
+    { name: '마포구', LAWD_CD: '11440' },
+    { name: '양천구', LAWD_CD: '11470' },
+    { name: '강서구', LAWD_CD: '11500' },
+    { name: '구로구', LAWD_CD: '11530' },
+    { name: '금천구', LAWD_CD: '11545' },
+    { name: '영등포구', LAWD_CD: '11560' },
+    { name: '동작구', LAWD_CD: '11590' },
+    { name: '관악구', LAWD_CD: '11620' },
+    { name: '서초구', LAWD_CD: '11650' },
+    { name: '강남구', LAWD_CD: '11680' },
+    { name: '송파구', LAWD_CD: '11710' },
+    { name: '강동구', LAWD_CD: '11740' },
+  ];
   constructor(
     @InjectRepository(OneRoom)
     private readonly oneRoomRepository: Repository<OneRoom>,
@@ -14,40 +41,15 @@ export class OneRoomService {
   ) {}
 
   async fetchOneRoomDataForEachDistrict(): Promise<void> {
-    const districts = [
-      { name: '종로구', LAWD_CD: '11110' },
-      { name: '중구', LAWD_CD: '11140' },
-      { name: '용산구', LAWD_CD: '11170' },
-      { name: '성동구', LAWD_CD: '11200' },
-      { name: '광진구', LAWD_CD: '11215' },
-      { name: '동대문구', LAWD_CD: '11230' },
-      { name: '중랑구', LAWD_CD: '11260' },
-      { name: '성북구', LAWD_CD: '11290' },
-      { name: '강북구', LAWD_CD: '11305' },
-      { name: '도봉구', LAWD_CD: '11320' },
-      { name: '노원구', LAWD_CD: '11350' },
-      { name: '은평구', LAWD_CD: '11380' },
-      { name: '서대문구', LAWD_CD: '11410' },
-      { name: '마포구', LAWD_CD: '11440' },
-      { name: '양천구', LAWD_CD: '11470' },
-      { name: '강서구', LAWD_CD: '11500' },
-      { name: '구로구', LAWD_CD: '11530' },
-      { name: '금천구', LAWD_CD: '11545' },
-      { name: '영등포구', LAWD_CD: '11560' },
-      { name: '동작구', LAWD_CD: '11590' },
-      { name: '관악구', LAWD_CD: '11620' },
-      { name: '서초구', LAWD_CD: '11650' },
-      { name: '강남구', LAWD_CD: '11680' },
-      { name: '송파구', LAWD_CD: '11710' },
-      { name: '강동구', LAWD_CD: '11740' },
-    ];
-
-    for (const district of districts) {
+    for (const district of this.districts) {
       await this.fetchOneRoomFromOpenAPI(district.LAWD_CD);
     }
   }
 
   async fetchOneRoomFromOpenAPI(LAWD_CD: string): Promise<void> {
+    if (!this.districts.some((district) => district.LAWD_CD === LAWD_CD)) {
+      throw new NotFoundException(`${LAWD_CD}인 것을 찾을 수 없습니다.`);
+    }
     const apiUrl =
       'http://openapi.molit.go.kr:8081/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcRHRent';
     const queryParams =
