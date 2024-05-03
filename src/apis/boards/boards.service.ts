@@ -100,7 +100,7 @@ export class BoardService {
 
   async create(
     folder: string,
-    file: Express.Multer.File | Express.Multer.File[],
+    file: Express.Multer.File[],
     user_id: string,
     createBoardInput: CreateBoardInput,
   ): Promise<Board> {
@@ -108,22 +108,14 @@ export class BoardService {
     const user = await this.userService.findById(user_id);
     const board = new Board();
 
-    const imgUrl: string | string[] = await this.postImageService.saveImageToS3(
+    const imgUrl: string[] = await this.postImageService.saveImageToS3(
       folder,
       file,
     );
-    if (Array.isArray(imgUrl)) {
-      for (const url of imgUrl) {
-        const postImage = new PostImage();
-        postImage.board = board;
-        postImage.imagePath = url;
-        await this.postImageRepository.save(postImage);
-        board.post_images.push(postImage);
-      }
-    } else {
+    for (const url of imgUrl) {
       const postImage = new PostImage();
       postImage.board = board;
-      postImage.imagePath = imgUrl;
+      postImage.imagePath = url;
       await this.postImageRepository.save(postImage);
       board.post_images.push(postImage);
     }
@@ -139,7 +131,7 @@ export class BoardService {
 
   async update(
     folder: string,
-    file: Express.Multer.File | Express.Multer.File[],
+    file: Express.Multer.File[],
     user_id: string,
     updateBoradInput: UpdateBoardInput,
   ): Promise<Board> {
@@ -153,16 +145,41 @@ export class BoardService {
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
     }
-    for (const post_image of board.post_images) {
-      await this.postImageService.deleteImageFromS3(post_image.imagePath);
-      await this.postImageRepository.delete(post_image.id);
+    const newImageUrls: string[] = [];
+    //기존 postImage에서 없는 이미지 삽입
+    for (const item of file) {
+      const key = `${folder}/${Date.now()}_${path.basename(
+        item.originalname,
+      )}`.replace(/ /g, '');
+      const s3Url = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
+      newImageUrls.push(s3Url);
+      if (
+        !board.post_images.some(
+          (postImage: PostImage) => postImage.imagePath === s3Url,
+        )
+      ) {
+        const imgUrl: string[] = await this.postImageService.saveImageToS3(
+          folder,
+          file,
+        );
+        const postImage = new PostImage();
+        postImage.board = board;
+        postImage.imagePath = imgUrl[0];
+        await this.postImageRepository.save(postImage);
+        board.post_images.push(postImage);
+      }
     }
-    board.post_images = [];
-    if (Array.isArray(file)) {
-    } else {
-      await this.postImageService.saveImageToS3(folder, file);
+    for (let i = board.post_images.length - 1; i >= 0; i--) {
+      const post_image = board.post_images[i];
+      if (
+        !newImageUrls.some(
+          (newImageUrl: string) => newImageUrl === post_image.imagePath,
+        )
+      )
+        this.postImageService.deleteImageFromS3(post_image.imagePath);
+      this.postImageRepository.delete(post_image.id);
+      board.post_images.splice(i, 1);
     }
-
     await this.boardRepository.update({ id: id }, { ...rest });
     return await this.boardRepository.findOne({
       where: { id: id },
