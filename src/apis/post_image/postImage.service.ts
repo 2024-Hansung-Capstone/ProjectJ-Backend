@@ -24,49 +24,30 @@ export class PostImageService {
 
   async saveImageToS3(
     folder: string,
-    file: Express.Multer.File | Express.Multer.File[],
-  ): Promise<string | string[]> {
+    file: Express.Multer.File[],
+  ): Promise<string[]> {
     try {
-      // 입력값이 파일 배열인 경우와 단일 파일인 경우를 구분하여 처리
-      if (Array.isArray(file)) {
-        const uploadedUrls: string[] = [];
+      const uploadedUrls: string[] = [];
 
-        for (const singleFile of file) {
-          const key = `${folder}/${Date.now()}_${path.basename(
-            singleFile.originalname,
-          )}`.replace(/ /g, '');
-
-          await this.awsS3
-            .putObject({
-              Bucket: this.S3_BUCKET_NAME,
-              Key: key,
-              Body: singleFile.buffer,
-              ACL: 'public-read',
-              ContentType: singleFile.mimetype,
-            })
-            .promise();
-
-          const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
-          uploadedUrls.push(imageUrl);
-        }
-
-        return uploadedUrls;
-      } else {
+      for (const singleFile of file) {
         const key = `${folder}/${Date.now()}_${path.basename(
-          file.originalname,
+          singleFile.originalname,
         )}`.replace(/ /g, '');
 
         await this.awsS3
           .putObject({
             Bucket: this.S3_BUCKET_NAME,
             Key: key,
-            Body: file.buffer,
+            Body: singleFile.buffer,
             ACL: 'public-read',
-            ContentType: file.mimetype,
+            ContentType: singleFile.mimetype,
           })
           .promise();
 
-        return `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
+        const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
+        uploadedUrls.push(imageUrl);
+
+        return uploadedUrls;
       }
     } catch (error) {
       console.error('이미지 업로드 중 에러사유:', error);
