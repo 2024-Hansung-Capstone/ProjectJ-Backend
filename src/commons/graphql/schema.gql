@@ -495,6 +495,11 @@ type Mutation {
   """
   updateBoardWithImage(updateBoradInput: UpdateBoardInput!): Board!
 
+  """
+  입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트된 게시글 사진이 한 장)
+  """
+  updateBoardWithImages(updateBoradInput: UpdateBoardInput!): Board!
+
   """입력된 id값을 가진 게시글을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)"""
   deleteBoard(
     """게시글 고유 ID"""

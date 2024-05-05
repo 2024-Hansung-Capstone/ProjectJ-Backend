@@ -243,7 +243,7 @@ export class UserService {
   getAccessToken(user: User | IUserContext['user']): string {
     return this.jwtService.sign(
       { sub: user.id },
-      { secret: 'sujin', expiresIn: '10m' },
+      { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '10m' },
     );
   }
 
@@ -255,7 +255,7 @@ export class UserService {
   getRefreshToken(user: User, context: IContext): void {
     const refreshToken = this.jwtService.sign(
       { sub: user.id },
-      { secret: 'sujin2', expiresIn: '2w' },
+      { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '2w' },
     );
 
     context.res.setHeader(

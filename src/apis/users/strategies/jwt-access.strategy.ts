@@ -8,7 +8,7 @@ export default class JwtAccessStrategy extends PassportStrategy(
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: 'sujin',
+      secretOrKey: process.env.JWT_ACCESS_SECRET,
     });
   }
 
