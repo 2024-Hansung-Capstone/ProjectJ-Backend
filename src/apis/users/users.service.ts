@@ -21,6 +21,7 @@ import { JwtService } from '@nestjs/jwt';
 import { setDateFormat } from 'src/utils/date';
 import { AreaService } from '../area/area.service';
 import { NotificationService } from '../notifications/notifications.service';
+import { PointService } from '../point/point.service';
 
 @Injectable()
 export class UserService {
@@ -32,6 +33,7 @@ export class UserService {
     private readonly areaService: AreaService,
     @Inject(forwardRef(() => NotificationService))
     private readonly notificationService: NotificationService,
+    private readonly pointService: PointService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -84,6 +86,9 @@ export class UserService {
 
     // 회원 가입 알림 생성
     await this.notificationService.create(newUser.id, '100');
+
+    //포인트 적립
+    await this.pointService.increase(newUser.id, 300);
 
     return await this.userRepository.findOne({
       where: { id: newUser.id },
