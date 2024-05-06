@@ -30,6 +30,7 @@ import { PointService } from './point/point.service';
 import { Role } from './point/entity/role.entity';
 import { PostImage } from './post_image/entities/postImage.entity';
 import { PostImageService } from './post_image/postImage.service';
+import { CommentReply } from './boards/entities/commet_reply.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -49,6 +50,7 @@ import { PostImageService } from './post_image/postImage.service';
       Role,
       DailyCheck,
       PostImage,
+      CommentReply,
     ]),
     JwtModule.register({}),
     HttpModule,
