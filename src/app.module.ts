@@ -1,4 +1,4 @@
-import { Module, Post } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -6,25 +6,25 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './apis/users/users.module';
 import { UsedProductModule } from './apis/used_markets/usedProducts.module';
 import { AreaModule } from './apis/area/area.module';
-import { IngredientModule } from './apis/ingredients/ingredient.module';
 import { BoardModule } from './apis/boards/boards.module';
 import { LetterModule } from './apis/letters/letters.module';
 import { OneRoomModule } from './apis/oneroom/oneroom.module';
 import { NotificationModule } from './apis/notifications/notifications.module';
 import { PointModule } from './apis/point/point.module';
 import { PostImageModule } from './apis/post_image/postImage.module';
+import { CookModule } from './apis/cooks/cook.module';
 @Module({
   imports: [
     UserModule,
     UsedProductModule,
     AreaModule,
     BoardModule,
-    IngredientModule,
     LetterModule,
     OneRoomModule,
     NotificationModule,
     PointModule,
     PostImageModule,
+    CookModule,
     ConfigModule.forRoot(),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
