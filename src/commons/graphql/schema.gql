@@ -328,6 +328,27 @@ type OneRoom {
   view: Int!
 }
 
+type Cook {
+  id: String!
+  name: String!
+  view: Int!
+  create_at: DateTime!
+}
+
+type Ing {
+  name: String!
+  count: Int
+  volume: Float
+  volume_unit: String
+}
+
+type Recipe {
+  name: String!
+  used_ingredients: [Ing!]
+  needed_ingredients: [Ing!]
+  instructions: [String!]!
+}
+
 type Query {
   """전체 사용자 정보 조회 기능입니다."""
   fetchUsers: [User!]!
@@ -385,8 +406,6 @@ type Query {
     """가져올 게시글 수"""
     rank: Float!
   ): [Board!]!
-  fetchIngredients: [Ingredient!]!
-  fetchMyIngredients: [Ingredient!]!
   fetchLetterById(letter_id: String!): Letter!
   fetchMySendLetters: Letter!
   fetchMyReceiveLetters: Letter!
@@ -413,6 +432,12 @@ type Query {
   """나의 알림을 전체 조회합니다."""
   fetchMyNotificationMessages: [Notification!]!
   fetchMyRole: Role!
+  fetchCookByUserId(user_id: String!): [Cook!]!
+  increaseCookView(id: String!): Cook!
+  searchCook(keyword: String!): [Cook!]!
+  fetchIngredients: [Ingredient!]!
+  fetchMyIngredients: [Ingredient!]!
+  fetchRecipes: [Recipe!]!
 }
 
 """중고마켓 상품 검색 입력 정보"""
@@ -601,9 +626,6 @@ type Mutation {
     """대댓글 고유 ID"""
     commentReply_id: String!
   ): Board!
-  createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
-  updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
-  deleteIngredient(ingredient_id: String!): Boolean!
   writeLetter(writing_id: String!, createLetterInput: CreateLetterInput!): Letter!
   replyLetter(letter_id: String!, replyLetterInput: ReplyLetterInput!): Letter!
   deleteLetter(letter_id: String!): Boolean!
@@ -623,6 +645,12 @@ type Mutation {
   """나의 알림을 전체 삭제합니다."""
   deleteAllMyNotificationMessages: Boolean!
   dailyCheckIn: Boolean!
+  createCook(createCookInput: CreateCookInput!): Cook!
+  updateCook(cook_id: String!, updateCookInput: UpdateCookInput!): Cook!
+  deleteCook(cook_id: String!): Boolean!
+  createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
+  updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
+  deleteIngredient(ingredient_id: String!): Boolean!
 }
 
 """유저 생성 입력 정보"""
@@ -754,6 +782,35 @@ input UpdateBoardInput {
   detail: String
 }
 
+"""쪽지 생성 입력 정보"""
+input CreateLetterInput {
+  """쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)"""
+  category: String!
+
+  """쪽지 제목"""
+  title: String!
+
+  """쪽지 내용"""
+  detail: String!
+}
+
+"""쪽지 답장 입력 정보"""
+input ReplyLetterInput {
+  """쪽지 답장 제목"""
+  title: String!
+
+  """쪽지 답장 내용"""
+  detail: String!
+}
+
+input CreateCookInput {
+  name: String!
+}
+
+input UpdateCookInput {
+  name: String
+}
+
 """식재료 생성 입력 정보"""
 input CreateIngredientInput {
   """식재료 이름"""
@@ -785,25 +842,4 @@ input UpdateIngredientInput {
 
   """식재료 양 단위"""
   volume_unit: String
-}
-
-"""쪽지 생성 입력 정보"""
-input CreateLetterInput {
-  """쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)"""
-  category: String!
-
-  """쪽지 제목"""
-  title: String!
-
-  """쪽지 내용"""
-  detail: String!
-}
-
-"""쪽지 답장 입력 정보"""
-input ReplyLetterInput {
-  """쪽지 답장 제목"""
-  title: String!
-
-  """쪽지 답장 내용"""
-  detail: String!
 }
