@@ -6,7 +6,7 @@ import { Sgng } from './area/entities/sgng.entity';
 import { Sido } from './area/entities/sido.entity';
 import { Board } from './boards/entities/board.entity';
 import { Reply } from './boards/entities/reply.entity';
-import { Ingredient } from './ingredients/entities/ingredient.entity';
+import { Ingredient } from './cooks/entities/ingredient.entity';
 import { Letter } from './letters/entities/letter.entity';
 import { LikeUserRecord } from './like/entities/like_user_record.entity';
 import { OneRoom } from './oneroom/entities/one_room.entity';
@@ -15,7 +15,6 @@ import { UsedProduct } from './used_markets/entities/used_product.entity';
 import { User } from './users/entities/user.entity';
 import { Token } from './users/entities/token.entity';
 import { BoardService } from './boards/boards.service';
-import { IngredientService } from './ingredients/ingredient.service';
 import { AreaService } from './area/area.service';
 import { LetterService } from './letters/letters.service';
 import { LikeUserRecordService } from './like/like_user_record.service';
@@ -30,6 +29,9 @@ import { PointService } from './point/point.service';
 import { Role } from './point/entity/role.entity';
 import { PostImage } from './post_image/entities/postImage.entity';
 import { PostImageService } from './post_image/postImage.service';
+import { CommentReply } from './boards/entities/commet_reply.entity';
+import { CookService } from './cooks/cook.service';
+import { Cook } from './cooks/entities/cook.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -49,6 +51,8 @@ import { PostImageService } from './post_image/postImage.service';
       Role,
       DailyCheck,
       PostImage,
+      CommentReply,
+      Cook,
     ]),
     JwtModule.register({}),
     HttpModule,
@@ -56,7 +60,6 @@ import { PostImageService } from './post_image/postImage.service';
   providers: [
     AreaService,
     BoardService,
-    IngredientService,
     LetterService,
     LikeUserRecordService,
     NotificationService,
@@ -66,11 +69,11 @@ import { PostImageService } from './post_image/postImage.service';
     NotificationMessages,
     PointService,
     PostImageService,
+    CookService,
   ],
   exports: [
     AreaService,
     BoardService,
-    IngredientService,
     LetterService,
     LikeUserRecordService,
     NotificationService,
@@ -80,6 +83,7 @@ import { PostImageService } from './post_image/postImage.service';
     NotificationMessages,
     PointService,
     PostImageService,
+    CookService,
   ],
 })
 export class CommonModule {}

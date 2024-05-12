@@ -19,7 +19,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jaeheoga') {
         }
         return refreshToken;
       },
-      secretOrKey: 'sujin2',
+      secretOrKey: process.env.JWT_REFRESH_SECRET,
     });
   }
 

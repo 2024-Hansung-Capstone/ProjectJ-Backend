@@ -7,6 +7,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Ing } from './recipe.entity';
 
 @Entity()
 @ObjectType()
@@ -22,11 +23,7 @@ export class Cook {
 
   @Column({ length: 100 })
   @Field(() => String)
-  title: string;
-
-  @Column()
-  @Field(() => String)
-  detail: string;
+  name: string;
 
   @Column({ default: 0 })
   @Field(() => Int)

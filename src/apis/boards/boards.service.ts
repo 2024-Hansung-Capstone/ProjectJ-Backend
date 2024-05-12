@@ -22,7 +22,7 @@ import { NotificationService } from '../notifications/notifications.service';
 import { PointService } from '../point/point.service';
 import { PostImage } from '../post_image/entities/postImage.entity';
 import { PostImageService } from '../post_image/postImage.service';
-import { isArray } from 'class-validator';
+import { CommentReply } from './entities/commet_reply.entity';
 import * as path from 'path';
 @Injectable()
 export class BoardService {
@@ -35,6 +35,8 @@ export class BoardService {
     private readonly postImageRepository: Repository<PostImage>,
     @InjectRepository(Reply)
     private readonly replyRepository: Repository<Reply>,
+    @InjectRepository(CommentReply)
+    private readonly commentReplyRepository: Repository<CommentReply>,
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     @Inject(forwardRef(() => NotificationService))
@@ -100,24 +102,28 @@ export class BoardService {
 
   async create(
     folder: string,
-    file: Express.Multer.File[],
+    files: Express.Multer.File[],
     user_id: string,
     createBoardInput: CreateBoardInput,
   ): Promise<Board> {
     const { title, detail, category } = createBoardInput;
     const user = await this.userService.findById(user_id);
     const board = new Board();
-
-    const imgUrl: string[] = await this.postImageService.saveImageToS3(
-      folder,
-      file,
-    );
-    for (const url of imgUrl) {
-      const postImage = new PostImage();
-      postImage.board = board;
-      postImage.imagePath = url;
-      await this.postImageRepository.save(postImage);
-      board.post_images.push(postImage);
+    if (!user) {
+      throw new Error('해당 사용자가 존재하지 않습니다');
+    }
+    if (files && files.length > 0) {
+      const imgUrl: string[] = await this.postImageService.saveImageToS3(
+        folder,
+        files,
+      );
+      for (const url of imgUrl) {
+        const postImage = new PostImage();
+        postImage.board = board;
+        postImage.imagePath = url;
+        await this.postImageRepository.save(postImage);
+        board.post_images.push(postImage);
+      }
     }
 
     board.title = title;
@@ -343,55 +349,128 @@ export class BoardService {
     return await this.findById(checkreply.board.id);
   }
 
-  async addReplyLike(user_id: string, reply_id: string): Promise<Board> {
+  async addReplyLike(user_id: string, reply_id: string): Promise<boolean> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
-      relations: ['like_user', 'board', 'user'],
+      relations: ['like_user', 'user'],
     });
-    const like_user_record = new LikeUserRecord();
+
+    let target: CommentReply | Reply;
+
+    if (!reply) {
+      const commentReply = await this.commentReplyRepository.findOne({
+        where: { id: reply_id },
+        relations: ['like_user', 'user'],
+      });
+
+      if (!commentReply) {
+        throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+      }
+
+      target = commentReply;
+    } else {
+      target = reply;
+    }
+
     const user = await this.userService.findById(user_id);
+
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+
     const checkreply = await this.likeUserRecordRepository.findOne({
-      where: { reply: { id: reply.id }, user: { id: user.id } },
+      where: { reply: { id: target.id }, user: { id: user.id } },
       relations: ['user', 'reply'],
     });
-    await this.pointService.increase(reply.user.id, 5);
-    if (reply.user.id === user_id) {
-      throw new ForbiddenException('자신의 댓글은 좋아요 할 수 없습니다');
+
+    if (target.user.id === user_id) {
+      throw new ForbiddenException('자신의 댓글은 좋아요 할 수 없습니다.');
     }
+
     if (checkreply) {
-      throw new ForbiddenException(`이미 좋아요한 댓글 입니다.`);
+      throw new ForbiddenException('이미 좋아요한 댓글입니다.');
     }
-    reply.like = reply.like + 1;
-    like_user_record.reply = reply;
+
+    await this.pointService.increase(target.user.id, 5);
+
+    target.like = target.like + 1;
+
+    const like_user_record = new LikeUserRecord();
+
     like_user_record.user = user;
-    reply.like_user.push(like_user_record);
-    const like = await this.likeUserRecordRepository.save(like_user_record);
-    await this.replyRepository.save(reply);
-    await this.notificationService.create(like.id, '203');
-    return await this.findById(reply.board.id);
+
+    let savedTarget: Reply | CommentReply;
+    if (target instanceof Reply) {
+      savedTarget = await this.replyRepository.save(target);
+      like_user_record.reply = target;
+    } else {
+      savedTarget = await this.commentReplyRepository.save(target);
+      like_user_record.commet_reply = target;
+    }
+    target.like_user.push(like_user_record);
+
+    const savedLikeUserRecord = await this.likeUserRecordRepository.save(
+      like_user_record,
+    );
+    await this.notificationService.create(savedLikeUserRecord.id, '203');
+
+    return !!savedTarget;
   }
 
-  async deleteReplyLike(user_id: string, reply_id: string): Promise<Board> {
+  async deleteReplyLike(user_id: string, reply_id: string): Promise<boolean> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
-      relations: ['like_user', 'board'],
+      relations: ['like_user', 'user'],
     });
-    const checkreply = await this.likeUserRecordRepository.findOne({
-      where: { reply: { id: reply_id }, user: { id: user_id } },
-      relations: ['user', 'reply'],
-    });
-    await this.pointService.increase(reply.user.id, -5);
+
+    let target: CommentReply | Reply;
+    let checkreply: LikeUserRecord;
+    if (!reply) {
+      const commentReply = await this.commentReplyRepository.findOne({
+        where: { id: reply_id },
+        relations: ['like_user', 'user'],
+      });
+
+      if (!commentReply) {
+        throw new NotFoundException('해당 댓글을 찾을 수 없습니다.');
+      }
+
+      target = commentReply;
+    } else {
+      target = reply;
+    }
+    if (target instanceof CommentReply) {
+      checkreply = await this.likeUserRecordRepository.findOne({
+        where: { commet_reply: { id: target.id }, user: { id: user_id } },
+        relations: ['user', 'comment_reply'],
+      });
+    } else {
+      checkreply = await this.likeUserRecordRepository.findOne({
+        where: { reply: { id: target.id }, user: { id: user_id } },
+        relations: ['user', 'reply'],
+      });
+    }
     if (!checkreply) {
       throw new ForbiddenException(`좋아요를 하지 않았습니다.`);
     }
-    reply.like = reply.like - 1;
-    const likeIndex = reply.like_user.findIndex(
-      (reply) => reply.id === checkreply.id,
+
+    await this.pointService.increase(target.user.id, -5);
+
+    target.like = target.like - 1;
+
+    const likeIndex = target.like_user.findIndex(
+      (likeUser) => likeUser.id === checkreply.id,
     );
-    reply.like_user.splice(likeIndex, 1);
+    target.like_user.splice(likeIndex, 1);
+
     await this.likeUserRecordRepository.delete(checkreply.id);
-    await this.boardRepository.save(reply);
-    return await this.findById(reply.board.id);
+    let savedTarget: Reply | CommentReply;
+    if (target instanceof Reply) {
+      savedTarget = await this.replyRepository.save(target);
+    } else {
+      savedTarget = await this.commentReplyRepository.save(target);
+    }
+    return !!savedTarget;
   }
 
   async findReplyById(reply_id: string): Promise<Reply> {
@@ -399,5 +478,63 @@ export class BoardService {
       where: { id: reply_id },
       relations: ['user', 'board', 'board.user'],
     });
+  }
+
+  async addCommnetReply(
+    user_id: string,
+    reply_id: string,
+    detail: string,
+  ): Promise<Board> {
+    const reply = await this.replyRepository.findOne({
+      where: { id: reply_id },
+      relations: ['user', 'board', 'comment_reply'],
+    });
+    const user = await this.userService.findById(user_id);
+    const commentReply = new CommentReply();
+    if (
+      detail.includes('씨발') ||
+      detail.includes('개새끼') ||
+      detail.includes('병신')
+    ) {
+      throw new HttpException(
+        '댓글 내용에 욕이 포함되어 있어 작성할 수 없습니다.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    await this.pointService.increase(user.id, 1);
+    commentReply.user = user;
+    commentReply.reply = reply;
+    commentReply.detail = detail;
+    reply.comment_reply.push(commentReply);
+    //const result = await this.replyRepository.save(commentReply);
+    await this.commentReplyRepository.save(commentReply);
+    await this.replyRepository.save(reply);
+    //await this.notificationService.create(commentReply.id, '300');
+    return await this.findById(reply.board.id);
+  }
+
+  async deleteCommentReply(
+    user_id: string,
+    commentReply_id: string,
+  ): Promise<Board> {
+    const checkcomment_reply = await this.commentReplyRepository.findOne({
+      where: { id: commentReply_id },
+      relations: ['user', 'board', 'reply'],
+    });
+    const reply = checkcomment_reply.reply;
+    if (checkcomment_reply.user.id !== user_id) {
+      throw new ForbiddenException(`본인이 작성한 댓글만 삭제할 수 있습니다.`);
+    }
+    if (!checkcomment_reply) {
+      throw new NotFoundException('댓글이 존재하지 않습니다.');
+    }
+    const replyIndex = reply.comment_reply.findIndex(
+      (reply) => reply.id === checkcomment_reply.id,
+    );
+    await this.pointService.increase(user_id, -1);
+    reply.comment_reply.splice(replyIndex, 1);
+    await this.commentReplyRepository.delete(checkcomment_reply.id);
+    await this.boardRepository.save(reply);
+    return await this.findById(reply.board.id);
   }
 }

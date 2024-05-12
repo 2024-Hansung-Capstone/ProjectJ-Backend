@@ -2,6 +2,32 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""대댓글 정보"""
+type CommentReply {
+  """고유 ID"""
+  id: String!
+
+  """작성자 정보"""
+  user: User!
+
+  """부모 댓글"""
+  reply: Reply!
+
+  """내용"""
+  detail: String!
+
+  """좋아요 수"""
+  like: Int!
+
+  """작성일"""
+  create_at: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 """댓글 정보"""
 type Reply {
   """고유 ID"""
@@ -22,11 +48,6 @@ type Reply {
   """작성일"""
   create_at: DateTime!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 """게시글 정보"""
 type Board {
@@ -104,6 +125,9 @@ type LikeUserRecord {
 
   """좋아요 누른 댓글 정보"""
   reply: Reply
+
+  """좋아요 누른 댓글 정보"""
+  commet_reply: CommentReply
 }
 
 """시/도 정보"""
@@ -304,6 +328,27 @@ type OneRoom {
   view: Int!
 }
 
+type Cook {
+  id: String!
+  name: String!
+  view: Int!
+  create_at: DateTime!
+}
+
+type Ing {
+  name: String!
+  count: Int
+  volume: Float
+  volume_unit: String
+}
+
+type Recipe {
+  name: String!
+  used_ingredients: [Ing!]
+  needed_ingredients: [Ing!]
+  instructions: [String!]!
+}
+
 type Query {
   """전체 사용자 정보 조회 기능입니다."""
   fetchUsers: [User!]!
@@ -361,11 +406,9 @@ type Query {
     """가져올 게시글 수"""
     rank: Float!
   ): [Board!]!
-  fetchIngredients: [Ingredient!]!
-  fetchMyIngredients: [Ingredient!]!
   fetchLetterById(letter_id: String!): Letter!
-  fetchMySendLetters: Letter!
-  fetchMyReceiveLetters: Letter!
+  fetchMySendLetters: [Letter!]!
+  fetchMyReceiveLetters: [Letter!]!
 
   """해당 X,Y좌표에 포함되어 있는 원룸들을 리턴(X,Y좌표는 소수점 14자리수 까지)"""
   fetchOneRoomByXY(StartX: Float!, StartY: Float!, EndX: Float!, EndY: Float!): [OneRoom!]!
@@ -389,6 +432,12 @@ type Query {
   """나의 알림을 전체 조회합니다."""
   fetchMyNotificationMessages: [Notification!]!
   fetchMyRole: Role!
+  fetchCookByUserId(user_id: String!): [Cook!]!
+  increaseCookView(id: String!): Cook!
+  searchCook(keyword: String!): [Cook!]!
+  fetchIngredients: [Ingredient!]!
+  fetchMyIngredients: [Ingredient!]!
+  fetchRecipes: [Recipe!]!
 }
 
 """중고마켓 상품 검색 입력 정보"""
@@ -484,8 +533,11 @@ type Mutation {
   """게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작"""
   decreaseUsedProductLike(product_id: String!): UsedProduct!
 
-  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 하나일 때)"""
+  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 하나일 때"""
   createBoardWithImage(createBoardInput: CreateBoardInput!): Board!
+
+  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 없을 때)"""
+  createBoard(createBoardInput: CreateBoardInput!): Board!
 
   """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 여러 장 일 때)"""
   createBoardWithImages(createBoardInput: CreateBoardInput!): Board!
@@ -494,6 +546,11 @@ type Mutation {
   입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트된 게시글 사진이 한 장)
   """
   updateBoardWithImage(updateBoradInput: UpdateBoardInput!): Board!
+
+  """
+  입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트된 게시글 사진이 한 장)
+  """
+  updateBoardWithImages(updateBoradInput: UpdateBoardInput!): Board!
 
   """입력된 id값을 가진 게시글을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)"""
   deleteBoard(
@@ -547,16 +604,28 @@ type Mutation {
   increaseReplyLike(
     """댓글 고유 ID"""
     reply_id: String!
-  ): Board!
+  ): Boolean!
 
   """댓글의 좋아요를 취소하는 기능입니다. (좋아요한 댓글에게만 동작)"""
   decreaseReplyLike(
     """댓글 고유 ID"""
     reply_id: String!
+  ): Boolean!
+
+  """댓글에 대댓글을 작성하는 기능입니다."""
+  createCommetReply(
+    """댓글 고유 ID"""
+    reply_id: String!
+
+    """댓글 내용"""
+    detail: String!
   ): Board!
-  createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
-  updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
-  deleteIngredient(ingredient_id: String!): Boolean!
+
+  """댓글에 대댓글을 삭제하는 기능입니다."""
+  deleteCommentReply(
+    """대댓글 고유 ID"""
+    commentReply_id: String!
+  ): Board!
   writeLetter(writing_id: String!, createLetterInput: CreateLetterInput!): Letter!
   replyLetter(letter_id: String!, replyLetterInput: ReplyLetterInput!): Letter!
   deleteLetter(letter_id: String!): Boolean!
@@ -576,6 +645,12 @@ type Mutation {
   """나의 알림을 전체 삭제합니다."""
   deleteAllMyNotificationMessages: Boolean!
   dailyCheckIn: Boolean!
+  createCook(createCookInput: CreateCookInput!): Cook!
+  updateCook(cook_id: String!, updateCookInput: UpdateCookInput!): Cook!
+  deleteCook(cook_id: String!): Boolean!
+  createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
+  updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
+  deleteIngredient(ingredient_id: String!): Boolean!
 }
 
 """유저 생성 입력 정보"""
@@ -707,6 +782,35 @@ input UpdateBoardInput {
   detail: String
 }
 
+"""쪽지 생성 입력 정보"""
+input CreateLetterInput {
+  """쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)"""
+  category: String!
+
+  """쪽지 제목"""
+  title: String!
+
+  """쪽지 내용"""
+  detail: String!
+}
+
+"""쪽지 답장 입력 정보"""
+input ReplyLetterInput {
+  """쪽지 답장 제목"""
+  title: String!
+
+  """쪽지 답장 내용"""
+  detail: String!
+}
+
+input CreateCookInput {
+  name: String!
+}
+
+input UpdateCookInput {
+  name: String
+}
+
 """식재료 생성 입력 정보"""
 input CreateIngredientInput {
   """식재료 이름"""
@@ -738,25 +842,4 @@ input UpdateIngredientInput {
 
   """식재료 양 단위"""
   volume_unit: String
-}
-
-"""쪽지 생성 입력 정보"""
-input CreateLetterInput {
-  """쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)"""
-  category: String!
-
-  """쪽지 제목"""
-  title: String!
-
-  """쪽지 내용"""
-  detail: String!
-}
-
-"""쪽지 답장 입력 정보"""
-input ReplyLetterInput {
-  """쪽지 답장 제목"""
-  title: String!
-
-  """쪽지 답장 내용"""
-  detail: String!
 }
