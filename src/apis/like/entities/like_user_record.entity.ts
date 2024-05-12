@@ -4,6 +4,7 @@ import { User } from '../../users/entities/user.entity';
 import { UsedProduct } from '../../used_markets/entities/used_product.entity';
 import { Board } from 'src/apis/boards/entities/board.entity';
 import { Reply } from 'src/apis/boards/entities/reply.entity';
+import { CommentReply } from 'src/apis/boards/entities/commet_reply.entity';
 @Entity()
 @ObjectType({ description: '좋아요 기록 정보' })
 export class LikeUserRecord {
@@ -47,4 +48,15 @@ export class LikeUserRecord {
   @JoinColumn()
   @Field(() => Reply, { nullable: true, description: '좋아요 누른 댓글 정보' })
   reply: Reply;
+
+  @ManyToOne(() => Reply, (Reply) => Reply.like_user, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  @Field(() => CommentReply, {
+    nullable: true,
+    description: '좋아요 누른 댓글 정보',
+  })
+  commet_reply: CommentReply;
 }

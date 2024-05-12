@@ -8,6 +8,7 @@ import { IContext } from '../users/interfaces/user-service.interface';
 import { UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { gqlAccessGuard } from '../users/guards/gql-auth.guard';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+
 @Resolver('Board')
 export class BoardResolver {
   constructor(private readonly boardService: BoardService) {}
@@ -63,8 +64,7 @@ export class BoardResolver {
   @UseGuards(gqlAccessGuard)
   @UseInterceptors(FileInterceptor('image'))
   @Mutation(() => Board, {
-    description:
-      '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 하나일 때)',
+    description: '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 하나일 때',
   })
   async createBoardWithImage(
     @UploadedFile() files: Express.Multer.File[],
@@ -74,6 +74,22 @@ export class BoardResolver {
     return this.boardService.create(
       'post',
       files,
+      context.req.user.id,
+      createBoardInput,
+    );
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Board, {
+    description: '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 없을 때)',
+  })
+  async createBoard(
+    @Args('createBoardInput') createBoardInput: CreateBoardInput,
+    @Context() context: IContext,
+  ): Promise<Board> {
+    return this.boardService.create(
+      'post',
+      [],
       context.req.user.id,
       createBoardInput,
     );
@@ -216,26 +232,58 @@ export class BoardResolver {
   }
 
   @UseGuards(gqlAccessGuard)
-  @Mutation(() => Board, {
+  @Mutation(() => Boolean, {
     description:
       '댓글의 좋아요 수를 올려주고 좋아요한 회원과 댓글 정보를 저장합니다.',
   })
   increaseReplyLike(
     @Args('reply_id', { description: '댓글 고유 ID' }) reply_id: string,
     @Context() context: IContext,
-  ): Promise<Board> {
+  ): Promise<boolean> {
     return this.boardService.addReplyLike(context.req.user.id, reply_id);
   }
 
   @UseGuards(gqlAccessGuard)
-  @Mutation(() => Board, {
+  @Mutation(() => Boolean, {
     description:
       '댓글의 좋아요를 취소하는 기능입니다. (좋아요한 댓글에게만 동작)',
   })
   decreaseReplyLike(
     @Args('reply_id', { description: '댓글 고유 ID' }) reply_id: string,
     @Context() context: IContext,
-  ): Promise<Board> {
+  ): Promise<boolean> {
     return this.boardService.deleteReplyLike(context.req.user.id, reply_id);
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Board, {
+    description: '댓글에 대댓글을 작성하는 기능입니다.',
+  })
+  createCommetReply(
+    @Context() context: IContext,
+    @Args('reply_id', { description: '댓글 고유 ID' }) reply_id: string,
+    @Args('detail', { description: '댓글 내용' }) detail: string,
+  ): Promise<Board> {
+    return this.boardService.addCommnetReply(
+      context.req.user.id,
+
+      reply_id,
+      detail,
+    );
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Board, {
+    description: '댓글에 대댓글을 삭제하는 기능입니다.',
+  })
+  deleteCommentReply(
+    @Context() context: IContext,
+    @Args('commentReply_id', { description: '대댓글 고유 ID' })
+    commentReply_id: string,
+  ): Promise<Board> {
+    return this.boardService.deleteCommentReply(
+      context.req.user.id,
+      commentReply_id,
+    );
   }
 }

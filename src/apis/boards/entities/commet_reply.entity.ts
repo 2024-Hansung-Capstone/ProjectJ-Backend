@@ -11,10 +11,10 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { Board } from './board.entity';
 import { LikeUserRecord } from 'src/apis/like/entities/like_user_record.entity';
-import { CommentReply } from './commet_reply.entity';
+import { Reply } from './reply.entity';
 @Entity()
-@ObjectType({ description: '댓글 정보' })
-export class Reply {
+@ObjectType({ description: '대댓글 정보' })
+export class CommentReply {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => String, { description: '고유 ID' })
   id: string;
@@ -24,10 +24,10 @@ export class Reply {
   @Field(() => User, { description: '작성자 정보' })
   user: User;
 
-  @ManyToOne(() => Board, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Reply, { onDelete: 'CASCADE' })
   @JoinColumn()
-  @Field(() => Board, { description: '원 게시글 정보' })
-  board: Board;
+  @Field(() => Reply, { description: '부모 댓글' })
+  reply: Reply;
 
   @Column('text')
   @Field(() => String, { description: '내용' })
@@ -46,12 +46,6 @@ export class Reply {
     },
   )
   like_user: LikeUserRecord[];
-
-  @JoinColumn()
-  @OneToMany(() => CommentReply, (Comment_Reply) => Comment_Reply.reply, {
-    nullable: true,
-  })
-  comment_reply: CommentReply[];
 
   @CreateDateColumn({ type: 'timestamp' })
   @Field(() => Date, { description: '작성일' })

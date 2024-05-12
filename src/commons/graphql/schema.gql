@@ -2,6 +2,32 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""대댓글 정보"""
+type CommentReply {
+  """고유 ID"""
+  id: String!
+
+  """작성자 정보"""
+  user: User!
+
+  """부모 댓글"""
+  reply: Reply!
+
+  """내용"""
+  detail: String!
+
+  """좋아요 수"""
+  like: Int!
+
+  """작성일"""
+  create_at: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 """댓글 정보"""
 type Reply {
   """고유 ID"""
@@ -22,11 +48,6 @@ type Reply {
   """작성일"""
   create_at: DateTime!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 """게시글 정보"""
 type Board {
@@ -104,6 +125,9 @@ type LikeUserRecord {
 
   """좋아요 누른 댓글 정보"""
   reply: Reply
+
+  """좋아요 누른 댓글 정보"""
+  commet_reply: CommentReply
 }
 
 """시/도 정보"""
@@ -484,8 +508,11 @@ type Mutation {
   """게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작"""
   decreaseUsedProductLike(product_id: String!): UsedProduct!
 
-  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 하나일 때)"""
+  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 하나일 때"""
   createBoardWithImage(createBoardInput: CreateBoardInput!): Board!
+
+  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 없을 때)"""
+  createBoard(createBoardInput: CreateBoardInput!): Board!
 
   """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 여러 장 일 때)"""
   createBoardWithImages(createBoardInput: CreateBoardInput!): Board!
@@ -552,12 +579,27 @@ type Mutation {
   increaseReplyLike(
     """댓글 고유 ID"""
     reply_id: String!
-  ): Board!
+  ): Boolean!
 
   """댓글의 좋아요를 취소하는 기능입니다. (좋아요한 댓글에게만 동작)"""
   decreaseReplyLike(
     """댓글 고유 ID"""
     reply_id: String!
+  ): Boolean!
+
+  """댓글에 대댓글을 작성하는 기능입니다."""
+  createCommetReply(
+    """댓글 고유 ID"""
+    reply_id: String!
+
+    """댓글 내용"""
+    detail: String!
+  ): Board!
+
+  """댓글에 대댓글을 삭제하는 기능입니다."""
+  deleteCommentReply(
+    """대댓글 고유 ID"""
+    commentReply_id: String!
   ): Board!
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
   updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
