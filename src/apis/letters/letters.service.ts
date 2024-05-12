@@ -97,13 +97,17 @@ export class LetterService {
   }
 
   async findSendAll(user_id: string): Promise<Letter[]> {
-    const user = await this.userService.findById(user_id);
-    return await this.letterRepository.find({ where: { sender: user } });
+    return await this.letterRepository.find({
+      where: { sender: { id: user_id } },
+      relations: ['sender', 'receiver', 'product', 'board'],
+    });
   }
 
   async findReceiveAll(user_id: string): Promise<Letter[]> {
-    const user = await this.userService.findById(user_id);
-    return await this.letterRepository.find({ where: { receiver: user } });
+    return await this.letterRepository.find({
+      where: { receiver: { id: user_id } },
+      relations: ['sender', 'receiver', 'product', 'board'],
+    });
   }
 
   async delete(letter_id: string): Promise<boolean> {

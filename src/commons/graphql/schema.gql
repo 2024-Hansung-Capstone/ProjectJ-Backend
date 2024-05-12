@@ -407,8 +407,8 @@ type Query {
     rank: Float!
   ): [Board!]!
   fetchLetterById(letter_id: String!): Letter!
-  fetchMySendLetters: Letter!
-  fetchMyReceiveLetters: Letter!
+  fetchMySendLetters: [Letter!]!
+  fetchMyReceiveLetters: [Letter!]!
 
   """해당 X,Y좌표에 포함되어 있는 원룸들을 리턴(X,Y좌표는 소수점 14자리수 까지)"""
   fetchOneRoomByXY(StartX: Float!, StartY: Float!, EndX: Float!, EndY: Float!): [OneRoom!]!
