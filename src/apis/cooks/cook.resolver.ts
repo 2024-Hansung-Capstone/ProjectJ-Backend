@@ -10,6 +10,7 @@ import { Recipe } from './entities/recipe.entity';
 import { Ingredient } from './entities/ingredient.entity';
 import { CreateIngredientInput } from './dto/create-ingredient.input';
 import { UpdateIngredientInput } from './dto/update-ingredient.input';
+import { CreateRecipeInput } from './dto/create-recipe.input';
 
 @Resolver()
 export class CookResolver {
@@ -26,9 +27,28 @@ export class CookResolver {
     return await this.cookService.create(context.req.user.id, createCookInput);
   }
 
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Cook)
+  async createCookByAI(
+    @Context() context: IContext,
+    @Args('createRecipeInput')
+    createRecipeInput: CreateRecipeInput,
+  ) {
+    return await this.cookService.createByAI(
+      context.req.user.id,
+      createRecipeInput,
+    );
+  }
+
+  @UseGuards(gqlAccessGuard)
   @Query(() => [Cook])
-  async fetchCookByUserId(@Args('user_id') user_id: string): Promise<Cook> {
-    return this.cookService.findByUserId(user_id);
+  async fetchMyCooks(@Context() context: IContext): Promise<Cook[]> {
+    return this.cookService.findByUserId(context.req.user.id);
+  }
+
+  @Query(() => Cook)
+  async fetchCookById(@Args('cook_id') cook_id: string): Promise<Cook> {
+    return this.cookService.findById(cook_id);
   }
 
   //수정

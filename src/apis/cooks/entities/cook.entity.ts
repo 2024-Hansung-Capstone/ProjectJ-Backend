@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Ing } from './recipe.entity';
@@ -24,6 +25,14 @@ export class Cook {
   @Column({ length: 100 })
   @Field(() => String)
   name: string;
+
+  @Column({ type: 'json' })
+  @Field(() => [Ing])
+  ingredients: Ing[];
+
+  @Column('simple-array')
+  @Field(() => [String])
+  instructions: string[];
 
   @Column({ default: 0 })
   @Field(() => Int)
