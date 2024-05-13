@@ -12,6 +12,7 @@ import {
   IIngredientServiceCreate,
   IIngredientServiceUpdate,
 } from './interfaces/ingredient-service.interface';
+import { Recipe } from './entities/recipe.entity';
 
 @Injectable()
 export class CookService {
@@ -68,8 +69,8 @@ export class CookService {
     });
   }
 
-  async findByUserId(user_id: string): Promise<Cook> {
-    return await this.cookRepository.findOne({
+  async findByUserId(user_id: string): Promise<Cook[]> {
+    return await this.cookRepository.find({
       where: { user: { id: user_id } },
       relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
     });
@@ -211,5 +212,16 @@ export class CookService {
       .toPromise();
 
     return JSON.parse(response.data.data[0].content[0].text.value).recipes;
+  }
+
+  async createByAI(user_id: string, recipe: Recipe) {
+    const user = await this.userService.findById(user_id);
+    const newCook = this.cookRepository.create({
+      user: user,
+      name: recipe.name,
+      ingredients: [...recipe.used_ingredients, ...recipe.needed_ingredients],
+      instructions: recipe.instructions,
+    });
+    return await this.cookRepository.save(newCook);
   }
 }

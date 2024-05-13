@@ -328,13 +328,6 @@ type OneRoom {
   view: Int!
 }
 
-type Cook {
-  id: String!
-  name: String!
-  view: Int!
-  create_at: DateTime!
-}
-
 type Ing {
   name: String!
   count: Int
@@ -347,6 +340,15 @@ type Recipe {
   used_ingredients: [Ing!]
   needed_ingredients: [Ing!]
   instructions: [String!]!
+}
+
+type Cook {
+  id: String!
+  name: String!
+  ingredients: [Ing!]!
+  instructions: [String!]!
+  view: Int!
+  create_at: DateTime!
 }
 
 type Query {
@@ -432,7 +434,8 @@ type Query {
   """나의 알림을 전체 조회합니다."""
   fetchMyNotificationMessages: [Notification!]!
   fetchMyRole: Role!
-  fetchCookByUserId(user_id: String!): [Cook!]!
+  fetchMyCooks: [Cook!]!
+  fetchCookById(cook_id: String!): Cook!
   increaseCookView(id: String!): Cook!
   searchCook(keyword: String!): [Cook!]!
   fetchIngredients: [Ingredient!]!
@@ -646,6 +649,7 @@ type Mutation {
   deleteAllMyNotificationMessages: Boolean!
   dailyCheckIn: Boolean!
   createCook(createCookInput: CreateCookInput!): Cook!
+  createCookByAI(createRecipeInput: CreateRecipeInput!): Cook!
   updateCook(cook_id: String!, updateCookInput: UpdateCookInput!): Cook!
   deleteCook(cook_id: String!): Boolean!
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
@@ -805,6 +809,22 @@ input ReplyLetterInput {
 
 input CreateCookInput {
   name: String!
+  ingredients: [CreateIngInput!]!
+  instructions: [String!]!
+}
+
+input CreateIngInput {
+  name: String!
+  count: Int
+  volume: Float
+  volume_unit: String
+}
+
+input CreateRecipeInput {
+  name: String!
+  used_ingredients: [CreateIngInput!]
+  needed_ingredients: [CreateIngInput!]
+  instructions: [String!]!
 }
 
 input UpdateCookInput {
