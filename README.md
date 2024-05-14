@@ -6,7 +6,7 @@ NestJS 프레임워크에서 GraphQL 쿼리 언어를 사용하여 개발 완료
 
 
 ## ﻿설치
-﻿1) 환경변수 설정
+﻿1) 환경변수 설정<br>
     가. .env 설정
 JWT_ACCESS_SECRET = (사용자 관리 중 JWT의 Access키 생성을 위한 암호)
 JWT_REFRESH_SECRET = (사용자 관리 중 JWT의 Refresh키 생성을 위한 암호)
