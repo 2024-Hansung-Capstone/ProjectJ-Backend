@@ -7,6 +7,7 @@ import {
   OneToMany,
   OneToOne,
   JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 import { LikeUserRecord } from 'src/apis/like/entities/like_user_record.entity';
 import { Dong } from 'src/apis/area/entities/dong.entity';
@@ -18,7 +19,7 @@ export class User {
   @Field(() => String, { description: '고유 ID' })
   id: string;
 
-  @OneToOne(() => Dong)
+  @ManyToOne(() => Dong)
   @JoinColumn()
   @Field(() => Dong, { description: '사용자 거주지역(행정동)' })
   dong: Dong;

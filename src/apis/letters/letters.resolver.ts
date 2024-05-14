@@ -50,14 +50,14 @@ export class LetterResolver {
 
   //로그인한 사용자가 보낸 쪽지 전부 조회
   @UseGuards(gqlAccessGuard)
-  @Query(() => Letter)
+  @Query(() => [Letter])
   async fetchMySendLetters(@Context() context: IContext): Promise<Letter[]> {
     return await this.letterService.findSendAll(context.req.user.id);
   }
 
   //로그인한 사용자가 받은 쪽지 전부 조회
   @UseGuards(gqlAccessGuard)
-  @Query(() => Letter)
+  @Query(() => [Letter])
   async fetchMyReceiveLetters(@Context() context: IContext): Promise<Letter[]> {
     return await this.letterService.findReceiveAll(context.req.user.id);
   }

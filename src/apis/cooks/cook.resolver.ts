@@ -6,6 +6,11 @@ import { Cook } from './entities/cook.entity';
 import { IContext } from '../users/interfaces/user-service.interface';
 import { CreateCookInput } from './dto/create-cook.input';
 import { UpdateCookInput } from './dto/update-cook.input';
+import { Recipe } from './entities/recipe.entity';
+import { Ingredient } from './entities/ingredient.entity';
+import { CreateIngredientInput } from './dto/create-ingredient.input';
+import { UpdateIngredientInput } from './dto/update-ingredient.input';
+import { CreateRecipeInput } from './dto/create-recipe.input';
 
 @Resolver()
 export class CookResolver {
@@ -22,9 +27,28 @@ export class CookResolver {
     return await this.cookService.create(context.req.user.id, createCookInput);
   }
 
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Cook)
+  async createCookByAI(
+    @Context() context: IContext,
+    @Args('createRecipeInput')
+    createRecipeInput: CreateRecipeInput,
+  ) {
+    return await this.cookService.createByAI(
+      context.req.user.id,
+      createRecipeInput,
+    );
+  }
+
+  @UseGuards(gqlAccessGuard)
   @Query(() => [Cook])
-  async fetchCookByUserId(@Args('user_id') user_id: string): Promise<Cook> {
-    return this.cookService.findByUserId(user_id);
+  async fetchMyCooks(@Context() context: IContext): Promise<Cook[]> {
+    return this.cookService.findByUserId(context.req.user.id);
+  }
+
+  @Query(() => Cook)
+  async fetchCookById(@Args('cook_id') cook_id: string): Promise<Cook> {
+    return this.cookService.findById(cook_id);
   }
 
   //수정
@@ -55,9 +79,7 @@ export class CookResolver {
   }
 
   //조회수로 순위 생성
-  async fetchCookByViewRank(
-    @Args('rank') rank: number,
-  ): Promise<Cook[]> {
+  async fetchCookByViewRank(@Args('rank') rank: number): Promise<Cook[]> {
     return this.cookService.findTopCooks(rank);
   }
 
@@ -65,5 +87,67 @@ export class CookResolver {
   @Query(() => [Cook])
   async searchCook(@Args('keyword') keyword: string): Promise<Cook[]> {
     return this.cookService.search(keyword);
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Ingredient)
+  async createIngredient(
+    @Context() context: IContext,
+    @Args('createIngredientInput')
+    createIngredientInput: CreateIngredientInput,
+  ) {
+    return await this.cookService.createIngredient(context.req.user.id, {
+      createIngredientInput,
+    });
+  }
+
+  @Query(() => [Ingredient])
+  async fetchIngredients(): Promise<Ingredient[]> {
+    return await this.cookService.findIngredientAll();
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @Query(() => [Ingredient])
+  async fetchMyIngredients(
+    @Context() context: IContext,
+  ): Promise<Ingredient[]> {
+    return await this.cookService.findIngredientByUserId(context.req.user.id);
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Ingredient)
+  async updateIngredient(
+    @Args('updateIngredientInput') updateIngredientInput: UpdateIngredientInput,
+  ): Promise<Ingredient> {
+    const result = await this.cookService.updateIngredient({
+      updateIngredientInput,
+    });
+    if (!result) {
+      throw new BadRequestException(
+        '알 수 없는 이유로 식재료 정보 수정에 실패하였습니다.',
+      );
+    }
+    return result;
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Boolean)
+  async deleteIngredient(
+    @Context() context: IContext,
+    @Args('ingredient_id') ingredient_id: string,
+  ) {
+    const ingre = await this.cookService.findIngredientById(ingredient_id);
+    if (ingre.user.id !== context.req.user.id) {
+      throw new BadRequestException(
+        '로그인 된 사용자가 만든 식재료 정보가 아니어서 삭제에 실패하였습니다.',
+      );
+    }
+    return await this.cookService.deleteIngredient(ingredient_id);
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @Query(() => [Recipe])
+  async fetchRecipes(@Context() context: IContext) {
+    return this.cookService.getRecipes(context.req.user.id);
   }
 }
