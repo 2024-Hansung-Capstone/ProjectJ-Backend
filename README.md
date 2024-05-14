@@ -95,12 +95,12 @@ __<출처>__
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp﻿;﻿﻿국토교통부에서 제공하는 연립 다세대 전월세 데이터를 사용하여 원룸 정보를 전달한다.   
 __<출처>__   
 ﻿https://www.data.go.kr/data/15058016/openapi.do   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp﻿; ﻿상세주소를 이용하여 Geocoding 기술을 사용하여 좌표를 전달한다.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp﻿;상세주소를 이용하여 Geocoding 기술을 사용하여 좌표를 전달한다.
 
-### ﻿요리 추천 AI 기능!    
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp﻿;﻿﻿﻿ OpenAI에 API 기능 중 Assistants를 생성해서 요리 추천 봇을 구현한다.   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp﻿;﻿﻿﻿ ﻿사용자가 갖고 있는 식재료를 Json 형태로 전달하면, Assistants는 Json 형태로 요리의 상세 정보와 레시피를 리턴한다.   
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp﻿; ﻿사용자의 요청 별로 각각 Thread를 만들고, 생성해 놓은 Assistants를 Run하여 결과를 도출한다.
+### ﻿요리 추천 AI 기능    
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp﻿;﻿﻿﻿OpenAI에 API 기능 중 Assistants를 생성해서 요리 추천 봇을 구현한다.   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp﻿;﻿﻿﻿사용자가 갖고 있는 식재료를 Json 형태로 전달하면, Assistants는 Json 형태로 요리의 상세 정보와 레시피를 리턴한다.   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp﻿;﻿사용자의 요청 별로 각각 Thread를 만들고, 생성해 놓은 Assistants를 Run하여 결과를 도출한다.
 __<OpenAI에서 생성한 요리 추천 Assistants>__   
 ![image](https://github.com/2024-Hansung-Capstone/ProjectJ-Backend/assets/157611169/cf1bba84-121c-483a-bbf6-41fa152e3bde)   
 
@@ -108,7 +108,7 @@ __<요리 추천 AI API 실행 결과>__
 ![image](https://github.com/2024-Hansung-Capstone/ProjectJ-Backend/assets/157611169/6f96c4e1-2880-49b4-9944-9b1a108777ad)    
 
 ### 기타 API 기능 설명
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp﻿;﻿﻿﻿ ﻿배포된 링크(http://13.209.72.136:5000/graphql)의 Docs를 참고하여 사용 가능하다.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp﻿;﻿﻿﻿배포된 링크(http://13.209.72.136:5000/graphql)의 Docs를 참고하여 사용 가능하다.
 
 
 
