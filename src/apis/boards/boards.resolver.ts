@@ -8,6 +8,8 @@ import { IContext } from '../users/interfaces/user-service.interface';
 import { UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { gqlAccessGuard } from '../users/guards/gql-auth.guard';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { Body } from '@nestjs/common';
+import { GraphQLUpload, FileUpload } from 'graphql-upload';
 
 @Resolver('Board')
 export class BoardResolver {
@@ -62,12 +64,30 @@ export class BoardResolver {
   }
 
   @UseGuards(gqlAccessGuard)
-  @UseInterceptors(FileInterceptor('image'))
   @Mutation(() => Board, {
-    description: '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 하나일 때',
+    description:
+      '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 한 장 있을 때)',
   })
   async createBoardWithImage(
-    @UploadedFile() files: Express.Multer.File[],
+    @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
+    @Args('createBoardInput') createBoardInput: CreateBoardInput,
+    @Context() context: IContext,
+  ): Promise<Board> {
+    return this.boardService.create(
+      'post',
+      file,
+      context.req.user.id,
+      createBoardInput,
+    );
+  }
+
+  @UseGuards(gqlAccessGuard)
+  @Mutation(() => Board, {
+    description:
+      '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 여러 장 있을 때)',
+  })
+  async createBoardWithImages(
+    @Args('files', { type: () => [GraphQLUpload] }) files: FileUpload[],
     @Args('createBoardInput') createBoardInput: CreateBoardInput,
     @Context() context: IContext,
   ): Promise<Board> {
@@ -96,51 +116,14 @@ export class BoardResolver {
   }
 
   @UseGuards(gqlAccessGuard)
-  @UseInterceptors(FilesInterceptor('image'))
-  @Mutation(() => Board, {
-    description:
-      '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 여러 장 일 때)',
-  })
-  async createBoardWithImages(
-    @UploadedFile() files: Express.Multer.File[],
-    @Args('createBoardInput') createBoardInput: CreateBoardInput,
-    @Context() context: IContext,
-  ): Promise<Board> {
-    return this.boardService.create(
-      'post',
-      files,
-      context.req.user.id,
-      createBoardInput,
-    );
-  }
-
-  @UseGuards(gqlAccessGuard)
   @UseInterceptors(FileInterceptor('image'))
   @Mutation(() => Board, {
     description:
-      '입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트된 게시글 사진이 한 장)',
+      '입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트된 게시글 사진이 있을 때)',
   })
   async updateBoardWithImage(
-    @UploadedFile() files: Express.Multer.File[],
-    @Args('updateBoradInput') updateBoradInput: UpdateBoardInput,
-    @Context() context: IContext,
-  ): Promise<Board> {
-    return this.boardService.update(
-      'post',
-      files,
-      context.req.user.id,
-      updateBoradInput,
-    );
-  }
-  @UseGuards(gqlAccessGuard)
-  @UseInterceptors(FilesInterceptor('image'))
-  @Mutation(() => Board, {
-    description:
-      '입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트된 게시글 사진이 한 장)',
-  })
-  async updateBoardWithImages(
-    @UploadedFile() files: Express.Multer.File[],
-    @Args('updateBoradInput') updateBoradInput: UpdateBoardInput,
+    @UploadedFile() files: FileUpload[],
+    @Body() updateBoradInput: UpdateBoardInput,
     @Context() context: IContext,
   ): Promise<Board> {
     return this.boardService.update(
@@ -285,5 +268,13 @@ export class BoardResolver {
       context.req.user.id,
       commentReply_id,
     );
+  }
+
+  @Mutation(() => Boolean)
+  async uploadFile(
+    @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
+  ): Promise<boolean> {
+    console.log('Uploaded file:', file);
+    return true;
   }
 }

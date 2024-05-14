@@ -23,6 +23,7 @@ import { PointService } from '../point/point.service';
 import { PostImage } from '../post_image/entities/postImage.entity';
 import { PostImageService } from '../post_image/postImage.service';
 import { CommentReply } from './entities/commet_reply.entity';
+import { FileUpload } from 'graphql-upload';
 import * as path from 'path';
 @Injectable()
 export class BoardService {
@@ -102,7 +103,7 @@ export class BoardService {
 
   async create(
     folder: string,
-    files: Express.Multer.File[],
+    files: FileUpload[] | FileUpload,
     user_id: string,
     createBoardInput: CreateBoardInput,
   ): Promise<Board> {
@@ -112,20 +113,26 @@ export class BoardService {
     if (!user) {
       throw new Error('해당 사용자가 존재하지 않습니다');
     }
-    if (files && files.length > 0) {
-      const imgUrl: string[] = await this.postImageService.saveImageToS3(
-        folder,
-        files,
-      );
-      for (const url of imgUrl) {
+    if (files) {
+      if (Array.isArray(files)) {
+        const imgUrl = await this.postImageService.saveImageToS3(folder, files);
+        for (const url of imgUrl) {
+          console.log(url);
+          const postImage = new PostImage();
+          postImage.board = board;
+          postImage.imagePath = url;
+          await this.postImageRepository.save(postImage);
+          board.post_images.push(postImage);
+        }
+      } else {
+        const imgUrl = await this.postImageService.saveImageToS3(folder, files);
         const postImage = new PostImage();
         postImage.board = board;
-        postImage.imagePath = url;
+        if (!Array.isArray(imgUrl)) postImage.imagePath = imgUrl;
         await this.postImageRepository.save(postImage);
         board.post_images.push(postImage);
       }
     }
-
     board.title = title;
     board.detail = detail;
     board.category = category;
@@ -137,7 +144,7 @@ export class BoardService {
 
   async update(
     folder: string,
-    file: Express.Multer.File[],
+    file: FileUpload[],
     user_id: string,
     updateBoradInput: UpdateBoardInput,
   ): Promise<Board> {
@@ -155,7 +162,7 @@ export class BoardService {
     //기존 postImage에서 없는 이미지 삽입
     for (const item of file) {
       const key = `${folder}/${Date.now()}_${path.basename(
-        item.originalname,
+        item.filename,
       )}`.replace(/ /g, '');
       const s3Url = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
       newImageUrls.push(s3Url);
@@ -164,10 +171,7 @@ export class BoardService {
           (postImage: PostImage) => postImage.imagePath === s3Url,
         )
       ) {
-        const imgUrl: string[] = await this.postImageService.saveImageToS3(
-          folder,
-          file,
-        );
+        const imgUrl = await this.postImageService.saveImageToS3(folder, file);
         const postImage = new PostImage();
         postImage.board = board;
         postImage.imagePath = imgUrl[0];
