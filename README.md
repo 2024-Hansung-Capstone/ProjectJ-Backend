@@ -6,7 +6,7 @@ NestJS 프레임워크에서 GraphQL 쿼리 언어를 사용하여 개발 완료
 
 
 ## ﻿설치
-﻿1) 환경변수 설정    
+﻿1. 환경변수 설정    
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;가. .env 설정
 <pre><code>
         JWT_ACCESS_SECRET = (사용자 관리 중 JWT의 Access키 생성을 위한 암호)
@@ -41,10 +41,10 @@ DATABASE_DATABASE = (데이터베이스 스키마명)
 
 </code></pre>
 
-2) 프로젝트 파일 설치
+2. 프로젝트 파일 설치
     git clone https://github.com/2024-Hansung-Capstone/ProjectJ-Backend.git
 
-3) Docker
+3. Docker
     docker-compose build
     docker-compose up
      -백그라운드에서 실행: docker-compose up -d
