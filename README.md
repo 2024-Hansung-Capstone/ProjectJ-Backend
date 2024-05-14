@@ -83,12 +83,12 @@ __<인증 메시지 전송 예>__
 
 ### 행정지역
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;행정안전부에서 지정한 2024년 2월 1일 기준인 시도, 시군구, 행정동 코드를 사용한다.    
-__<출처>__     
-﻿https://www.mois.go.kr/frt/bbs/type001/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000052&nttId=106692
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__<출처>__     
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;﻿https://www.mois.go.kr/frt/bbs/type001/commonSelectBoardArticle.do?bbsId=BBSMSTR_000000000052&nttId=106692
 
 ### 포인트
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;가. 사용자 역할 관리    
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;포인트 별로 사용자의 역할을 분류한다.   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;포인트 별로 사용자의 역할을 분류한다.   
 ![image](https://github.com/2024-Hansung-Capstone/ProjectJ-Backend/assets/157611169/7da4224c-f98b-44ee-9ba3-5c9da523ad76)
 
 ### 원룸    
