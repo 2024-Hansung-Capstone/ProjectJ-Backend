@@ -53,7 +53,7 @@ docker-compose up
 
 # ﻿Release Link
 
-﻿http://13.209.72.136:5000/graphql
+[http://13.209.72.136:5000/graphql](http://54.180.182.40:5000/graphql)
 
 # ﻿Apollo GraphQL Playground UI
 __<UI 설명>__    
