@@ -6,8 +6,9 @@ NestJS 프레임워크에서 GraphQL 쿼리 언어를 사용하여 개발 완료
 
 
 ## ﻿설치
-﻿1) 환경변수 설정<br>
-    가. .env 설정
+﻿1) 환경변수 설정    
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;가. .env 설정
+<pre><code>
         JWT_ACCESS_SECRET = (사용자 관리 중 JWT의 Access키 생성을 위한 암호)
         JWT_REFRESH_SECRET = (사용자 관리 중 JWT의 Refresh키 생성을 위한 암호)
 
@@ -27,14 +28,18 @@ NestJS 프레임워크에서 GraphQL 쿼리 언어를 사용하여 개발 완료
         DATABASE_DATABASE = (데이터베이스 스키마명)
 
         OPENAI_SECRET = (OPENAI API 비밀 키)
+</code></pre>
 
-나. .env.docker 설정
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;나. .env.docker 설정
+<pre><code>    
 DATABASE_TYPE = (메인으로 사용할 데이터베이스의 종류 ex)mysql)
 DATABASE_HOST = (데이터베이스 host 주소)
 DATABASE_PORT= (데이터베이스 포트)
 DATABASE_USERNAME = (데이터베이스 사용자명)
 DATABASE_PASSWORD = (데이터베이스 암호)
 DATABASE_DATABASE = (데이터베이스 스키마명)
+
+</code></pre>
 
 2) 프로젝트 파일 설치
     git clone https://github.com/2024-Hansung-Capstone/ProjectJ-Backend.git
