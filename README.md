@@ -94,7 +94,7 @@ __<인증 메시지 전송 예>__
 ### 원룸    
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;국토교통부에서 제공하는 연립 다세대 전월세 데이터를 사용하여 원룸 정보를 전달한다.   
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__<출처>__   
-﻿https://www.data.go.kr/data/15058016/openapi.do   
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;﻿https://www.data.go.kr/data/15058016/openapi.do   
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;상세주소를 이용하여 Geocoding 기술을 사용하여 좌표를 전달한다.
 
 ### ﻿요리 추천 AI 기능    
