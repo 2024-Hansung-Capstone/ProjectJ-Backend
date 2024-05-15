@@ -27,4 +27,7 @@ export class UpdateUserInput {
 
   @Field(() => Boolean, { nullable: true, description: '메이트 매칭 여부' })
   is_find_mate?: boolean;
+
+  @Field(() => String, { nullable: true, description: '비밀번호' })
+  password?: string;
 }
