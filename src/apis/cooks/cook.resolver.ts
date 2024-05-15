@@ -53,9 +53,13 @@ export class CookResolver {
   }
 
   //삭제
+  @UseGuards(gqlAccessGuard)
   @Mutation(() => Boolean)
-  async deleteCook(@Args('cook_id') cook_id: string): Promise<boolean> {
-    return await this.cookService.delete(cook_id);
+  async deleteCook(
+    @Context() context: IContext,
+    @Args('cook_id') cook_id: string,
+  ): Promise<boolean> {
+    return await this.cookService.delete(context.req.user.id, cook_id);
   }
 
   //조회수 증가

@@ -10,7 +10,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PostImage } from 'src/apis/post_image/entities/postImage.entity';
-import { GraphQLUpload } from 'graphql-upload';
 
 @Entity()
 @ObjectType()
@@ -25,10 +24,10 @@ export class Cook {
   user: User;
 
   @JoinColumn()
-  @OneToMany(() => PostImage, (PostImage) => PostImage.cook, {
+  @OneToMany(() => PostImage, (postImage) => postImage.cook, {
     nullable: true,
   })
-  @Field(() => [GraphQLUpload])
+  @Field(() => [PostImage])
   post_images: PostImage[];
 
   @Column({ length: 100 })
