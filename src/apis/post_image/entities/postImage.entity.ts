@@ -22,6 +22,7 @@ export class PostImage {
     description: '이미지경로(아마존S3에 저장되어 있는 파일 이름)',
   })
   imagePath: string;
+
   @ManyToOne(() => Board, (Board) => Board.post_images, {
     nullable: true,
     onDelete: 'CASCADE',
@@ -46,10 +47,12 @@ export class PostImage {
 
   @JoinColumn()
   @ManyToOne(() => Cook, (Cook) => Cook.post_images, {
-    eager: false,
     nullable: true,
-    onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
+  })
+  @Field(() => Cook, {
+    nullable: true,
+    description: '해당 이미지가 있는 요리 정보',
   })
   cook: Cook;
 }
