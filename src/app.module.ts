@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,6 +12,7 @@ import { OneRoomModule } from './apis/oneroom/oneroom.module';
 import { NotificationModule } from './apis/notifications/notifications.module';
 import { PointModule } from './apis/point/point.module';
 import { PostImageModule } from './apis/post_image/postImage.module';
+import { graphqlUploadExpress } from 'graphql-upload';
 import { CookModule } from './apis/cooks/cook.module';
 @Module({
   imports: [
@@ -44,4 +45,8 @@ import { CookModule } from './apis/cooks/cook.module';
     }),
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(graphqlUploadExpress()).forRoutes('graphql');
+  }
+}
