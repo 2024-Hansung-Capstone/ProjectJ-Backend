@@ -1,6 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { Ing } from '../entities/recipe.entity';
-import { CreateIngInput } from './create-ing.input';
+import { FileUpload, GraphQLUpload } from 'graphql-upload';
 
 @InputType()
 export class CreateCookInput {
@@ -10,9 +9,6 @@ export class CreateCookInput {
   @Field(() => String)
   detail: string;
 
-  @Field(() => [CreateIngInput])
-  ingredients: Ing[];
-
-  @Field(() => [String])
-  instructions: string[];
+  @Field(() => [GraphQLUpload])
+  post_images: FileUpload[]
 }

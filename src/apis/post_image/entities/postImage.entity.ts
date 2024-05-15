@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Board } from 'src/apis/boards/entities/board.entity';
+import { Cook } from 'src/apis/cooks/entities/cook.entity';
 import { UsedProduct } from 'src/apis/used_markets/entities/used_product.entity';
 import {
   Column,
@@ -37,4 +38,13 @@ export class PostImage {
     onDelete: 'CASCADE',
   })
   used_proudct: UsedProduct;
+
+  @JoinColumn()
+  @ManyToOne(() => Cook, (Cook) => Cook.post_images, {
+    eager: false,
+    nullable: true,
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  })
+  cook: Cook;
 }
