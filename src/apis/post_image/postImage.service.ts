@@ -12,7 +12,7 @@ export class PostImageService {
 
   constructor(
     @InjectRepository(PostImage)
-    private PostImageRepository: Repository<PostImage>,
+    private postImageRepository: Repository<PostImage>,
   ) {
     this.awsS3 = new AWS.S3({
       accessKeyId: process.env.AWS_S3_ACCESS_KEY,
@@ -59,5 +59,13 @@ export class PostImageService {
       console.error('이미지 삭제 중 에러사유:', error);
       throw new Error('이미지 삭제에 에러 발생');
     }
+  }
+
+  async createPostImage(postImage: PostImage) {
+    await this.postImageRepository.save(postImage);
+  }
+
+  async removePostImage(postImage: PostImage) {
+    await this.postImageRepository.remove(postImage);
   }
 }

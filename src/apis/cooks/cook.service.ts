@@ -12,7 +12,8 @@ import {
   IIngredientServiceCreate,
   IIngredientServiceUpdate,
 } from './interfaces/ingredient-service.interface';
-import { Recipe } from './entities/recipe.entity';
+import { PostImageService } from '../post_image/postImage.service';
+import { PostImage } from '../post_image/entities/postImage.entity';
 
 @Injectable()
 export class CookService {
@@ -22,6 +23,7 @@ export class CookService {
     @InjectRepository(Ingredient)
     private readonly ingredientRepository: Repository<Ingredient>,
     private readonly userService: UserService,
+    private readonly postImageService: PostImageService,
     private httpService: HttpService,
   ) {}
 
@@ -30,11 +32,31 @@ export class CookService {
     createCookInput: CreateCookInput,
   ): Promise<Cook> {
     const user = await this.userService.findById(user_id);
-    const newCook = this.cookRepository.create({
+    const folder = 'post';
+    const cook = await this.cookRepository.save({
       user: user,
-      ...createCookInput,
+      name: createCookInput.name,
+      detail: createCookInput.detail,
+      post_images: [],
     });
-    return await this.cookRepository.save(newCook);
+
+    const imgUrl = await this.postImageService.saveImageToS3(
+      folder,
+      await Promise.all(createCookInput.post_images),
+    );
+    for (const url of imgUrl) {
+      const postImage = new PostImage();
+      postImage.cook = cook;
+      postImage.imagePath = url;
+      await this.postImageService.createPostImage(postImage);
+      cook.post_images.push(postImage);
+    }
+
+    await this.cookRepository.update(
+      { id: cook.id },
+      { post_images: cook.post_images },
+    );
+    return this.findById(cook.id);
   }
 
   async update(
@@ -45,9 +67,35 @@ export class CookService {
     if (!cook) {
       throw new BadRequestException('수정해야 할 게시글을 찾을 수 없습니다.');
     }
+
+    if (updateCookInput.post_images) {
+      // 기존 이미지 삭제
+      for (const postImage of cook.post_images) {
+        await this.postImageService.deleteImageFromS3(postImage.imagePath);
+        await this.postImageService.removePostImage(postImage);
+      }
+
+      const folder = 'post';
+      const imgUrl = await this.postImageService.saveImageToS3(
+        folder,
+        updateCookInput.post_images,
+      );
+      for (const url of imgUrl) {
+        const postImage = new PostImage();
+        postImage.cook = cook;
+        postImage.imagePath = url;
+        await this.postImageService.createPostImage(postImage);
+        cook.post_images.push(postImage);
+      }
+    }
+
     const result = await this.cookRepository.update(
       { id: cook_id },
-      { ...updateCookInput },
+      {
+        name: updateCookInput.name,
+        detail: updateCookInput.detail,
+        post_images: cook.post_images,
+      },
     );
 
     if (result.affected > 0) {
@@ -65,14 +113,26 @@ export class CookService {
   async findById(cook_id: string): Promise<Cook> {
     return await this.cookRepository.findOne({
       where: { id: cook_id },
-      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'post_images',
+      ],
     });
   }
 
   async findByUserId(user_id: string): Promise<Cook[]> {
     return await this.cookRepository.find({
       where: { user: { id: user_id } },
-      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido'],
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'post_images',
+      ],
     });
   }
 
@@ -212,22 +272,5 @@ export class CookService {
       .toPromise();
 
     return JSON.parse(response.data.data[0].content[0].text.value).recipes;
-  }
-
-  async createByAI(
-    user_id: string,
-    recipe: Recipe,
-    name: string,
-    detail: string,
-  ) {
-    const user = await this.userService.findById(user_id);
-    const newCook = this.cookRepository.create({
-      user: user,
-      name: name,
-      detail: detail,
-      ingredients: [...recipe.used_ingredients, ...recipe.needed_ingredients],
-      instructions: recipe.instructions,
-    });
-    return await this.cookRepository.save(newCook);
   }
 }

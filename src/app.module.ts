@@ -30,6 +30,7 @@ import { CookModule } from './apis/cooks/cook.module';
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'src/commons/graphql/schema.gql',
+      csrfPrevention: false,
       context: ({ req, res }) => ({ req, res }),
     }),
     TypeOrmModule.forRoot({
