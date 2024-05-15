@@ -47,16 +47,10 @@ export class PostImageService {
 
   async deleteImageFromS3(imageUrl: string): Promise<void> {
     try {
-      // 이미지 URL에서 키(Key)를 추출
-      const key = imageUrl.split(
-        `${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/`,
-      )[1];
-
-      // S3 객체 삭제 요청
       await this.awsS3
         .deleteObject({
           Bucket: this.S3_BUCKET_NAME,
-          Key: key,
+          Key: imageUrl,
         })
         .promise();
 
