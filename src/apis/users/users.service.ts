@@ -125,7 +125,7 @@ export class UserService {
     }
     // 날짜에 대한 수정이 없을 때, 날짜 변환 없이 전부 update 진행
     else {
-      result = await this.userRepository.update({ id: user_id }, rest);
+      result = await this.userRepository.update({ id: user_id }, { ...rest });
     }
 
     if (result.affected > 0) {
