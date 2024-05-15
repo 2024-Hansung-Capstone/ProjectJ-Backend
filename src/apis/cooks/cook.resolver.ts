@@ -33,10 +33,14 @@ export class CookResolver {
     @Context() context: IContext,
     @Args('createRecipeInput')
     createRecipeInput: CreateRecipeInput,
+    @Args('name') name: string,
+    @Args('detail') detail: string,
   ) {
     return await this.cookService.createByAI(
       context.req.user.id,
       createRecipeInput,
+      name,
+      detail,
     );
   }
 

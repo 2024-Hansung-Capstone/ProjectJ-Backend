@@ -26,6 +26,10 @@ export class Cook {
   @Field(() => String)
   name: string;
 
+  @Column({ type: 'text' })
+  @Field(() => String)
+  detail: string;
+
   @Column({ type: 'json' })
   @Field(() => [Ing])
   ingredients: Ing[];
