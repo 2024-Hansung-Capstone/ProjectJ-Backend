@@ -76,6 +76,18 @@ type Board {
   create_at: DateTime!
 }
 
+type Cook {
+  id: String!
+  post_images: [Upload!]!
+  name: String!
+  detail: String!
+  view: Int!
+  create_at: DateTime!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
 """중고물품 정보"""
 type UsedProduct {
   """고유 ID"""
@@ -340,16 +352,6 @@ type Recipe {
   used_ingredients: [Ing!]
   needed_ingredients: [Ing!]
   instructions: [String!]!
-}
-
-type Cook {
-  id: String!
-  name: String!
-  detail: String!
-  ingredients: [Ing!]!
-  instructions: [String!]!
-  view: Int!
-  create_at: DateTime!
 }
 
 type Query {
@@ -646,7 +648,6 @@ type Mutation {
   deleteAllMyNotificationMessages: Boolean!
   dailyCheckIn: Boolean!
   createCook(createCookInput: CreateCookInput!): Cook!
-  createCookByAI(createRecipeInput: CreateRecipeInput!, name: String!, detail: String!): Cook!
   updateCook(cook_id: String!, updateCookInput: UpdateCookInput!): Cook!
   deleteCook(cook_id: String!): Boolean!
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
@@ -756,9 +757,6 @@ input UpdateUsedProductInput {
   state: String
 }
 
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
-
 """게시글 생성 입력 정보"""
 input CreateBoardInput {
   """게시판 카테고리"""
@@ -795,29 +793,13 @@ input ReplyLetterInput {
 input CreateCookInput {
   name: String!
   detail: String!
-  ingredients: [CreateIngInput!]!
-  instructions: [String!]!
-}
-
-input CreateIngInput {
-  name: String!
-  count: Int
-  volume: Float
-  volume_unit: String
-}
-
-input CreateRecipeInput {
-  name: String!
-  used_ingredients: [CreateIngInput!]
-  needed_ingredients: [CreateIngInput!]
-  instructions: [String!]!
+  post_images: [Upload!]!
 }
 
 input UpdateCookInput {
   name: String
   detail: String
-  ingredients: [CreateIngInput!]
-  instructions: [String!]
+  post_images: [Upload!]
 }
 
 """식재료 생성 입력 정보"""

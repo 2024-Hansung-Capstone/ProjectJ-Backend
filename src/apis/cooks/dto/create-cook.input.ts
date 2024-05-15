@@ -10,5 +10,5 @@ export class CreateCookInput {
   detail: string;
 
   @Field(() => [GraphQLUpload])
-  post_images: FileUpload[]
+  post_images: FileUpload[];
 }

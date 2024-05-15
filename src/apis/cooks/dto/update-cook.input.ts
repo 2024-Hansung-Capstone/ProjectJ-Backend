@@ -10,5 +10,5 @@ export class UpdateCookInput {
   detail: string;
 
   @Field(() => [GraphQLUpload], { nullable: true })
-  post_images: FileUpload[]
+  post_images: FileUpload[];
 }

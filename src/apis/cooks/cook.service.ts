@@ -33,14 +33,17 @@ export class CookService {
   ): Promise<Cook> {
     const user = await this.userService.findById(user_id);
     const folder = 'post';
-    const cook = await this.cookRepository.create({
+    const cook = await this.cookRepository.save({
       user: user,
-      name : createCookInput.name,
-      detail : createCookInput.detail,
-      post_images : []
+      name: createCookInput.name,
+      detail: createCookInput.detail,
+      post_images: [],
     });
 
-    const imgUrl = await this.postImageService.saveImageToS3(folder, createCookInput.post_images);
+    const imgUrl = await this.postImageService.saveImageToS3(
+      folder,
+      await Promise.all(createCookInput.post_images),
+    );
     for (const url of imgUrl) {
       const postImage = new PostImage();
       postImage.cook = cook;
@@ -49,7 +52,11 @@ export class CookService {
       cook.post_images.push(postImage);
     }
 
-    return await this.cookRepository.save(cook);
+    await this.cookRepository.update(
+      { id: cook.id },
+      { post_images: cook.post_images },
+    );
+    return this.findById(cook.id);
   }
 
   async update(
@@ -69,7 +76,10 @@ export class CookService {
       }
 
       const folder = 'post';
-      const imgUrl = await this.postImageService.saveImageToS3(folder, updateCookInput.post_images);
+      const imgUrl = await this.postImageService.saveImageToS3(
+        folder,
+        updateCookInput.post_images,
+      );
       for (const url of imgUrl) {
         const postImage = new PostImage();
         postImage.cook = cook;
@@ -81,7 +91,11 @@ export class CookService {
 
     const result = await this.cookRepository.update(
       { id: cook_id },
-      { name: updateCookInput.name, detail: updateCookInput.detail, post_images: cook.post_images},
+      {
+        name: updateCookInput.name,
+        detail: updateCookInput.detail,
+        post_images: cook.post_images,
+      },
     );
 
     if (result.affected > 0) {
@@ -99,14 +113,26 @@ export class CookService {
   async findById(cook_id: string): Promise<Cook> {
     return await this.cookRepository.findOne({
       where: { id: cook_id },
-      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido', 'post_images'],
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'post_images',
+      ],
     });
   }
 
   async findByUserId(user_id: string): Promise<Cook[]> {
     return await this.cookRepository.find({
       where: { user: { id: user_id } },
-      relations: ['user', 'user.dong', 'user.dong.sgng', 'user.dong.sgng.sido', 'post_images'],
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'post_images',
+      ],
     });
   }
 
