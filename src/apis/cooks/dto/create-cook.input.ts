@@ -7,6 +7,9 @@ export class CreateCookInput {
   @Field(() => String)
   name: string;
 
+  @Field(() => String)
+  detail: string;
+
   @Field(() => [CreateIngInput])
   ingredients: Ing[];
 

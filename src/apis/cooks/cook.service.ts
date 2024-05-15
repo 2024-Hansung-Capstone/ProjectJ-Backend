@@ -214,11 +214,17 @@ export class CookService {
     return JSON.parse(response.data.data[0].content[0].text.value).recipes;
   }
 
-  async createByAI(user_id: string, recipe: Recipe) {
+  async createByAI(
+    user_id: string,
+    recipe: Recipe,
+    name: string,
+    detail: string,
+  ) {
     const user = await this.userService.findById(user_id);
     const newCook = this.cookRepository.create({
       user: user,
-      name: recipe.name,
+      name: name,
+      detail: detail,
       ingredients: [...recipe.used_ingredients, ...recipe.needed_ingredients],
       instructions: recipe.instructions,
     });
