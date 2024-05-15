@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PostImage } from './entities/postImage.entity';
 import { Repository } from 'typeorm';
@@ -22,46 +22,20 @@ export class PostImageService {
     this.S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
   }
 
-  async saveImageToS3(
-    folder: string,
-    file: FileUpload[] | FileUpload,
-  ): Promise<string[] | string> {
+  async saveImageToS3(folder: string, file: FileUpload): Promise<string> {
     try {
-      if (Array.isArray(file)) {
-        const uploadedUrls: string[] = [];
-
-        for (const singleFile of file) {
-          const fileName = `${Date.now()}_${singleFile.filename}`.replace(
-            / /g,
-            '',
-          ); // 파일 이름 생성
-          const key = `${folder}/${fileName}`; // S3에 저장할 파일 경로
-          const uploadParams = {
-            Bucket: this.S3_BUCKET_NAME,
-            Key: key,
-            Body: singleFile.createReadStream(),
-            ACL: 'public-read',
-            ContentType: singleFile.mimetype,
-          };
-
-          await this.awsS3.upload(uploadParams).promise();
-          uploadedUrls.push(fileName);
-        }
-        return uploadedUrls;
-      } else {
-        const fileName = `${Date.now()}_${file.filename}`.replace(/ /g, ''); // 파일 이름 생성
-        const key = `${folder}/${fileName}`; // S3에 저장할 파일 경로
-        const uploadParams = {
-          Bucket: this.S3_BUCKET_NAME,
-          Key: key,
-          Body: file.createReadStream(),
-          ACL: 'public-read',
-          ContentType: file.mimetype,
-        };
-
-        await this.awsS3.upload(uploadParams).promise();
-        return fileName;
-      }
+      const fileName = `${Date.now()}_${file.filename}`.replace(/ /g, ''); // 파일 이름 생성
+      const key = `${folder}/${fileName}`; // S3에 저장할 파일 경로
+      const uploadParams = {
+        Bucket: this.S3_BUCKET_NAME,
+        Key: key,
+        Body: file.createReadStream(),
+        ACL: 'public-read',
+        ContentType: file.mimetype,
+      };
+      console.log(fileName);
+      await this.awsS3.upload(uploadParams).promise();
+      return fileName;
     } catch (error) {
       console.error('이미지 업로드 중 에러사유:', error);
       throw new Error('이미지 업로드에 에러 발생');

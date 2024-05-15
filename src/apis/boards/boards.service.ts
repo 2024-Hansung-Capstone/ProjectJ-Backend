@@ -110,34 +110,35 @@ export class BoardService {
     const { title, detail, category } = createBoardInput;
     const user = await this.userService.findById(user_id);
     const board = new Board();
-    if (!user) {
-      throw new Error('해당 사용자가 존재하지 않습니다');
-    }
-    if (files) {
-      if (Array.isArray(files)) {
-        const imgUrl = await this.postImageService.saveImageToS3(folder, files);
-        for (const url of imgUrl) {
-          console.log(url);
-          const postImage = new PostImage();
-          postImage.board = board;
-          postImage.imagePath = url;
-          await this.postImageRepository.save(postImage);
-          board.post_images.push(postImage);
-        }
-      } else {
-        const imgUrl = await this.postImageService.saveImageToS3(folder, files);
-        const postImage = new PostImage();
-        postImage.board = board;
-        if (!Array.isArray(imgUrl)) postImage.imagePath = imgUrl;
-        await this.postImageRepository.save(postImage);
-        board.post_images.push(postImage);
-      }
-    }
     board.title = title;
     board.detail = detail;
     board.category = category;
     board.create_at = new Date();
     board.user = user;
+    board.post_images = [];
+    await this.boardRepository.save(board);
+    if (!user) {
+      throw new Error('해당 사용자가 존재하지 않습니다');
+    }
+    if (files) {
+      if (Array.isArray(files)) {
+        for (const file of files) {
+          const url = await this.postImageService.saveImageToS3(folder, file);
+          const postImage = new PostImage();
+          postImage.board = board;
+          postImage.imagePath = url;
+          board.post_images.push(postImage);
+          await this.postImageRepository.save(postImage);
+        }
+      } else {
+        const url = await this.postImageService.saveImageToS3(folder, files);
+        const postImage = new PostImage();
+        postImage.board = board;
+        postImage.imagePath = url;
+        board.post_images.push(postImage);
+        await this.postImageRepository.save(postImage);
+      }
+    }
     await this.pointService.increase(user.id, +10);
     return await this.boardRepository.save(board);
   }
@@ -171,12 +172,12 @@ export class BoardService {
           (postImage: PostImage) => postImage.imagePath === s3Url,
         )
       ) {
-        const imgUrl = await this.postImageService.saveImageToS3(folder, file);
+        // const imgUrl = await this.postImageService.saveImageToS3(folder, file);
         const postImage = new PostImage();
         postImage.board = board;
-        postImage.imagePath = imgUrl[0];
-        await this.postImageRepository.save(postImage);
+        // postImage.imagePath = imgUrl[0];
         board.post_images.push(postImage);
+        await this.postImageRepository.save(postImage);
       }
     }
     for (let i = board.post_images.length - 1; i >= 0; i--) {
