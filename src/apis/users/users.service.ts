@@ -248,7 +248,7 @@ export class UserService {
   getAccessToken(user: User | IUserContext['user']): string {
     return this.jwtService.sign(
       { sub: user.id },
-      { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '10m' },
+      { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '100m' },
     );
   }
 

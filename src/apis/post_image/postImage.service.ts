@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PostImage } from './entities/postImage.entity';
 import { Repository } from 'typeorm';
 import * as AWS from 'aws-sdk';
-import * as path from 'path';
 import { FileUpload } from 'graphql-upload';
+import { Cook } from '../cooks/entities/cook.entity';
 @Injectable()
 export class PostImageService {
   private readonly awsS3: AWS.S3;
@@ -12,8 +12,11 @@ export class PostImageService {
 
   constructor(
     @InjectRepository(PostImage)
-    private PostImageRepository: Repository<PostImage>,
+    private postImageRepository: Repository<PostImage>,
   ) {
+    // AWS.config.update({
+    //   logger: console,
+    // });
     this.awsS3 = new AWS.S3({
       accessKeyId: process.env.AWS_S3_ACCESS_KEY,
       secretAccessKey: process.env.AWS_S3_SECRET_KEY,
@@ -22,46 +25,23 @@ export class PostImageService {
     this.S3_BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
   }
 
-  async saveImageToS3(
-    folder: string,
-    file: FileUpload[] | FileUpload,
-  ): Promise<string[] | string> {
+  async saveImageToS3(folder: string, file: FileUpload): Promise<string> {
     try {
-      if (Array.isArray(file)) {
-        const uploadedUrls: string[] = [];
+      const fileName = `${Date.now()}_${encodeURIComponent(
+        file.filename,
+      )}`.replace(/ /g, ''); // 파일 이름 생성
+      const key = `${folder}/${fileName}`; // S3에 저장할 파일 경로
+      const uploadParams = {
+        Bucket: this.S3_BUCKET_NAME,
+        Key: key,
+        Body: file.createReadStream(),
+        ACL: 'public-read',
+        ContentType: file.mimetype,
+      };
 
-        for (const singleFile of file) {
-          const fileName = `${Date.now()}_${singleFile.filename}`.replace(
-            / /g,
-            '',
-          ); // 파일 이름 생성
-          const key = `${folder}/${fileName}`; // S3에 저장할 파일 경로
-          const uploadParams = {
-            Bucket: this.S3_BUCKET_NAME,
-            Key: key,
-            Body: singleFile.createReadStream(),
-            ACL: 'public-read',
-            ContentType: singleFile.mimetype,
-          };
+      const result = await this.awsS3.upload(uploadParams).promise();
 
-          await this.awsS3.upload(uploadParams).promise();
-          uploadedUrls.push(fileName);
-        }
-        return uploadedUrls;
-      } else {
-        const fileName = `${Date.now()}_${file.filename}`.replace(/ /g, ''); // 파일 이름 생성
-        const key = `${folder}/${fileName}`; // S3에 저장할 파일 경로
-        const uploadParams = {
-          Bucket: this.S3_BUCKET_NAME,
-          Key: key,
-          Body: file.createReadStream(),
-          ACL: 'public-read',
-          ContentType: file.mimetype,
-        };
-
-        await this.awsS3.upload(uploadParams).promise();
-        return fileName;
-      }
+      return result.Location;
     } catch (error) {
       console.error('이미지 업로드 중 에러사유:', error);
       throw new Error('이미지 업로드에 에러 발생');
@@ -71,22 +51,33 @@ export class PostImageService {
   async deleteImageFromS3(imageUrl: string): Promise<void> {
     try {
       // 이미지 URL에서 키(Key)를 추출
-      const key = imageUrl.split(
-        `${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/`,
-      )[1];
+      const key = decodeURIComponent(
+        imageUrl.split(
+          `${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/`,
+        )[1],
+      );
 
       // S3 객체 삭제 요청
       await this.awsS3
         .deleteObject({
           Bucket: this.S3_BUCKET_NAME,
-          Key: key,
+          Key: imageUrl,
         })
         .promise();
-
-      console.log(`이미지 (${imageUrl}) 삭제 완료`);
     } catch (error) {
       console.error('이미지 삭제 중 에러사유:', error);
       throw new Error('이미지 삭제에 에러 발생');
     }
+  }
+
+  async createPostImage(cook: Cook, imagePath: string) {
+    return await this.postImageRepository.save({
+      cook: cook,
+      imagePath: imagePath,
+    });
+  }
+
+  async removePostImage(id: string) {
+    return await this.postImageRepository.delete({ id: id });
   }
 }

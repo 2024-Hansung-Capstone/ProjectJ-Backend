@@ -4,11 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Ing } from './recipe.entity';
+import { PostImage } from 'src/apis/post_image/entities/postImage.entity';
 
 @Entity()
 @ObjectType()
@@ -22,6 +23,13 @@ export class Cook {
   })
   user: User;
 
+  @JoinColumn()
+  @OneToMany(() => PostImage, (postImage) => postImage.cook, {
+    nullable: true,
+  })
+  @Field(() => [PostImage])
+  post_images: PostImage[];
+
   @Column({ length: 100 })
   @Field(() => String)
   name: string;
@@ -29,14 +37,6 @@ export class Cook {
   @Column({ type: 'text' })
   @Field(() => String)
   detail: string;
-
-  @Column({ type: 'json' })
-  @Field(() => [Ing])
-  ingredients: Ing[];
-
-  @Column('simple-array')
-  @Field(() => [String])
-  instructions: string[];
 
   @Column({ default: 0 })
   @Field(() => Int)

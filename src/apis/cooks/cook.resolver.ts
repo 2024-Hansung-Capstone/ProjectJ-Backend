@@ -10,7 +10,6 @@ import { Recipe } from './entities/recipe.entity';
 import { Ingredient } from './entities/ingredient.entity';
 import { CreateIngredientInput } from './dto/create-ingredient.input';
 import { UpdateIngredientInput } from './dto/update-ingredient.input';
-import { CreateRecipeInput } from './dto/create-recipe.input';
 
 @Resolver()
 export class CookResolver {
@@ -25,23 +24,6 @@ export class CookResolver {
     createCookInput: CreateCookInput,
   ) {
     return await this.cookService.create(context.req.user.id, createCookInput);
-  }
-
-  @UseGuards(gqlAccessGuard)
-  @Mutation(() => Cook)
-  async createCookByAI(
-    @Context() context: IContext,
-    @Args('createRecipeInput')
-    createRecipeInput: CreateRecipeInput,
-    @Args('name') name: string,
-    @Args('detail') detail: string,
-  ) {
-    return await this.cookService.createByAI(
-      context.req.user.id,
-      createRecipeInput,
-      name,
-      detail,
-    );
   }
 
   @UseGuards(gqlAccessGuard)
@@ -71,9 +53,13 @@ export class CookResolver {
   }
 
   //삭제
+  @UseGuards(gqlAccessGuard)
   @Mutation(() => Boolean)
-  async deleteCook(@Args('cook_id') cook_id: string): Promise<boolean> {
-    return await this.cookService.delete(cook_id);
+  async deleteCook(
+    @Context() context: IContext,
+    @Args('cook_id') cook_id: string,
+  ): Promise<boolean> {
+    return await this.cookService.delete(context.req.user.id, cook_id);
   }
 
   //조회수 증가

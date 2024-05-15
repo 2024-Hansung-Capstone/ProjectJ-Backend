@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Board } from 'src/apis/boards/entities/board.entity';
+import { Cook } from 'src/apis/cooks/entities/cook.entity';
 import { UsedProduct } from 'src/apis/used_markets/entities/used_product.entity';
 import {
   Column,
@@ -16,25 +17,42 @@ export class PostImage {
   @Field(() => String, { description: '고유 ID' })
   id: string;
 
-  @Field()
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ length: 255 })
+  @Field(() => String, {
+    description: '이미지경로(아마존S3에 저장되어 있는 파일 이름)',
+  })
   imagePath: string;
 
-  @JoinColumn()
   @ManyToOne(() => Board, (Board) => Board.post_images, {
-    eager: false,
     nullable: true,
-    onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  @Field(() => Board, {
+    nullable: true,
+    description: '해당 이미지가 있는 게시글',
   })
   board: Board;
 
-  @JoinColumn()
   @ManyToOne(() => UsedProduct, (UsedProduct) => UsedProduct.post_images, {
-    eager: false,
     nullable: true,
-    onUpdate: 'CASCADE',
     onDelete: 'CASCADE',
   })
+  @JoinColumn()
+  @Field(() => UsedProduct, {
+    nullable: true,
+    description: '해당 이미지가 있는 중고 상품 정보',
+  })
   used_proudct: UsedProduct;
+
+  @JoinColumn()
+  @ManyToOne(() => Cook, (Cook) => Cook.post_images, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @Field(() => Cook, {
+    nullable: true,
+    description: '해당 이미지가 있는 요리 정보',
+  })
+  cook: Cook;
 }

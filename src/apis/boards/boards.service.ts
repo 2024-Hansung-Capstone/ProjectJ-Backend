@@ -110,41 +110,41 @@ export class BoardService {
     const { title, detail, category } = createBoardInput;
     const user = await this.userService.findById(user_id);
     const board = new Board();
-    if (!user) {
-      throw new Error('해당 사용자가 존재하지 않습니다');
-    }
-    if (files) {
-      if (Array.isArray(files)) {
-        const imgUrl = await this.postImageService.saveImageToS3(folder, files);
-        for (const url of imgUrl) {
-          console.log(url);
-          const postImage = new PostImage();
-          postImage.board = board;
-          postImage.imagePath = url;
-          await this.postImageRepository.save(postImage);
-          board.post_images.push(postImage);
-        }
-      } else {
-        const imgUrl = await this.postImageService.saveImageToS3(folder, files);
-        const postImage = new PostImage();
-        postImage.board = board;
-        if (!Array.isArray(imgUrl)) postImage.imagePath = imgUrl;
-        await this.postImageRepository.save(postImage);
-        board.post_images.push(postImage);
-      }
-    }
     board.title = title;
     board.detail = detail;
     board.category = category;
     board.create_at = new Date();
     board.user = user;
+    board.post_images = [];
+    await this.boardRepository.save(board);
+    if (!user) {
+      throw new Error('해당 사용자가 존재하지 않습니다');
+    }
+    if (files) {
+      if (Array.isArray(files)) {
+        console.log(files);
+        for (const file of files) {
+          const url = await this.postImageService.saveImageToS3(folder, file);
+          this.createPostImage(board, url);
+        }
+      } else {
+        console.log(files);
+        const url = await this.postImageService.saveImageToS3(folder, files);
+        this.createPostImage(board, url);
+      }
+    }
     await this.pointService.increase(user.id, +10);
     return await this.boardRepository.save(board);
   }
-
+  async createPostImage(board: Board, imagePath: string): Promise<PostImage> {
+    const postImage = new PostImage();
+    postImage.board = board;
+    postImage.imagePath = imagePath;
+    return this.postImageRepository.save(postImage);
+  }
   async update(
     folder: string,
-    file: FileUpload[],
+    files: FileUpload[] | FileUpload,
     user_id: string,
     updateBoradInput: UpdateBoardInput,
   ): Promise<Board> {
@@ -158,37 +158,19 @@ export class BoardService {
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
     }
-    const newImageUrls: string[] = [];
-    //기존 postImage에서 없는 이미지 삽입
-    for (const item of file) {
-      const key = `${folder}/${Date.now()}_${path.basename(
-        item.filename,
-      )}`.replace(/ /g, '');
-      const s3Url = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${key}`;
-      newImageUrls.push(s3Url);
-      if (
-        !board.post_images.some(
-          (postImage: PostImage) => postImage.imagePath === s3Url,
-        )
-      ) {
-        const imgUrl = await this.postImageService.saveImageToS3(folder, file);
-        const postImage = new PostImage();
-        postImage.board = board;
-        postImage.imagePath = imgUrl[0];
-        await this.postImageRepository.save(postImage);
-        board.post_images.push(postImage);
+    if (files) {
+      for (const post_image of board.post_images) {
+        await this.postImageService.deleteImageFromS3(post_image.imagePath);
       }
-    }
-    for (let i = board.post_images.length - 1; i >= 0; i--) {
-      const post_image = board.post_images[i];
-      if (
-        !newImageUrls.some(
-          (newImageUrl: string) => newImageUrl === post_image.imagePath,
-        )
-      )
-        this.postImageService.deleteImageFromS3(post_image.imagePath);
-      this.postImageRepository.delete(post_image.id);
-      board.post_images.splice(i, 1);
+      if (Array.isArray(files)) {
+        for (const file of files) {
+          const url = await this.postImageService.saveImageToS3(folder, file);
+          this.createPostImage(board, url);
+        }
+      } else {
+        const url = await this.postImageService.saveImageToS3(folder, files);
+        this.createPostImage(board, url);
+      }
     }
     await this.boardRepository.update({ id: id }, { ...rest });
     return await this.boardRepository.findOne({
