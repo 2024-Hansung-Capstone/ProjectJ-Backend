@@ -2,38 +2,24 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-"""
-대댓글 정보
-"""
+"""대댓글 정보"""
 type CommentReply {
-  """
-  고유 ID
-  """
+  """고유 ID"""
   id: String!
 
-  """
-  작성자 정보
-  """
+  """작성자 정보"""
   user: User!
 
-  """
-  부모 댓글
-  """
+  """부모 댓글"""
   reply: Reply!
 
-  """
-  내용
-  """
+  """내용"""
   detail: String!
 
-  """
-  좋아요 수
-  """
+  """좋아요 수"""
   like: Int!
 
-  """
-  작성일
-  """
+  """작성일"""
   create_at: DateTime!
 }
 
@@ -42,483 +28,291 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-"""
-댓글 정보
-"""
+"""댓글 정보"""
 type Reply {
-  """
-  고유 ID
-  """
+  """고유 ID"""
   id: String!
 
-  """
-  작성자 정보
-  """
+  """작성자 정보"""
   user: User!
 
-  """
-  원 게시글 정보
-  """
+  """원 게시글 정보"""
   board: Board!
 
-  """
-  내용
-  """
+  """내용"""
   detail: String!
 
-  """
-  좋아요 수
-  """
+  """좋아요 수"""
   like: Int!
 
-  """
-  작성일
-  """
+  """작성일"""
   create_at: DateTime!
 }
 
-"""
-게시글 정보
-"""
+"""게시글 정보"""
 type Board {
-  """
-  고유 ID
-  """
+  """고유 ID"""
   id: String!
 
-  """
-  작성자 정보
-  """
+  """작성자 정보"""
   user: User!
 
-  """
-  카테고리
-  """
+  """카테고리"""
   category: String!
 
-  """
-  제목
-  """
+  """제목"""
   title: String!
 
-  """
-  내용
-  """
+  """내용"""
   detail: String!
 
-  """
-  조회수
-  """
+  """조회수"""
   view: Int!
 
-  """
-  좋아요 수
-  """
+  """좋아요 수"""
   like: Int!
 
-  """
-  작성일
-  """
+  """작성일"""
   create_at: DateTime!
 }
 
-"""
-중고물품 정보
-"""
+"""중고물품 정보"""
 type UsedProduct {
-  """
-  고유 ID
-  """
+  """고유 ID"""
   id: String!
 
-  """
-  판매자 정보
-  """
+  """판매자 정보"""
   user: User!
 
-  """
-  중고물품 제목
-  """
+  """중고물품 제목"""
   title: String!
 
-  """
-  중고물품 조회수
-  """
+  """중고물품 조회수"""
   view: Int!
 
-  """
-  중고물품 좋아요 수
-  """
+  """중고물품 좋아요 수"""
   like: Int!
 
-  """
-  중고물품 가격
-  """
+  """중고물품 가격"""
   price: Int!
 
-  """
-  중고물품 상세설명
-  """
+  """중고물품 상세설명"""
   detail: String!
 
-  """
-  중고물품 카테고리
-  """
+  """중고물품 카테고리"""
   category: String!
 
-  """
-  중고물품 거래 상태(판매중/예약중/판매완료)
-  """
+  """중고물품 거래 상태(판매중/예약중/판매완료)"""
   state: String!
 
-  """
-  중고물품 생성시간
-  """
+  """중고물품 생성시간"""
   create_at: DateTime!
 }
 
-"""
-좋아요 기록 정보
-"""
+"""좋아요 기록 정보"""
 type LikeUserRecord {
-  """
-  고유 ID
-  """
+  """고유 ID"""
   id: String!
 
-  """
-  좋아요 누른 사용자 정보
-  """
+  """좋아요 누른 사용자 정보"""
   user: User!
 
-  """
-  좋아요 누른 중고 상품 정보
-  """
+  """좋아요 누른 중고 상품 정보"""
   used_product: UsedProduct
 
-  """
-  좋아요 누른 게시글 정보
-  """
+  """좋아요 누른 게시글 정보"""
   board: Board
 
-  """
-  좋아요 누른 댓글 정보
-  """
+  """좋아요 누른 댓글 정보"""
   reply: Reply
 
-  """
-  좋아요 누른 댓글 정보
-  """
+  """좋아요 누른 댓글 정보"""
   commet_reply: CommentReply
 }
 
-"""
-시/도 정보
-"""
+"""시/도 정보"""
 type Sido {
-  """
-  시/도 코드
-  """
+  """시/도 코드"""
   id: String!
 
-  """
-  시/도 이름
-  """
+  """시/도 이름"""
   name: String!
 
-  """
-  기준일자
-  """
+  """기준일자"""
   crtr_at: DateTime!
 }
 
-"""
-시/군/구 정보
-"""
+"""시/군/구 정보"""
 type Sgng {
-  """
-  시/군/구 코드
-  """
+  """시/군/구 코드"""
   id: String!
 
-  """
-  시/도 정보
-  """
+  """시/도 정보"""
   sido: Sido!
 
-  """
-  시/군/구 이름
-  """
+  """시/군/구 이름"""
   name: String!
 
-  """
-  기준일자
-  """
+  """기준일자"""
   crtr_at: DateTime!
 }
 
-"""
-행정동 정보
-"""
+"""행정동 정보"""
 type Dong {
-  """
-  행정동 코드
-  """
+  """행정동 코드"""
   id: String!
 
-  """
-  시/군/구 정보
-  """
+  """시/군/구 정보"""
   sgng: Sgng!
 
-  """
-  행정동 이름
-  """
+  """행정동 이름"""
   name: String!
 
-  """
-  기준일자
-  """
+  """기준일자"""
   crtr_at: DateTime!
 }
 
-"""
-사용자 정보
-"""
+"""사용자 정보"""
 type User {
-  """
-  고유 ID
-  """
+  """고유 ID"""
   id: String!
 
-  """
-  사용자 거주지역(행정동)
-  """
+  """사용자 거주지역(행정동)"""
   dong: Dong!
 
-  """
-  이메일
-  """
+  """이메일"""
   email: String!
 
-  """
-  성함
-  """
+  """성함"""
   name: String!
 
-  """
-  성별
-  """
+  """성별"""
   gender: String!
 
-  """
-  생년월일
-  """
+  """생년월일"""
   birth_at: DateTime!
 
-  """
-  MBTI
-  """
+  """MBTI"""
   mbti: String!
 
-  """
-  휴대폰 번호 ex)01012345678
-  """
+  """휴대폰 번호 ex)01012345678"""
   phone_number: String!
 
-  """
-  메이트 매칭 여부
-  """
+  """메이트 매칭 여부"""
   is_find_mate: Boolean!
 
-  """
-  포인트
-  """
+  """포인트"""
   point: Int!
 
-  """
-  가입일
-  """
+  """가입일"""
   create_at: DateTime!
 }
 
-"""
-쪽지 정보
-"""
+"""쪽지 정보"""
 type Letter {
-  """
-  고유 ID
-  """
+  """고유 ID"""
   id: String!
 
-  """
-  보낸 사람 정보
-  """
+  """보낸 사람 정보"""
   sender: User!
 
-  """
-  받는 사람 정보
-  """
+  """받는 사람 정보"""
   receiver: User!
 
-  """
-  중고 상품 정보
-  """
+  """중고 상품 정보"""
   product: UsedProduct
 
-  """
-  게시글 정보
-  """
+  """게시글 정보"""
   board: Board
 
-  """
-  쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)
-  """
+  """쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)"""
   category: String!
 
-  """
-  제목
-  """
+  """제목"""
   title: String!
 
-  """
-  내용
-  """
+  """내용"""
   detail: String!
 
-  """
-  읽음 여부
-  """
+  """읽음 여부"""
   is_read: Boolean!
 
-  """
-  작성일
-  """
+  """작성일"""
   create_at: DateTime!
 }
 
-"""
-등급 정보
-"""
+"""등급 정보"""
 type Role {
-  """
-  등급 코드
-  """
+  """등급 코드"""
   code: String!
 
-  """
-  최소 포인트
-  """
+  """최소 포인트"""
   min_point: Int!
 
-  """
-  최대 포인트
-  """
+  """최대 포인트"""
   max_point: Int!
 
-  """
-  등급 이름
-  """
+  """등급 이름"""
   name: String!
 }
 
-"""
-알림 정보
-"""
+"""알림 정보"""
 type Notification {
-  """
-  고유 ID
-  """
+  """고유 ID"""
   id: String!
 
-  """
-  받는 사람 정보
-  """
+  """받는 사람 정보"""
   user: User!
 
-  """
-  알림이 생성된 쪽지 정보
-  """
+  """알림이 생성된 쪽지 정보"""
   letter: Letter
 
-  """
-  알림이 생성된 게시글 정보
-  """
+  """알림이 생성된 게시글 정보"""
   board: Board
 
-  """
-  알림이 생성된 댓글 정보
-  """
+  """알림이 생성된 댓글 정보"""
   reply: Reply
 
-  """
-  알림이 생성된 중고 물품 정보
-  """
+  """알림이 생성된 중고 물품 정보"""
   used_product: UsedProduct
 
-  """
-  알림이 생성된 중고 상품 정보
-  """
+  """알림이 생성된 중고 상품 정보"""
   like: LikeUserRecord
 
-  """
-  알림 코드(코드표 참조)
-  """
+  """알림 코드(코드표 참조)"""
   code: String!
 
-  """
-  확인 여부
-  """
+  """확인 여부"""
   is_read: Boolean!
 
-  """
-  알림 생성일
-  """
+  """알림 생성일"""
   create_at: DateTime!
 }
 
-"""
-재료 정보
-"""
+"""재료 정보"""
 type Ingredient {
-  """
-  고유 ID
-  """
+  """고유 ID"""
   id: String!
 
-  """
-  사용자 정보
-  """
+  """사용자 정보"""
   user: User!
 
-  """
-  재료 이름
-  """
+  """재료 이름"""
   name: String!
 
-  """
-  재료 수량
-  """
+  """재료 수량"""
   count: Int
 
-  """
-  재료 양
-  """
+  """재료 양"""
   volume: Float
 
-  """
-  재료 양 단위
-  """
+  """재료 양 단위"""
   volume_unit: String
 
-  """
-  추가일
-  """
+  """추가일"""
   create_at: DateTime!
 
-  """
-  수정일
-  """
+  """수정일"""
   updated_at: DateTime!
 }
 
@@ -551,6 +345,7 @@ type Recipe {
 type Cook {
   id: String!
   name: String!
+  detail: String!
   ingredients: [Ing!]!
   instructions: [String!]!
   view: Int!
@@ -558,145 +353,86 @@ type Cook {
 }
 
 type Query {
-  """
-  전체 사용자 정보 조회 기능입니다.
-  """
+  """전체 사용자 정보 조회 기능입니다."""
   fetchUsers: [User!]!
 
-  """
-  특정 사용자 id값을 기준으로 사용자 정보 조회 기능입니다.
-  """
+  """특정 사용자 id값을 기준으로 사용자 정보 조회 기능입니다."""
   fetchUserById(user_id: String!): User!
 
-  """
-  현재 로그인된 사용자 정보를 조회하는 기능입니다.
-  """
+  """현재 로그인된 사용자 정보를 조회하는 기능입니다."""
   whoAmI: User!
 
-  """
-  전체 중고 물품 정보를 확인합니다.
-  """
+  """전체 중고 물품 정보를 확인합니다."""
   fetchUsedProducts: [UsedProduct!]!
 
-  """
-  입력된 id값을 가진 중고 물품의 정보를 확인합니다.
-  """
+  """입력된 id값을 가진 중고 물품의 정보를 확인합니다."""
   fetchUsedProductById(id: String!): UsedProduct!
 
-  """
-  입력된 user_id를 가진 사용자가 작성한 중고 물품의 정보를 확인합니다.
-  """
+  """입력된 user_id를 가진 사용자가 작성한 중고 물품의 정보를 확인합니다."""
   fetchUsedProductByUserId(user_id: String!): [UsedProduct!]!
 
-  """
-  종합검색 기능으로 가격은 검색한 가격보다 낮게 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계
-  """
-  fetchUsedProductsBySearch(
-    SerachUsedProductInput: SearchProductInput!
-  ): [UsedProduct!]!
+  """종합검색 기능으로 가격은 검색한 가격보다 낮게 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계"""
+  fetchUsedProductsBySearch(SerachUsedProductInput: SearchProductInput!): [UsedProduct!]!
 
-  """
-  행정동 이름으로 행정동 정보를 조회합니다.
-  """
+  """행정동 이름으로 행정동 정보를 조회합니다."""
   fetchDongByName(
-    """
-    행정동 이름
-    """
+    """행정동 이름"""
     dong_name: String!
   ): Dong!
 
-  """
-  입력된 카테고리에 해당하는 게시글의 정보를 확인합니다.
-  """
+  """입력된 카테고리에 해당하는 게시글의 정보를 확인합니다."""
   fetchBoards(
-    """
-    게시글 카테고리
-    """
+    """게시글 카테고리"""
     category: String!
   ): [Board!]!
 
-  """
-  게시글 고유 ID로 게시글 정보를 확인합니다.
-  """
+  """게시글 고유 ID로 게시글 정보를 확인합니다."""
   fetchBoardById(
-    """
-    게시글 고유 ID
-    """
+    """게시글 고유 ID"""
     board_id: String!
   ): Board!
 
-  """
-  입력된 user_id를 가진 사용자가 작성한 게시글의 정보를 확인합니다.
-  """
+  """입력된 user_id를 가진 사용자가 작성한 게시글의 정보를 확인합니다."""
   fetchBoardByUserId(
-    """
-    사용자 ID
-    """
+    """사용자 ID"""
     user_id: String!
   ): [Board!]!
 
-  """
-  종합검색 기능으로 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계
-  """
+  """종합검색 기능으로 제목과 본문내용은 해당되는 내용이 있으면 검색이 되도록 설계"""
   fetchBoardsBySerach(SerachBoardInput: SearchBoardInput!): [Board!]!
 
-  """
-  조회수가 많은 게시글 rank개를 가져옵니다.
-  """
+  """조회수가 많은 게시글 rank개를 가져옵니다."""
   fetchBoardsByViewRank(
-    """
-    게시글 카테고리
-    """
+    """게시글 카테고리"""
     category: String!
 
-    """
-    가져올 게시글 수
-    """
+    """가져올 게시글 수"""
     rank: Float!
   ): [Board!]!
   fetchLetterById(letter_id: String!): Letter!
   fetchMySendLetters: [Letter!]!
   fetchMyReceiveLetters: [Letter!]!
 
-  """
-  해당 X,Y좌표에 포함되어 있는 원룸들을 리턴(X,Y좌표는 소수점 14자리수 까지)
-  """
-  fetchOneRoomByXY(
-    StartX: Float!
-    StartY: Float!
-    EndX: Float!
-    EndY: Float!
-  ): [OneRoom!]!
+  """해당 X,Y좌표에 포함되어 있는 원룸들을 리턴(X,Y좌표는 소수점 14자리수 까지)"""
+  fetchOneRoomByXY(StartX: Float!, StartY: Float!, EndX: Float!, EndY: Float!): [OneRoom!]!
 
-  """
-  검색조건으로 원룸 검색하는 기능
-  """
+  """검색조건으로 원룸 검색하는 기능"""
   fetchOneRoomBySerach(SerachUsedProductInput: SearchOneRoomInput!): [OneRoom!]!
 
-  """
-  모든 원룸을 가져오는 기능.
-  """
+  """모든 원룸을 가져오는 기능."""
   fetchOneRooms: [OneRoom!]!
   fetchOneRoomById(id: String!): OneRoom!
 
-  """
-  조회수가 많은 원룸 rank개를 리턴
-  """
+  """조회수가 많은 원룸 rank개를 리턴"""
   fetchOneRoomsByViewRank(rank: Float!): [OneRoom!]!
 
-  """
-  특정 알림의 메시지를 조회합니다.
-  """
+  """특정 알림의 메시지를 조회합니다."""
   getNotificationMessage(
-    """
-    알림 고유 ID
-    """
+    """알림 고유 ID"""
     notification_id: String!
   ): String!
 
-  """
-  나의 알림을 전체 조회합니다.
-  """
+  """나의 알림을 전체 조회합니다."""
   fetchMyNotificationMessages: [Notification!]!
   fetchMyRole: Role!
   fetchMyCooks: [Cook!]!
@@ -708,53 +444,33 @@ type Query {
   fetchRecipes: [Recipe!]!
 }
 
-"""
-중고마켓 상품 검색 입력 정보
-"""
+"""중고마켓 상품 검색 입력 정보"""
 input SearchProductInput {
-  """
-  상품 제목
-  """
+  """상품 제목"""
   title: String
 
-  """
-  상품 가격
-  """
+  """상품 가격"""
   price: Int
 
-  """
-  상품 설명
-  """
+  """상품 설명"""
   detail: String
 
-  """
-  상품 카테고리
-  """
+  """상품 카테고리"""
   category: String
 
-  """
-  상품 거래 상태(판매중/예약중/판매완료)
-  """
+  """상품 거래 상태(판매중/예약중/판매완료)"""
   state: String
 }
 
-"""
-게시글 검색 입력 정보
-"""
+"""게시글 검색 입력 정보"""
 input SearchBoardInput {
-  """
-  게시판 카테고리
-  """
+  """게시판 카테고리"""
   category: String
 
-  """
-  게시글 제목
-  """
+  """게시글 제목"""
   title: String
 
-  """
-  게시글 내용
-  """
+  """게시글 내용"""
   detail: String
 }
 
@@ -772,104 +488,62 @@ input SearchOneRoomInput {
 }
 
 type Mutation {
-  """
-  신규 회원 가입 기능입니다. (이메일 중복이 없고 휴대폰 인증이 완료되어야 가능)
-  """
+  """신규 회원 가입 기능입니다. (이메일 중복이 없고 휴대폰 인증이 완료되어야 가능)"""
   signUp(createUserInput: CreateUserInput!): User!
 
-  """
-  현재 로그인 된 사용자의 정보를 수정하는 기능입니다.
-  """
+  """현재 로그인 된 사용자의 정보를 수정하는 기능입니다."""
   updateUser(updateUserInput: UpdateUserInput!): User!
 
-  """
-  현재 로그인 된 사용자의 탈퇴 기능입니다.
-  """
+  """현재 로그인 된 사용자의 탈퇴 기능입니다."""
   deleteUser: Boolean!
 
-  """
-  휴대폰 인증을 위해 인증번호를 생성하는 기능입니다.
-  """
+  """휴대폰 인증을 위해 인증번호를 생성하는 기능입니다."""
   createToken(phone_number: String!): String!
 
-  """
-  인증 토큰을 통해 휴대폰 인증을 진행하는 기능입니다.
-  """
+  """인증 토큰을 통해 휴대폰 인증을 진행하는 기능입니다."""
   authPhone(phone_number: String!, token: String!): Boolean!
 
-  """
-  로그인을 하는 기능입니다. (JWT 토큰을 return하여 발급, cookie에 재발급용 JWT 토큰 발급)
-  """
+  """로그인을 하는 기능입니다. (JWT 토큰을 return하여 발급, cookie에 재발급용 JWT 토큰 발급)"""
   login(email: String!, password: String!): String!
 
-  """
-  로그아웃 기능입니다. (재발급용 JWT 토큰을 삭제)
-  """
+  """로그아웃 기능입니다. (재발급용 JWT 토큰을 삭제)"""
   logout: Boolean!
 
-  """
-  JWT 토큰이 만료되었을 때 cookie에 저장된 토큰으로 로그인 토큰을 재발급하는 기능입니다.
-  """
+  """JWT 토큰이 만료되었을 때 cookie에 저장된 토큰으로 로그인 토큰을 재발급하는 기능입니다."""
   restoreAccessToken: String!
 
-  """
-  !!테스트용!! 인증번호 전송 없이 바로 토큰 생성과 인증이 완료되는 테스트용 기능입니다.
-  """
+  """!!테스트용!! 인증번호 전송 없이 바로 토큰 생성과 인증이 완료되는 테스트용 기능입니다."""
   testCreateToken(phone_number: String!): String!
 
   """
   createUsedProductInput의 입력값을 바탕으로 새 중고 물품을 추가합니다. (user는 현재 로그인 된 사용자의 정보로 자동으로 등록되고, 로그인이 되어 있어야지만 추가 가능)
   """
-  createUsedProduct(
-    createUsedProductInput: CreateUsedProductInput!
-  ): UsedProduct!
+  createUsedProduct(createUsedProductInput: CreateUsedProductInput!): UsedProduct!
 
   """
   updateUsedProductInput의 입력값을 바탕으로 업데이트합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 업데이트 가능)
   """
-  updateUsedProduct(
-    updateUsedProductInput: UpdateUsedProductInput!
-  ): UsedProduct!
+  updateUsedProduct(updateUsedProductInput: UpdateUsedProductInput!): UsedProduct!
 
-  """
-  입력된 id값을 가진 중고물품을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)
-  """
+  """입력된 id값을 가진 중고물품을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)"""
   deleteUsedProduct(product_id: String!): Boolean!
 
-  """
-  게시글의 조회수를 1 증가시킵니다.
-  """
+  """게시글의 조회수를 1 증가시킵니다."""
   increaseUsedProductView(product_id: String!): UsedProduct!
 
-  """
-  게시글의 찜 수(Like)를 올려주고 Like_user_record에 찜한 회원과 중고물품을 저장
-  """
+  """게시글의 찜 수(Like)를 올려주고 Like_user_record에 찜한 회원과 중고물품을 저장"""
   increaseUsedProductLike(product_id: String!): UsedProduct!
 
-  """
-  게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작
-  """
+  """게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작"""
   decreaseUsedProductLike(product_id: String!): UsedProduct!
 
-  """
-  입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 있을 때)
-  """
-  createBoardWithImage(
-    file: Upload!
-    createBoardInput: CreateBoardInput!
-  ): Board!
+  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 한 장 있을 때)"""
+  createBoardWithImage(file: Upload!, createBoardInput: CreateBoardInput!): Board!
 
-  """
-  입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 여러 장 있을 때)
-  """
-  createBoardWithImages(
-    files: [Upload!]!
-    createBoardInput: CreateBoardInput!
-  ): Board!
+  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 여러 장 있을 때)"""
+  createBoardWithImages(files: [Upload!]!, createBoardInput: CreateBoardInput!): Board!
 
-  """
-  입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 없을 때)
-  """
+  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 없을 때)"""
   createBoard(createBoardInput: CreateBoardInput!): Board!
 
   """
@@ -877,165 +551,102 @@ type Mutation {
   """
   updateBoardWithImage: Board!
 
-  """
-  입력된 id값을 가진 게시글을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)
-  """
+  """입력된 id값을 가진 게시글을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)"""
   deleteBoard(
-    """
-    게시글 고유 ID
-    """
+    """게시글 고유 ID"""
     board_id: String!
   ): Boolean!
 
-  """
-  게시글의 조회수를 1 증가시킵니다.
-  """
+  """게시글의 조회수를 1 증가시킵니다."""
   increaseBoardView(
-    """
-    게시글 고유 ID
-    """
+    """게시글 고유 ID"""
     board_id: String!
   ): Board!
 
-  """
-  게시글의  좋아요 수를 올려주고 좋아요한 회원과 게시글 정보를 저장합니다.
-  """
+  """게시글의  좋아요 수를 올려주고 좋아요한 회원과 게시글 정보를 저장합니다."""
   increaseBoardLike(
-    """
-    게시글 고유 ID
-    """
+    """게시글 고유 ID"""
     board_id: String!
   ): Board!
 
-  """
-  게시글의 좋아요를 취소하는 기능입니다. (좋아요한 게시글에게만 동작)
-  """
+  """게시글의 좋아요를 취소하는 기능입니다. (좋아요한 게시글에게만 동작)"""
   decreaseBoardLike(
-    """
-    게시글 고유 ID
-    """
+    """게시글 고유 ID"""
     board_id: String!
   ): Board!
 
-  """
-  게시글에 댓글을 생성하는 기능입니다.
-  """
+  """게시글에 댓글을 생성하는 기능입니다."""
   createReply(
-    """
-    게시글 고유 ID
-    """
+    """게시글 고유 ID"""
     board_id: String!
 
-    """
-    댓글 내용
-    """
+    """댓글 내용"""
     detail: String!
   ): Board!
 
-  """
-  게시글에 댓글을 삭제하는 기능입니다.
-  """
+  """게시글에 댓글을 삭제하는 기능입니다."""
   deleteReply(
-    """
-    댓글 고유 ID
-    """
+    """댓글 고유 ID"""
     reply_id: String!
   ): Board!
 
-  """
-  게시글에 댓글을 수정하는 기능입니다.
-  """
+  """게시글에 댓글을 수정하는 기능입니다."""
   updateReply(
-    """
-    댓글 고유 ID
-    """
+    """댓글 고유 ID"""
     reply_id: String!
 
-    """
-    댓글 내용
-    """
+    """댓글 내용"""
     detail: String!
   ): Board!
 
-  """
-  댓글의 좋아요 수를 올려주고 좋아요한 회원과 댓글 정보를 저장합니다.
-  """
+  """댓글의 좋아요 수를 올려주고 좋아요한 회원과 댓글 정보를 저장합니다."""
   increaseReplyLike(
-    """
-    댓글 고유 ID
-    """
+    """댓글 고유 ID"""
     reply_id: String!
   ): Boolean!
 
-  """
-  댓글의 좋아요를 취소하는 기능입니다. (좋아요한 댓글에게만 동작)
-  """
+  """댓글의 좋아요를 취소하는 기능입니다. (좋아요한 댓글에게만 동작)"""
   decreaseReplyLike(
-    """
-    댓글 고유 ID
-    """
+    """댓글 고유 ID"""
     reply_id: String!
   ): Boolean!
 
-  """
-  댓글에 대댓글을 작성하는 기능입니다.
-  """
+  """댓글에 대댓글을 작성하는 기능입니다."""
   createCommetReply(
-    """
-    댓글 고유 ID
-    """
+    """댓글 고유 ID"""
     reply_id: String!
 
-    """
-    댓글 내용
-    """
+    """댓글 내용"""
     detail: String!
   ): Board!
 
-  """
-  댓글에 대댓글을 삭제하는 기능입니다.
-  """
+  """댓글에 대댓글을 삭제하는 기능입니다."""
   deleteCommentReply(
-    """
-    대댓글 고유 ID
-    """
+    """대댓글 고유 ID"""
     commentReply_id: String!
   ): Board!
   uploadFile(file: Upload!): Boolean!
-  writeLetter(
-    writing_id: String!
-    createLetterInput: CreateLetterInput!
-  ): Letter!
+  writeLetter(writing_id: String!, createLetterInput: CreateLetterInput!): Letter!
   replyLetter(letter_id: String!, replyLetterInput: ReplyLetterInput!): Letter!
   deleteLetter(letter_id: String!): Boolean!
 
-  """
-  해당 지역에 원룸들을 OpenApi를 통해 가져옴(중복된 원룸자료들은 DB에 저장 X)
-  """
+  """해당 지역에 원룸들을 OpenApi를 통해 가져옴(중복된 원룸자료들은 DB에 저장 X)"""
   fetchOneRoomFromOpenAPI(LAWD_CD: String!): Boolean!
 
-  """
-  원룸의 조회수를 1 증가시킵니다.
-  """
+  """원룸의 조회수를 1 증가시킵니다."""
   inceaseOneRoomView(oneRoom_id: String!): OneRoom!
 
-  """
-  특정 알림을 삭제합니다.
-  """
+  """특정 알림을 삭제합니다."""
   deleteNotificationMessage(
-    """
-    알림 고유 ID
-    """
+    """알림 고유 ID"""
     notification_id: String!
   ): Boolean!
 
-  """
-  나의 알림을 전체 삭제합니다.
-  """
+  """나의 알림을 전체 삭제합니다."""
   deleteAllMyNotificationMessages: Boolean!
   dailyCheckIn: Boolean!
   createCook(createCookInput: CreateCookInput!): Cook!
-  createCookByAI(createRecipeInput: CreateRecipeInput!): Cook!
+  createCookByAI(createRecipeInput: CreateRecipeInput!, name: String!, detail: String!): Cook!
   updateCook(cook_id: String!, updateCookInput: UpdateCookInput!): Cook!
   deleteCook(cook_id: String!): Boolean!
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
@@ -1043,252 +654,201 @@ type Mutation {
   deleteIngredient(ingredient_id: String!): Boolean!
 }
 
-"""
-유저 생성 입력 정보
-"""
+"""유저 생성 입력 정보"""
 input CreateUserInput {
-  """
-  이메일
-  """
+  """이메일"""
   email: String!
 
-  """
-  성함
-  """
+  """성함"""
   name: String!
 
-  """
-  성별
-  """
+  """성별"""
   gender: String!
 
-  """
-  생년
-  """
+  """생년"""
   birth_year: String!
 
-  """
-  생월
-  """
+  """생월"""
   birth_month: String!
 
-  """
-  생일
-  """
+  """생일"""
   birth_day: String!
 
-  """
-  MBTI
-  """
+  """MBTI"""
   mbti: String!
 
-  """
-  행정동 지역명 ex)청운효자동
-  """
+  """행정동 지역명 ex)청운효자동"""
   dong_nm: String!
 
-  """
-  휴대폰 번호 ex)01012345678
-  """
+  """휴대폰 번호 ex)01012345678"""
   phone_number: String!
 
-  """
-  비밀번호
-  """
+  """비밀번호"""
   password: String!
 
-  """
-  메이트 매칭 여부
-  """
+  """메이트 매칭 여부"""
   is_find_mate: Boolean!
 }
 
-"""
-유저 정보 수정 입력 정보
-"""
+"""유저 정보 수정 입력 정보"""
 input UpdateUserInput {
-  """
-  이메일
-  """
+  """이메일"""
   email: String
 
-  """
-  성함
-  """
+  """성함"""
   name: String
 
-  """
-  성별
-  """
+  """성별"""
   gender: String
 
-  """
-  생년
-  """
+  """생년"""
   birth_year: String
 
-  """
-  생월
-  """
+  """생월"""
   birth_month: String
 
-  """
-  생일
-  """
+  """생일"""
   birth_day: String
 
-  """
-  MBTI
-  """
+  """MBTI"""
   mbti: String
 
-  """
-  메이트 매칭 여부
-  """
+  """메이트 매칭 여부"""
   is_find_mate: Boolean
 }
 
-"""
-중고마켓 상품 생성 입력 정보
-"""
+"""중고마켓 상품 생성 입력 정보"""
 input CreateUsedProductInput {
-  """
-  중고마켓 상품 제목
-  """
+  """중고마켓 상품 제목"""
   title: String!
 
-  """
-  중고마켓 상품 가격
-  """
+  """중고마켓 상품 가격"""
   price: Int!
 
-  """
-  중고마켓 상품 설명
-  """
+  """중고마켓 상품 설명"""
   detail: String!
 
-  """
-  중고마켓 상품 카테고리
-  """
+  """중고마켓 상품 카테고리"""
   category: String!
 
-  """
-  중고마켓 상품 거래 상태(판매중/예약중/판매완료)
-  """
+  """중고마켓 상품 거래 상태(판매중/예약중/판매완료)"""
   state: String!
 }
 
-"""
-중고마켓 상품 수정 입력 정보
-"""
+"""중고마켓 상품 수정 입력 정보"""
 input UpdateUsedProductInput {
-  """
-  중고마켓 상품 ID
-  """
+  """중고마켓 상품 ID"""
   id: String!
 
-  """
-  상품 제목
-  """
+  """상품 제목"""
   title: String
 
-  """
-  상품 가격
-  """
+  """상품 가격"""
   price: Int
 
-  """
-  상품 설명
-  """
+  """상품 설명"""
   detail: String
 
-  """
-  상품 카테고리
-  """
+  """상품 카테고리"""
   category: String
 
-  """
-  상품 거래 상태(판매중/예약중/판매완료)
-  """
+  """상품 거래 상태(판매중/예약중/판매완료)"""
   state: String
 }
 
-"""
-The `Upload` scalar type represents a file upload.
-"""
+"""The `Upload` scalar type represents a file upload."""
 scalar Upload
 
-"""
-게시글 생성 입력 정보
-"""
+"""게시글 생성 입력 정보"""
 input CreateBoardInput {
-  """
-  게시판 카테고리
-  """
+  """게시판 카테고리"""
   category: String!
 
-  """
-  게시글 제목
-  """
+  """게시글 제목"""
   title: String!
 
-  """
-  게시글 내용
-  """
+  """게시글 내용"""
   detail: String!
 }
 
-"""
-식재료 생성 입력 정보
-"""
-input CreateIngredientInput {
-  """
-  식재료 이름
-  """
+"""쪽지 생성 입력 정보"""
+input CreateLetterInput {
+  """쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)"""
+  category: String!
+
+  """쪽지 제목"""
+  title: String!
+
+  """쪽지 내용"""
+  detail: String!
+}
+
+"""쪽지 답장 입력 정보"""
+input ReplyLetterInput {
+  """쪽지 답장 제목"""
+  title: String!
+
+  """쪽지 답장 내용"""
+  detail: String!
+}
+
+input CreateCookInput {
   name: String!
+  detail: String!
+  ingredients: [CreateIngInput!]!
+  instructions: [String!]!
+}
 
-  """
-  식재료 수량
-  """
+input CreateIngInput {
+  name: String!
   count: Int
-
-  """
-  식재료 양
-  """
   volume: Float
-
-  """
-  식재료 양 단위
-  """
   volume_unit: String
 }
 
-"""
-식재료 수정 입력 정보
-"""
-input UpdateIngredientInput {
-  """
-  고유 ID
-  """
-  id: String!
+input CreateRecipeInput {
+  name: String!
+  used_ingredients: [CreateIngInput!]
+  needed_ingredients: [CreateIngInput!]
+  instructions: [String!]!
+}
 
-  """
-  식재료 이름
-  """
+input UpdateCookInput {
   name: String
+  detail: String
+  ingredients: [CreateIngInput!]
+  instructions: [String!]
+}
 
-  """
-  식재료 수량
-  """
+"""식재료 생성 입력 정보"""
+input CreateIngredientInput {
+  """식재료 이름"""
+  name: String!
+
+  """식재료 수량"""
   count: Int
 
-  """
-  식재료 양
-  """
+  """식재료 양"""
   volume: Float
 
-  """
-  식재료 양 단위
-  """
+  """식재료 양 단위"""
+  volume_unit: String
+}
+
+"""식재료 수정 입력 정보"""
+input UpdateIngredientInput {
+  """고유 ID"""
+  id: String!
+
+  """식재료 이름"""
+  name: String
+
+  """식재료 수량"""
+  count: Int
+
+  """식재료 양"""
+  volume: Float
+
+  """식재료 양 단위"""
   volume_unit: String
 }
