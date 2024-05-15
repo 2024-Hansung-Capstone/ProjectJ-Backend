@@ -77,6 +77,19 @@ type Board {
 }
 
 """중고물품 정보"""
+type Cook {
+  id: String!
+  post_images: [Upload!]!
+  name: String!
+  detail: String!
+  view: Int!
+  create_at: DateTime!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+"""중고물품 정보"""
 type UsedProduct {
   """고유 ID"""
   id: String!
@@ -760,6 +773,7 @@ input UpdateUsedProductInput {
 scalar Upload
 
 """게시글 생성 입력 정보"""
+"""게시글 생성 입력 정보"""
 input CreateBoardInput {
   """게시판 카테고리"""
   category: String!
@@ -818,6 +832,40 @@ input UpdateCookInput {
   detail: String
   ingredients: [CreateIngInput!]
   instructions: [String!]
+}
+
+"""식재료 생성 입력 정보"""
+"""쪽지 생성 입력 정보"""
+input CreateLetterInput {
+  """쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)"""
+  category: String!
+
+  """쪽지 제목"""
+  title: String!
+
+  """쪽지 내용"""
+  detail: String!
+}
+
+"""쪽지 답장 입력 정보"""
+input ReplyLetterInput {
+  """쪽지 답장 제목"""
+  title: String!
+
+  """쪽지 답장 내용"""
+  detail: String!
+}
+
+input CreateCookInput {
+  name: String!
+  detail: String!
+  post_images: [Upload!]!
+}
+
+input UpdateCookInput {
+  name: String
+  detail: String
+  post_images: [Upload!]
 }
 
 """식재료 생성 입력 정보"""
