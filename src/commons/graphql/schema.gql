@@ -76,18 +76,31 @@ type Board {
   create_at: DateTime!
 }
 
-"""중고물품 정보"""
 type Cook {
   id: String!
-  post_images: [Upload!]!
+  post_images: [PostImage!]!
   name: String!
   detail: String!
   view: Int!
   create_at: DateTime!
 }
 
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
+type PostImage {
+  """고유 ID"""
+  id: String!
+
+  """이미지경로(아마존S3에 저장되어 있는 파일 이름)"""
+  imagePath: String!
+
+  """해당 이미지가 있는 게시글"""
+  board: Board
+
+  """해당 이미지가 있는 중고 상품 정보"""
+  used_proudct: UsedProduct
+
+  """해당 이미지가 있는 요리 정보"""
+  cook: Cook
+}
 
 """중고물품 정보"""
 type UsedProduct {
@@ -353,16 +366,6 @@ type Recipe {
   used_ingredients: [Ing!]
   needed_ingredients: [Ing!]
   instructions: [String!]!
-}
-
-type Cook {
-  id: String!
-  name: String!
-  detail: String!
-  ingredients: [Ing!]!
-  instructions: [String!]!
-  view: Int!
-  create_at: DateTime!
 }
 
 type Query {
@@ -659,7 +662,6 @@ type Mutation {
   deleteAllMyNotificationMessages: Boolean!
   dailyCheckIn: Boolean!
   createCook(createCookInput: CreateCookInput!): Cook!
-  createCookByAI(createRecipeInput: CreateRecipeInput!, name: String!, detail: String!): Cook!
   updateCook(cook_id: String!, updateCookInput: UpdateCookInput!): Cook!
   deleteCook(cook_id: String!): Boolean!
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
@@ -773,7 +775,6 @@ input UpdateUsedProductInput {
 scalar Upload
 
 """게시글 생성 입력 정보"""
-"""게시글 생성 입력 정보"""
 input CreateBoardInput {
   """게시판 카테고리"""
   category: String!
@@ -785,56 +786,6 @@ input CreateBoardInput {
   detail: String!
 }
 
-"""쪽지 생성 입력 정보"""
-input CreateLetterInput {
-  """쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)"""
-  category: String!
-
-  """쪽지 제목"""
-  title: String!
-
-  """쪽지 내용"""
-  detail: String!
-}
-
-"""쪽지 답장 입력 정보"""
-input ReplyLetterInput {
-  """쪽지 답장 제목"""
-  title: String!
-
-  """쪽지 답장 내용"""
-  detail: String!
-}
-
-input CreateCookInput {
-  name: String!
-  detail: String!
-  ingredients: [CreateIngInput!]!
-  instructions: [String!]!
-}
-
-input CreateIngInput {
-  name: String!
-  count: Int
-  volume: Float
-  volume_unit: String
-}
-
-input CreateRecipeInput {
-  name: String!
-  used_ingredients: [CreateIngInput!]
-  needed_ingredients: [CreateIngInput!]
-  instructions: [String!]!
-}
-
-input UpdateCookInput {
-  name: String
-  detail: String
-  ingredients: [CreateIngInput!]
-  instructions: [String!]
-}
-
-"""식재료 생성 입력 정보"""
 """쪽지 생성 입력 정보"""
 input CreateLetterInput {
   """쪽지 카테고리(중고마켓, 자취생메이트, 룸메이트)"""

@@ -13,10 +13,11 @@ import {
   IIngredientServiceUpdate,
 } from './interfaces/ingredient-service.interface';
 import { PostImageService } from '../post_image/postImage.service';
-import { PostImage } from '../post_image/entities/postImage.entity';
 
 @Injectable()
 export class CookService {
+  private imageFolder = 'cook';
+
   constructor(
     @InjectRepository(Cook)
     private readonly cookRepository: Repository<Cook>,
@@ -32,7 +33,6 @@ export class CookService {
     createCookInput: CreateCookInput,
   ): Promise<Cook> {
     const user = await this.userService.findById(user_id);
-    const folder = 'post';
     const cook = await this.cookRepository.save({
       user: user,
       name: createCookInput.name,
@@ -40,23 +40,17 @@ export class CookService {
       post_images: [],
     });
 
-    const imgUrl = await this.postImageService.saveImageToS3(
-      folder,
-      await Promise.all(createCookInput.post_images),
-    );
-    for (const url of imgUrl) {
-      const postImage = new PostImage();
-      postImage.cook = cook;
-      postImage.imagePath = url;
-      await this.postImageService.createPostImage(postImage);
+    const files = await Promise.all(createCookInput.post_images);
+
+    for (const file of files) {
+      const url = await this.postImageService.saveImageToS3(
+        this.imageFolder,
+        file,
+      );
+      const postImage = await this.postImageService.createPostImage(cook, url);
       cook.post_images.push(postImage);
     }
-
-    await this.cookRepository.update(
-      { id: cook.id },
-      { post_images: cook.post_images },
-    );
-    return this.findById(cook.id);
+    return await this.cookRepository.save(cook);
   }
 
   async update(
@@ -72,19 +66,18 @@ export class CookService {
       // 기존 이미지 삭제
       for (const postImage of cook.post_images) {
         await this.postImageService.deleteImageFromS3(postImage.imagePath);
-        await this.postImageService.removePostImage(postImage);
+        await this.postImageService.removePostImage(postImage.id);
       }
-
-      const folder = 'post';
-      const imgUrl = await this.postImageService.saveImageToS3(
-        folder,
-        updateCookInput.post_images,
-      );
-      for (const url of imgUrl) {
-        const postImage = new PostImage();
-        postImage.cook = cook;
-        postImage.imagePath = url;
-        await this.postImageService.createPostImage(postImage);
+      const files = await Promise.all(updateCookInput.post_images);
+      for (const file of files) {
+        const url = await this.postImageService.saveImageToS3(
+          this.imageFolder,
+          file,
+        );
+        const postImage = await this.postImageService.createPostImage(
+          cook,
+          url,
+        );
         cook.post_images.push(postImage);
       }
     }
@@ -105,8 +98,16 @@ export class CookService {
     }
   }
 
-  async delete(id: string): Promise<boolean> {
-    const result = await this.cookRepository.delete(id);
+  async delete(user_id: string, cook_id: string): Promise<boolean> {
+    const cook = await this.findById(cook_id);
+    if (cook.user.id !== user_id) {
+      throw new BadRequestException('게시글을 삭제할 권한이 없습니다.');
+    }
+    for (const postImage of cook.post_images) {
+      await this.postImageService.deleteImageFromS3(postImage.imagePath);
+      await this.postImageService.removePostImage(postImage.id);
+    }
+    const result = await this.cookRepository.delete(cook_id);
     return result.affected > 0;
   }
 
@@ -119,6 +120,7 @@ export class CookService {
         'user.dong.sgng',
         'user.dong.sgng.sido',
         'post_images',
+        'post_images.cook',
       ],
     });
   }
@@ -132,6 +134,7 @@ export class CookService {
         'user.dong.sgng',
         'user.dong.sgng.sido',
         'post_images',
+        'post_images.cook',
       ],
     });
   }
