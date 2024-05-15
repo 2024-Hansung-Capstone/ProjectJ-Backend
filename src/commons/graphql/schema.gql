@@ -345,6 +345,7 @@ type Recipe {
 type Cook {
   id: String!
   name: String!
+  detail: String!
   ingredients: [Ing!]!
   instructions: [String!]!
   view: Int!
@@ -645,7 +646,7 @@ type Mutation {
   deleteAllMyNotificationMessages: Boolean!
   dailyCheckIn: Boolean!
   createCook(createCookInput: CreateCookInput!): Cook!
-  createCookByAI(createRecipeInput: CreateRecipeInput!): Cook!
+  createCookByAI(createRecipeInput: CreateRecipeInput!, name: String!, detail: String!): Cook!
   updateCook(cook_id: String!, updateCookInput: UpdateCookInput!): Cook!
   deleteCook(cook_id: String!): Boolean!
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
@@ -793,6 +794,7 @@ input ReplyLetterInput {
 
 input CreateCookInput {
   name: String!
+  detail: String!
   ingredients: [CreateIngInput!]!
   instructions: [String!]!
 }
@@ -813,6 +815,9 @@ input CreateRecipeInput {
 
 input UpdateCookInput {
   name: String
+  detail: String
+  ingredients: [CreateIngInput!]
+  instructions: [String!]
 }
 
 """식재료 생성 입력 정보"""

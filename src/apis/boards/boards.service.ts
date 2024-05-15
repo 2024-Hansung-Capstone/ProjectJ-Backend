@@ -122,6 +122,7 @@ export class BoardService {
     }
     if (files) {
       if (Array.isArray(files)) {
+        console.log(files);
         for (const file of files) {
           const url = await this.postImageService.saveImageToS3(folder, file);
           const postImage = new PostImage();
@@ -131,6 +132,7 @@ export class BoardService {
           await this.postImageRepository.save(postImage);
         }
       } else {
+        console.log(files);
         const url = await this.postImageService.saveImageToS3(folder, files);
         const postImage = new PostImage();
         postImage.board = board;

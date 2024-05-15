@@ -87,13 +87,15 @@ export class BoardResolver {
       '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 여러 장 있을 때)',
   })
   async createBoardWithImages(
-    @Args('files', { type: () => [GraphQLUpload] }) files: FileUpload[],
+    @Args('files', { type: () => [GraphQLUpload] })
+    files: Promise<FileUpload>[],
     @Args('createBoardInput') createBoardInput: CreateBoardInput,
     @Context() context: IContext,
   ): Promise<Board> {
+    const actualFiles = await Promise.all(files);
     return this.boardService.create(
       'post',
-      files,
+      actualFiles,
       context.req.user.id,
       createBoardInput,
     );

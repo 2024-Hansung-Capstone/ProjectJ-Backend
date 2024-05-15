@@ -23,6 +23,9 @@ export class PostImageService {
   }
 
   async saveImageToS3(folder: string, file: FileUpload): Promise<string> {
+    console.log(file);
+    console.log(file.createReadStream);
+    console.log(typeof file);
     try {
       const fileName = `${Date.now()}_${file.filename}`.replace(/ /g, ''); // 파일 이름 생성
       const key = `${folder}/${fileName}`; // S3에 저장할 파일 경로
