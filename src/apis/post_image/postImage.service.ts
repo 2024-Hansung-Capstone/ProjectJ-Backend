@@ -61,7 +61,7 @@ export class PostImageService {
       await this.awsS3
         .deleteObject({
           Bucket: this.S3_BUCKET_NAME,
-          Key: key,
+          Key: imageUrl,
         })
         .promise();
     } catch (error) {
