@@ -106,12 +106,12 @@ export class UserService {
     user_id: string,
     { updateUserInput }: IUserServiceUpdate,
   ): Promise<User> {
-    const { birth_year, birth_month, birth_day, password, ...rest } = updateUserInput;
+    const { birth_year, birth_month, birth_day, ...rest } = updateUserInput;
 
     //비밀번호 hash
-    if(password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      updateUserInput.password = hashedPassword;
+    if (rest.password) {
+      const hashedPassword = await bcrypt.hash(rest.password, 10);
+      rest.password = hashedPassword;
     }
     let result = null;
 
