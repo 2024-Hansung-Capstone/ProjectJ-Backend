@@ -6,6 +6,7 @@ import * as AWS from 'aws-sdk';
 import { FileUpload } from 'graphql-upload';
 import { Cook } from '../cooks/entities/cook.entity';
 import { Board } from '../boards/entities/board.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class PostImageService {
@@ -71,10 +72,16 @@ export class PostImageService {
     }
   }
 
-  async createPostImage(imagePath: string, cook?: Cook, board?: Board) {
+  async createPostImage(
+    imagePath: string,
+    cook?: Cook,
+    board?: Board,
+    user?: User,
+  ) {
     return await this.postImageRepository.save({
       cook: cook,
       board: board,
+      user: user,
       imagePath: imagePath,
     });
   }

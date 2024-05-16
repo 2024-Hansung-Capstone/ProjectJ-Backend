@@ -68,5 +68,6 @@ export class Board {
   @OneToMany(() => PostImage, (PostImage) => PostImage.board, {
     nullable: true,
   })
+  @Field(() => [PostImage], { description: '이미지' })
   post_images: PostImage[];
 }

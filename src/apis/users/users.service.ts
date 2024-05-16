@@ -22,9 +22,11 @@ import { setDateFormat } from 'src/utils/date';
 import { AreaService } from '../area/area.service';
 import { NotificationService } from '../notifications/notifications.service';
 import { PointService } from '../point/point.service';
+import { PostImageService } from '../post_image/postImage.service';
 
 @Injectable()
 export class UserService {
+  private imageFolder = 'user';
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -34,6 +36,7 @@ export class UserService {
     @Inject(forwardRef(() => NotificationService))
     private readonly notificationService: NotificationService,
     private readonly pointService: PointService,
+    private readonly postImageService: PostImageService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -65,34 +68,58 @@ export class UserService {
       );
     }
 
-    const { birth_year, birth_month, birth_day, password, dong_code, ...rest } =
-      createUserInput;
+    const {
+      birth_year,
+      birth_month,
+      birth_day,
+      password,
+      dong_code,
+      profile_image,
+      ...rest
+    } = createUserInput;
     const birthDate = setDateFormat(birth_year, birth_month, birth_day);
     const hashedPassword = await bcrypt.hash(password, 10);
     const dong = await this.areaService.findDongByCode(dong_code);
 
-    const newUser = await this.userRepository.save({
+    const user = await this.userRepository.save({
       birth_at: birthDate,
       password: hashedPassword,
       dong: dong,
       ...rest,
     });
 
+    if (profile_image) {
+      const url = await this.postImageService.saveImageToS3(
+        this.imageFolder,
+        await profile_image,
+      );
+      const postImage = await this.postImageService.createPostImage(
+        url,
+        undefined,
+        undefined,
+        user,
+      );
+      await this.userRepository.update(
+        { id: user.id },
+        { profile_image: postImage },
+      );
+    }
+
     // Token에 user 정보 업데이트
     await this.tokenRepository.update(
       { phone_number: createUserInput.phone_number },
-      { user: newUser },
+      { user: user },
     );
 
     // 회원 가입 알림 생성
-    await this.notificationService.create(newUser.id, '100');
+    await this.notificationService.create(user.id, '100');
 
     //포인트 적립
-    await this.pointService.increase(newUser.id, 300);
+    await this.pointService.increase(user.id, 300);
 
     return await this.userRepository.findOne({
-      where: { id: newUser.id },
-      relations: ['dong', 'dong.sgng', 'dong.sgng.sido'],
+      where: { id: user.id },
+      relations: ['dong', 'dong.sgng', 'dong.sgng.sido', 'profile_image'],
     });
   }
 
@@ -106,7 +133,9 @@ export class UserService {
     user_id: string,
     { updateUserInput }: IUserServiceUpdate,
   ): Promise<User> {
-    const { birth_year, birth_month, birth_day, ...rest } = updateUserInput;
+    const user = await this.findById(user_id);
+    const { birth_year, birth_month, birth_day, profile_image, ...rest } =
+      updateUserInput;
 
     //비밀번호 hash
     if (rest.password) {
@@ -115,17 +144,39 @@ export class UserService {
     }
     let result = null;
 
+    if (profile_image) {
+      await this.postImageService.deleteImageFromS3(
+        user.profile_image.imagePath,
+      );
+      await this.postImageService.removePostImage(user.profile_image.id);
+
+      const url = await this.postImageService.saveImageToS3(
+        this.imageFolder,
+        await profile_image,
+      );
+      const postImage = await this.postImageService.createPostImage(
+        url,
+        undefined,
+        undefined,
+        user,
+      );
+      user.profile_image = postImage;
+    }
+
     // 날짜에 대한 수정이 들어오면, date타입으로 전환하는 메커니즘을 실행한 후, update를 진행
     if (birth_year && birth_month && birth_day) {
       const birthDate = setDateFormat(birth_year, birth_month, birth_day);
       result = await this.userRepository.update(
         { id: user_id },
-        { birth_at: birthDate, ...rest },
+        { birth_at: birthDate, profile_image: user.profile_image, ...rest },
       );
     }
     // 날짜에 대한 수정이 없을 때, 날짜 변환 없이 전부 update 진행
     else {
-      result = await this.userRepository.update({ id: user_id }, { ...rest });
+      result = await this.userRepository.update(
+        { id: user_id },
+        { profile_image: user.profile_image, ...rest },
+      );
     }
 
     if (result.affected > 0) {
@@ -141,6 +192,13 @@ export class UserService {
    * @returns 사용자 삭제 성공 여부
    */
   async delete(user_id: string): Promise<boolean> {
+    const user = await this.findById(user_id);
+    if (user.profile_image) {
+      await this.postImageService.deleteImageFromS3(
+        user.profile_image.imagePath,
+      );
+    }
+
     const result = await this.userRepository.delete({ id: user_id });
     return result.affected > 0;
   }
@@ -151,7 +209,7 @@ export class UserService {
    */
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({
-      relations: ['dong', 'dong.sgng', 'dong.sgng.sido'],
+      relations: ['dong', 'dong.sgng', 'dong.sgng.sido', 'profile_image'],
     });
   }
 
@@ -163,7 +221,7 @@ export class UserService {
   async findById(user_id: string): Promise<User> {
     return await this.userRepository.findOne({
       where: { id: user_id },
-      relations: ['dong', 'dong.sgng', 'dong.sgng.sido'],
+      relations: ['dong', 'dong.sgng', 'dong.sgng.sido', 'profile_image'],
     });
   }
 
@@ -175,7 +233,7 @@ export class UserService {
   async findByEmail(email: string): Promise<User> {
     return await this.userRepository.findOne({
       where: { email: email },
-      relations: ['dong', 'dong.sgng', 'dong.sgng.sido'],
+      relations: ['dong', 'dong.sgng', 'dong.sgng.sido', 'profile_image'],
     });
   }
 

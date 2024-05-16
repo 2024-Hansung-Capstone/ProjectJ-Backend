@@ -63,17 +63,13 @@ export class BoardResolver {
 
   @UseGuards(gqlAccessGuard)
   @Mutation(() => Board, {
-    description:
-      '입력된 정보를 바탕으로 게시글을 작성합니다.',
+    description: '입력된 정보를 바탕으로 게시글을 작성합니다.',
   })
   async createBoard(
     @Args('createBoardInput') createBoardInput: CreateBoardInput,
     @Context() context: IContext,
   ): Promise<Board> {
-    return this.boardService.create(
-      context.req.user.id,
-      createBoardInput,
-    );
+    return this.boardService.create(context.req.user.id, createBoardInput);
   }
 
   @UseGuards(gqlAccessGuard)
@@ -85,10 +81,7 @@ export class BoardResolver {
     @Args('updateBoradInput') updateBoradInput: UpdateBoardInput,
     @Context() context: IContext,
   ): Promise<Board> {
-    return this.boardService.update(
-      context.req.user.id,
-      updateBoradInput,
-    );
+    return this.boardService.update(context.req.user.id, updateBoradInput);
   }
 
   @UseGuards(gqlAccessGuard)

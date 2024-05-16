@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { FileUpload, GraphQLUpload } from 'graphql-upload';
 
 @InputType({
   description: '유저 생성 입력 정보',
@@ -36,4 +37,7 @@ export class CreateUserInput {
 
   @Field(() => Boolean, { description: '메이트 매칭 여부' })
   is_find_mate: boolean;
+
+  @Field(() => GraphQLUpload, { description: '프로필 이미지' })
+  profile_image: FileUpload;
 }

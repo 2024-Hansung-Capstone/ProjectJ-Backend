@@ -5,12 +5,13 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   OneToMany,
-  OneToOne,
   JoinColumn,
   ManyToOne,
+  OneToOne,
 } from 'typeorm';
 import { LikeUserRecord } from 'src/apis/like/entities/like_user_record.entity';
 import { Dong } from 'src/apis/area/entities/dong.entity';
+import { PostImage } from 'src/apis/post_image/entities/postImage.entity';
 
 @Entity()
 @ObjectType({ description: '사용자 정보' })
@@ -18,6 +19,14 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   @Field(() => String, { description: '고유 ID' })
   id: string;
+
+  @JoinColumn()
+  @OneToOne(() => PostImage, (PostImage) => PostImage.user, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @Field(() => PostImage, { description: '사용자 프로필 이미지' })
+  profile_image: PostImage;
 
   @ManyToOne(() => Dong, { nullable: false })
   @JoinColumn()

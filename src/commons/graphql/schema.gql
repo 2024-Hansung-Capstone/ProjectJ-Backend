@@ -74,6 +74,9 @@ type Board {
 
   """작성일"""
   create_at: DateTime!
+
+  """이미지"""
+  post_images: [PostImage!]!
 }
 
 type Cook {
@@ -100,6 +103,9 @@ type PostImage {
 
   """해당 이미지가 있는 요리 정보"""
   cook: Cook
+
+  """해당 이미지가 프로필인 사용자 정보"""
+  user: User
 }
 
 """중고물품 정보"""
@@ -202,6 +208,9 @@ type Dong {
 type User {
   """고유 ID"""
   id: String!
+
+  """사용자 프로필 이미지"""
+  profile_image: PostImage!
 
   """사용자 거주지역(행정동)"""
   dong: Dong!
@@ -684,8 +693,8 @@ input CreateUserInput {
   """MBTI"""
   mbti: String!
 
-  """행정동 지역명 ex)청운효자동"""
-  dong_nm: String!
+  """행정동 지역코드"""
+  dong_code: String!
 
   """휴대폰 번호 ex)01012345678"""
   phone_number: String!
@@ -695,7 +704,13 @@ input CreateUserInput {
 
   """메이트 매칭 여부"""
   is_find_mate: Boolean!
+
+  """프로필 이미지"""
+  profile_image: Upload!
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 """유저 정보 수정 입력 정보"""
 input UpdateUserInput {
@@ -725,6 +740,9 @@ input UpdateUserInput {
 
   """비밀번호"""
   password: String
+
+  """프로필 이미지"""
+  profile_image: Upload
 }
 
 """중고마켓 상품 생성 입력 정보"""
@@ -780,9 +798,6 @@ input CreateBoardInput {
   """게시글 이미지"""
   post_images: [Upload!]!
 }
-
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
 
 """게시글 수정 입력 정보"""
 input UpdateBoardInput {
