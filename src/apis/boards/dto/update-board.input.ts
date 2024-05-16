@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { FileUpload, GraphQLUpload } from 'graphql-upload';
 
 @InputType({ description: '게시글 수정 입력 정보' })
 export class UpdateBoardInput {
@@ -13,4 +14,7 @@ export class UpdateBoardInput {
 
   @Field(() => String, { nullable: true, description: '게시글 내용' })
   detail?: string;
+
+  @Field(() => [GraphQLUpload], { nullable: true, description: '게시글 이미지' })
+  post_images?: FileUpload[];
 }

@@ -553,29 +553,11 @@ type Mutation {
   """게시글의 찜을 취소하는 기능 찜한 게시글에게만 동작"""
   decreaseUsedProductLike(product_id: String!): UsedProduct!
 
-  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 한 장 있을 때)"""
-  createBoardWithImage(file: Upload!, createBoardInput: CreateBoardInput!): Board!
-
-  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 여러 장 있을 때)"""
-  createBoardWithImages(files: [Upload!]!, createBoardInput: CreateBoardInput!): Board!
-
-  """입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 없을 때)"""
+  """입력된 정보를 바탕으로 게시글을 작성합니다."""
   createBoard(createBoardInput: CreateBoardInput!): Board!
 
-  """
-  입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트 할 때 이미지 입력 없음)
-  """
+  """입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능)"""
   updateBoard(updateBoradInput: UpdateBoardInput!): Board!
-
-  """
-  입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트 할 때 이미지 입력 사진 한 장)
-  """
-  updateBoardWithImage(file: Upload!, updateBoradInput: UpdateBoardInput!): Board!
-
-  """
-  입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트 할 때 이미지 입력 사진 여러 장)
-  """
-  updateBoardWithImages(files: [Upload!]!, updateBoradInput: UpdateBoardInput!): Board!
 
   """입력된 id값을 가진 게시글을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)"""
   deleteBoard(
@@ -784,9 +766,6 @@ input UpdateUsedProductInput {
   state: String
 }
 
-"""The `Upload` scalar type represents a file upload."""
-scalar Upload
-
 """게시글 생성 입력 정보"""
 input CreateBoardInput {
   """게시판 카테고리"""
@@ -797,7 +776,13 @@ input CreateBoardInput {
 
   """게시글 내용"""
   detail: String!
+
+  """게시글 이미지"""
+  post_images: [Upload!]!
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 """게시글 수정 입력 정보"""
 input UpdateBoardInput {
@@ -812,6 +797,9 @@ input UpdateBoardInput {
 
   """게시글 내용"""
   detail: String
+
+  """게시글 이미지"""
+  post_images: [Upload!]
 }
 
 """쪽지 생성 입력 정보"""

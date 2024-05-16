@@ -74,6 +74,7 @@ export class PostImageService {
   async createPostImage(imagePath: string, cook?: Cook, board?: Board) {
     return await this.postImageRepository.save({
       cook: cook,
+      board: board,
       imagePath: imagePath,
     });
   }

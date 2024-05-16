@@ -64,105 +64,28 @@ export class BoardResolver {
   @UseGuards(gqlAccessGuard)
   @Mutation(() => Board, {
     description:
-      '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 한 장 있을 때)',
-  })
-  async createBoardWithImage(
-    @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
-    @Args('createBoardInput') createBoardInput: CreateBoardInput,
-    @Context() context: IContext,
-  ): Promise<Board> {
-    return this.boardService.create(
-      'post',
-      file,
-      context.req.user.id,
-      createBoardInput,
-    );
-  }
-
-  @UseGuards(gqlAccessGuard)
-  @Mutation(() => Board, {
-    description:
-      '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 여러 장 있을 때)',
-  })
-  async createBoardWithImages(
-    @Args('files', { type: () => [GraphQLUpload] })
-    files: Promise<FileUpload>[],
-    @Args('createBoardInput') createBoardInput: CreateBoardInput,
-    @Context() context: IContext,
-  ): Promise<Board> {
-    const actualFiles = await Promise.all(files);
-    return this.boardService.create(
-      'post',
-      actualFiles,
-      context.req.user.id,
-      createBoardInput,
-    );
-  }
-
-  @UseGuards(gqlAccessGuard)
-  @Mutation(() => Board, {
-    description: '입력된 정보를 바탕으로 게시글을 작성합니다.(사진이 없을 때)',
+      '입력된 정보를 바탕으로 게시글을 작성합니다.',
   })
   async createBoard(
     @Args('createBoardInput') createBoardInput: CreateBoardInput,
     @Context() context: IContext,
   ): Promise<Board> {
     return this.boardService.create(
-      'post',
-      [],
       context.req.user.id,
       createBoardInput,
-    );
-  }
-  @UseGuards(gqlAccessGuard)
-  @Mutation(() => Board, {
-    description:
-      '입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트 할 때 이미지 입력 없음)',
-  })
-  async updateBoard(
-    @Args('updateBoradInput') updateBoradInput: UpdateBoardInput,
-    @Context() context: IContext,
-  ): Promise<Board> {
-    return this.boardService.update(
-      'post',
-      [],
-      context.req.user.id,
-      updateBoradInput,
     );
   }
 
   @UseGuards(gqlAccessGuard)
   @Mutation(() => Board, {
     description:
-      '입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트 할 때 이미지 입력 사진 한 장)',
+      '입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능)',
   })
-  async updateBoardWithImage(
-    @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
+  async updateBoard(
     @Args('updateBoradInput') updateBoradInput: UpdateBoardInput,
     @Context() context: IContext,
   ): Promise<Board> {
     return this.boardService.update(
-      'post',
-      file,
-      context.req.user.id,
-      updateBoradInput,
-    );
-  }
-  @UseGuards(gqlAccessGuard)
-  @Mutation(() => Board, {
-    description:
-      '입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트 할 때 이미지 입력 사진 여러 장)',
-  })
-  async updateBoardWithImages(
-    @Args('files', { type: () => [GraphQLUpload] })
-    files: Promise<FileUpload>[],
-    @Args('updateBoradInput') updateBoradInput: UpdateBoardInput,
-    @Context() context: IContext,
-  ): Promise<Board> {
-    const actualFiles = await Promise.all(files);
-    return this.boardService.update(
-      'post',
-      actualFiles,
       context.req.user.id,
       updateBoradInput,
     );
