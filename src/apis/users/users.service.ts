@@ -106,7 +106,13 @@ export class UserService {
     user_id: string,
     { updateUserInput }: IUserServiceUpdate,
   ): Promise<User> {
-    const { birth_year, birth_month, birth_day, ...rest } = updateUserInput;
+    const { birth_year, birth_month, birth_day, password, ...rest } = updateUserInput;
+
+    //비밀번호 hash
+    if(password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updateUserInput.password = hashedPassword;
+    }
     let result = null;
 
     // 날짜에 대한 수정이 들어오면, date타입으로 전환하는 메커니즘을 실행한 후, update를 진행
