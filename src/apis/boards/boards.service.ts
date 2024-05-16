@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Inject,
   forwardRef,
-  Post,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -24,9 +23,11 @@ import { PostImage } from '../post_image/entities/postImage.entity';
 import { PostImageService } from '../post_image/postImage.service';
 import { CommentReply } from './entities/commet_reply.entity';
 import { FileUpload } from 'graphql-upload';
-import * as path from 'path';
+
 @Injectable()
 export class BoardService {
+  private imageFolder = 'board';
+
   constructor(
     @InjectRepository(Board)
     private readonly boardRepository: Repository<Board>,
@@ -102,36 +103,32 @@ export class BoardService {
   }
 
   async create(
-    folder: string,
-    files: FileUpload[] | FileUpload,
     user_id: string,
     createBoardInput: CreateBoardInput,
   ): Promise<Board> {
     const { title, detail, category } = createBoardInput;
     const user = await this.userService.findById(user_id);
-    const board = new Board();
-    board.title = title;
-    board.detail = detail;
-    board.category = category;
-    board.create_at = new Date();
-    board.user = user;
-    board.post_images = [];
-    await this.boardRepository.save(board);
     if (!user) {
       throw new Error('해당 사용자가 존재하지 않습니다');
     }
-    if (files) {
-      if (Array.isArray(files)) {
-        console.log(files);
-        for (const file of files) {
-          const url = await this.postImageService.saveImageToS3(folder, file);
-          this.createPostImage(board, url);
-        }
-      } else {
-        console.log(files);
-        const url = await this.postImageService.saveImageToS3(folder, files);
-        this.createPostImage(board, url);
-      }
+
+    const board = await this.boardRepository.save({
+      title: title,
+      detail: detail,
+      category: category,
+      create_at: new Date(),
+      user: user,
+      post_images: [],
+    });
+
+    const files = await Promise.all(createBoardInput.post_images);
+
+    for (const file of files) {
+      const url = await this.postImageService.saveImageToS3(
+        this.imageFolder,
+        file,
+      );
+      this.postImageService.createPostImage(url);
     }
     await this.pointService.increase(user.id, +10);
     return await this.boardRepository.save(board);
@@ -143,7 +140,6 @@ export class BoardService {
     return this.postImageRepository.save(postImage);
   }
   async update(
-    folder: string,
     files: FileUpload[] | FileUpload,
     user_id: string,
     updateBoradInput: UpdateBoardInput,
@@ -164,11 +160,17 @@ export class BoardService {
       }
       if (Array.isArray(files)) {
         for (const file of files) {
-          const url = await this.postImageService.saveImageToS3(folder, file);
+          const url = await this.postImageService.saveImageToS3(
+            this.imageFolder,
+            file,
+          );
           this.createPostImage(board, url);
         }
       } else {
-        const url = await this.postImageService.saveImageToS3(folder, files);
+        const url = await this.postImageService.saveImageToS3(
+          this.imageFolder,
+          files,
+        );
         this.createPostImage(board, url);
       }
     }

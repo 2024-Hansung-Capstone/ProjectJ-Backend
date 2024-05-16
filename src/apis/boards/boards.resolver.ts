@@ -5,10 +5,8 @@ import { UpdateBoardInput } from './dto/update-board.input';
 import { SearchBoardInput } from './dto/search_board.input';
 import { CreateBoardInput } from './dto/create-board.input';
 import { IContext } from '../users/interfaces/user-service.interface';
-import { UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { gqlAccessGuard } from '../users/guards/gql-auth.guard';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { Body } from '@nestjs/common';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 
 @Resolver('Board')

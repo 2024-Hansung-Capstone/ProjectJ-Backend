@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import * as AWS from 'aws-sdk';
 import { FileUpload } from 'graphql-upload';
 import { Cook } from '../cooks/entities/cook.entity';
+import { Board } from '../boards/entities/board.entity';
+
 @Injectable()
 export class PostImageService {
   private readonly awsS3: AWS.S3;
@@ -29,8 +31,8 @@ export class PostImageService {
     try {
       const fileName = `${Date.now()}_${encodeURIComponent(
         file.filename,
-      )}`.replace(/ /g, ''); // 파일 이름 생성
-      const key = `${folder}/${fileName}`; // S3에 저장할 파일 경로
+      )}`.replace(/ /g, '');
+      const key = `${folder}/${fileName}`;
       const uploadParams = {
         Bucket: this.S3_BUCKET_NAME,
         Key: key,
@@ -50,7 +52,6 @@ export class PostImageService {
 
   async deleteImageFromS3(imageUrl: string): Promise<void> {
     try {
-      // 이미지 URL에서 키(Key)를 추출
       const key = decodeURIComponent(
         imageUrl.split(
           `${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/`,
@@ -61,7 +62,7 @@ export class PostImageService {
       await this.awsS3
         .deleteObject({
           Bucket: this.S3_BUCKET_NAME,
-          Key: imageUrl,
+          Key: key,
         })
         .promise();
     } catch (error) {
@@ -70,7 +71,7 @@ export class PostImageService {
     }
   }
 
-  async createPostImage(cook: Cook, imagePath: string) {
+  async createPostImage(imagePath: string, cook?: Cook, board?: Board) {
     return await this.postImageRepository.save({
       cook: cook,
       imagePath: imagePath,

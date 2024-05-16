@@ -51,7 +51,7 @@ export class CookService {
         this.imageFolder,
         file,
       );
-      const postImage = await this.postImageService.createPostImage(cook, url);
+      const postImage = await this.postImageService.createPostImage(url, cook);
       cook.post_images.push(postImage);
     }
     return await this.cookRepository.save(cook);
@@ -85,8 +85,8 @@ export class CookService {
           file,
         );
         const postImage = await this.postImageService.createPostImage(
-          cook,
           url,
+          cook,
         );
         cook.post_images.push(postImage);
       }
