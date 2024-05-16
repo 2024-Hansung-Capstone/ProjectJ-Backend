@@ -65,11 +65,11 @@ export class UserService {
       );
     }
 
-    const { birth_year, birth_month, birth_day, password, dong_nm, ...rest } =
+    const { birth_year, birth_month, birth_day, password, dong_code, ...rest } =
       createUserInput;
     const birthDate = setDateFormat(birth_year, birth_month, birth_day);
     const hashedPassword = await bcrypt.hash(password, 10);
-    const dong = await this.areaService.findDongByName(dong_nm);
+    const dong = await this.areaService.findDongByCode(dong_code);
 
     const newUser = await this.userRepository.save({
       birth_at: birthDate,
