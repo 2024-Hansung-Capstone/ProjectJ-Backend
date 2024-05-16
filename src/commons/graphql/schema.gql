@@ -563,9 +563,19 @@ type Mutation {
   createBoard(createBoardInput: CreateBoardInput!): Board!
 
   """
-  입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트된 게시글 사진이 있을 때)
+  입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트 할 때 이미지 입력 없음)
   """
-  updateBoardWithImage: Board!
+  updateBoard(updateBoradInput: UpdateBoardInput!): Board!
+
+  """
+  입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트 할 때 이미지 입력 사진 한 장)
+  """
+  updateBoardWithImage(file: Upload!, updateBoradInput: UpdateBoardInput!): Board!
+
+  """
+  입력된 id값을 가진 게시글을 수정합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 수정 가능, 업데이트 할 때 이미지 입력 사진 여러 장)
+  """
+  updateBoardWithImages(files: [Upload!]!, updateBoradInput: UpdateBoardInput!): Board!
 
   """입력된 id값을 가진 게시글을 삭제합니다. (게시글의 유저정보와 로그인 된 유저가 동일해야지만 삭제 가능)"""
   deleteBoard(
@@ -730,6 +740,9 @@ input UpdateUserInput {
 
   """메이트 매칭 여부"""
   is_find_mate: Boolean
+
+  """비밀번호"""
+  password: String
 }
 
 """중고마켓 상품 생성 입력 정보"""
@@ -784,6 +797,21 @@ input CreateBoardInput {
 
   """게시글 내용"""
   detail: String!
+}
+
+"""게시글 수정 입력 정보"""
+input UpdateBoardInput {
+  """고유 ID"""
+  id: String!
+
+  """게시판 카테고리"""
+  category: String
+
+  """게시글 제목"""
+  title: String
+
+  """게시글 내용"""
+  detail: String
 }
 
 """쪽지 생성 입력 정보"""
