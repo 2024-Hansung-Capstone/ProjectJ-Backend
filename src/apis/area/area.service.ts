@@ -21,4 +21,16 @@ export class AreaService {
       relations: ['sgng', 'sgng.sido'],
     });
   }
+
+  /**
+   * 행정동 코드로 행정동 정보 조회 서비스 메서드
+   * @param dong_code 행정동 코드
+   * @returns 행정동 정보
+   */
+  async findDongByCode(dong_code: string): Promise<Dong> {
+    return await this.dongRepository.findOne({
+      where: { id: dong_code },
+      relations: ['sgng', 'sgng.sido'],
+    });
+  }
 }

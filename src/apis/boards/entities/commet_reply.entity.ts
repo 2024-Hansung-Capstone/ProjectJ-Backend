@@ -9,9 +9,9 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Board } from './board.entity';
 import { LikeUserRecord } from 'src/apis/like/entities/like_user_record.entity';
 import { Reply } from './reply.entity';
+
 @Entity()
 @ObjectType({ description: '대댓글 정보' })
 export class CommentReply {

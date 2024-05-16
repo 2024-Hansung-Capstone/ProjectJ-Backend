@@ -19,7 +19,7 @@ export class User {
   @Field(() => String, { description: '고유 ID' })
   id: string;
 
-  @ManyToOne(() => Dong)
+  @ManyToOne(() => Dong, { nullable: false })
   @JoinColumn()
   @Field(() => Dong, { description: '사용자 거주지역(행정동)' })
   dong: Dong;

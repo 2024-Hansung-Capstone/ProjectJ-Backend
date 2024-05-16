@@ -6,7 +6,6 @@ import {
   HttpStatus,
   Inject,
   forwardRef,
-  Post,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -24,9 +23,11 @@ import { PostImage } from '../post_image/entities/postImage.entity';
 import { PostImageService } from '../post_image/postImage.service';
 import { CommentReply } from './entities/commet_reply.entity';
 import { FileUpload } from 'graphql-upload';
-import * as path from 'path';
+
 @Injectable()
 export class BoardService {
+  private imageFolder = 'board';
+
   constructor(
     @InjectRepository(Board)
     private readonly boardRepository: Repository<Board>,
@@ -102,81 +103,73 @@ export class BoardService {
   }
 
   async create(
-    folder: string,
-    files: FileUpload[] | FileUpload,
     user_id: string,
     createBoardInput: CreateBoardInput,
   ): Promise<Board> {
     const { title, detail, category } = createBoardInput;
     const user = await this.userService.findById(user_id);
-    const board = new Board();
-    board.title = title;
-    board.detail = detail;
-    board.category = category;
-    board.create_at = new Date();
-    board.user = user;
-    board.post_images = [];
-    await this.boardRepository.save(board);
     if (!user) {
       throw new Error('해당 사용자가 존재하지 않습니다');
     }
-    if (files) {
-      if (Array.isArray(files)) {
-        console.log(files);
-        for (const file of files) {
-          const url = await this.postImageService.saveImageToS3(folder, file);
-          this.createPostImage(board, url);
-        }
-      } else {
-        console.log(files);
-        const url = await this.postImageService.saveImageToS3(folder, files);
-        this.createPostImage(board, url);
-      }
+
+    const board = await this.boardRepository.save({
+      title: title,
+      detail: detail,
+      category: category,
+      create_at: new Date(),
+      user: user,
+      post_images: [],
+    });
+
+    const files = await Promise.all(createBoardInput.post_images);
+
+    for (const file of files) {
+      const url = await this.postImageService.saveImageToS3(
+        this.imageFolder,
+        file,
+      );
+      this.postImageService.createPostImage(url, undefined, board);
     }
+
     await this.pointService.increase(user.id, +10);
     return await this.boardRepository.save(board);
   }
-  async createPostImage(board: Board, imagePath: string): Promise<PostImage> {
-    const postImage = new PostImage();
-    postImage.board = board;
-    postImage.imagePath = imagePath;
-    return this.postImageRepository.save(postImage);
-  }
+
   async update(
-    folder: string,
-    files: FileUpload[] | FileUpload,
     user_id: string,
     updateBoradInput: UpdateBoardInput,
   ): Promise<Board> {
-    const { id, ...rest } = updateBoradInput;
-    const board = await this.findById(id);
+    const {id, post_images, ...rest} = updateBoradInput;
+    const board = await this.findById(updateBoradInput.id);
     if (!board) {
-      throw new NotFoundException(`ID가 ${id}인 게시글을 찾을 수 없습니다.`);
+      throw new NotFoundException(`ID가 ${updateBoradInput.id}인 게시글을 찾을 수 없습니다.`);
     }
     if (board.user.id !== user_id) {
       throw new ForbiddenException(
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
     }
-    if (files) {
+
+    if(post_images) {
       for (const post_image of board.post_images) {
         await this.postImageService.deleteImageFromS3(post_image.imagePath);
+        await this.postImageService.removePostImage(post_image.id);
       }
-      if (Array.isArray(files)) {
-        for (const file of files) {
-          const url = await this.postImageService.saveImageToS3(folder, file);
-          this.createPostImage(board, url);
-        }
-      } else {
-        const url = await this.postImageService.saveImageToS3(folder, files);
-        this.createPostImage(board, url);
+
+      const files = await Promise.all(post_images)
+
+      for (const file of files) {
+        const url = await this.postImageService.saveImageToS3(
+          this.imageFolder,
+          file,
+        );
+        const postImage = await this.postImageService.createPostImage(url, undefined, board);
+        board.post_images.push(postImage);
       }
     }
-    await this.boardRepository.update({ id: id }, { ...rest });
-    return await this.boardRepository.findOne({
-      where: { id: id },
-      relations: ['user'],
-    });
+
+    await this.boardRepository.update({id: board.id}, {...board, ...rest});
+    return this.findById(board.id);
   }
 
   async delete(user_id: string, board_id: string): Promise<boolean> {
@@ -191,10 +184,12 @@ export class BoardService {
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
     }
+    
     for (const post_image of board.post_images) {
       await this.postImageService.deleteImageFromS3(post_image.imagePath);
+      await this.postImageService.removePostImage(post_image.id);
     }
-    await this.pointService.increase(board.user.id, -10);
+
     const result = await this.boardRepository.delete(board_id);
     return result.affected ? true : false;
   }

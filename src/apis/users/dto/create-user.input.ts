@@ -25,8 +25,8 @@ export class CreateUserInput {
   @Field(() => String, { description: 'MBTI' })
   mbti: string;
 
-  @Field(() => String, { description: '행정동 지역명 ex)청운효자동' })
-  dong_nm: string;
+  @Field(() => String, { description: '행정동 지역코드' })
+  dong_code: string;
 
   @Field(() => String, { description: '휴대폰 번호 ex)01012345678' })
   phone_number: string;
