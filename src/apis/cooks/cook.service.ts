@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
 import { Cook } from './entities/cook.entity';
@@ -54,12 +58,18 @@ export class CookService {
   }
 
   async update(
+    user_id: string,
     cook_id: string,
     updateCookInput: UpdateCookInput,
   ): Promise<Cook> {
     const cook = await this.findById(cook_id);
     if (!cook) {
       throw new BadRequestException('수정해야 할 게시글을 찾을 수 없습니다.');
+    }
+    if (cook.user.id !== user_id) {
+      throw new ForbiddenException(
+        `본인이 작성한 게시글만 수정할 수 있습니다.`,
+      );
     }
 
     if (updateCookInput.post_images) {
@@ -101,7 +111,9 @@ export class CookService {
   async delete(user_id: string, cook_id: string): Promise<boolean> {
     const cook = await this.findById(cook_id);
     if (cook.user.id !== user_id) {
-      throw new BadRequestException('게시글을 삭제할 권한이 없습니다.');
+      throw new ForbiddenException(
+        `본인이 작성한 게시글만 삭제할 수 있습니다.`,
+      );
     }
     for (const postImage of cook.post_images) {
       await this.postImageService.deleteImageFromS3(postImage.imagePath);

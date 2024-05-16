@@ -38,12 +38,18 @@ export class CookResolver {
   }
 
   //수정
+  @UseGuards(gqlAccessGuard)
   @Mutation(() => Cook)
   async updateCook(
+    @Context() context: IContext,
     @Args('cook_id') cook_id: string,
     @Args('updateCookInput') updateCookInput: UpdateCookInput,
   ): Promise<Cook> {
-    const result = await this.cookService.update(cook_id, updateCookInput);
+    const result = await this.cookService.update(
+      context.req.user.id,
+      cook_id,
+      updateCookInput,
+    );
     if (!result) {
       throw new BadRequestException(
         '알 수 없는 이유로 게시글 수정에 실패하였습니다.',
