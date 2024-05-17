@@ -2,11 +2,13 @@ import { Field, ObjectType } from '@nestjs/graphql';
 import { Board } from 'src/apis/boards/entities/board.entity';
 import { Cook } from 'src/apis/cooks/entities/cook.entity';
 import { UsedProduct } from 'src/apis/used_markets/entities/used_product.entity';
+import { User } from 'src/apis/users/entities/user.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -55,4 +57,15 @@ export class PostImage {
     description: '해당 이미지가 있는 요리 정보',
   })
   cook: Cook;
+
+  @JoinColumn()
+  @OneToOne(() => User, (user) => user.profile_image, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
+  @Field(() => User, {
+    nullable: true,
+    description: '해당 이미지가 프로필인 사용자 정보',
+  })
+  user: User;
 }

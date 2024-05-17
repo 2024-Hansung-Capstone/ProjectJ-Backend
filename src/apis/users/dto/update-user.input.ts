@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { FileUpload, GraphQLUpload } from 'graphql-upload';
 
 @InputType({
   description: '유저 정보 수정 입력 정보',
@@ -30,4 +31,7 @@ export class UpdateUserInput {
 
   @Field(() => String, { nullable: true, description: '비밀번호' })
   password?: string;
+
+  @Field(() => GraphQLUpload, { nullable: true, description: '프로필 이미지' })
+  profile_image: FileUpload;
 }

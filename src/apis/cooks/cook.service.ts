@@ -103,9 +103,8 @@ export class CookService {
 
     if (result.affected > 0) {
       return await this.findById(cook_id);
-    } else {
-      return null;
     }
+    return null;
   }
 
   async delete(user_id: string, cook_id: string): Promise<boolean> {
@@ -117,7 +116,6 @@ export class CookService {
     }
     for (const postImage of cook.post_images) {
       await this.postImageService.deleteImageFromS3(postImage.imagePath);
-      await this.postImageService.removePostImage(postImage.id);
     }
     const result = await this.cookRepository.delete(cook_id);
     return result.affected > 0;
