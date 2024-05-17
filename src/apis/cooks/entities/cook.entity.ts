@@ -26,6 +26,7 @@ export class Cook {
   @JoinColumn()
   @OneToMany(() => PostImage, (postImage) => postImage.cook, {
     nullable: true,
+    onDelete: 'CASCADE',
   })
   @Field(() => [PostImage])
   post_images: PostImage[];

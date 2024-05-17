@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -193,6 +194,11 @@ export class UserService {
    */
   async delete(user_id: string): Promise<boolean> {
     const user = await this.findById(user_id);
+    if (user.id !== user_id) {
+      throw new ForbiddenException(
+        `현재 로그인 한 계정으로만 삭제할 수 있습니다.`,
+      );
+    }
     if (user.profile_image) {
       await this.postImageService.deleteImageFromS3(
         user.profile_image.imagePath,

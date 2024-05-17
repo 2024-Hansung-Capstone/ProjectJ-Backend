@@ -52,14 +52,26 @@ export class BoardService {
   async findAll(category: string): Promise<Board[]> {
     return await this.boardRepository.find({
       where: { category: category },
-      relations: ['user', 'reply', 'like_user'],
+      relations: [
+        'user',
+        'reply',
+        'like_user',
+        'like_user.user',
+        'post_images',
+      ],
     });
   }
 
   async findById(id: string): Promise<Board> {
     return await this.boardRepository.findOne({
       where: { id: id },
-      relations: ['user', 'reply', 'like_user'],
+      relations: [
+        'user',
+        'reply',
+        'like_user',
+        'like_user.user',
+        'post_images',
+      ],
     });
   }
 
@@ -128,7 +140,12 @@ export class BoardService {
         this.imageFolder,
         file,
       );
-      this.postImageService.createPostImage(url, undefined, board);
+      const postImage = await this.postImageService.createPostImage(
+        url,
+        null,
+        board,
+      );
+      board.post_images.push(postImage);
     }
 
     await this.pointService.increase(user.id, +10);
@@ -139,10 +156,12 @@ export class BoardService {
     user_id: string,
     updateBoradInput: UpdateBoardInput,
   ): Promise<Board> {
-    const {id, post_images, ...rest} = updateBoradInput;
-    const board = await this.findById(updateBoradInput.id);
+    const { id, post_images, ...rest } = updateBoradInput;
+    const board = await this.findById(id);
     if (!board) {
-      throw new NotFoundException(`ID가 ${updateBoradInput.id}인 게시글을 찾을 수 없습니다.`);
+      throw new NotFoundException(
+        `ID가 ${updateBoradInput.id}인 게시글을 찾을 수 없습니다.`,
+      );
     }
     if (board.user.id !== user_id) {
       throw new ForbiddenException(
@@ -150,26 +169,36 @@ export class BoardService {
       );
     }
 
-    if(post_images) {
+    if (post_images) {
       for (const post_image of board.post_images) {
         await this.postImageService.deleteImageFromS3(post_image.imagePath);
         await this.postImageService.removePostImage(post_image.id);
       }
 
-      const files = await Promise.all(post_images)
+      const files = await Promise.all(post_images);
 
       for (const file of files) {
         const url = await this.postImageService.saveImageToS3(
           this.imageFolder,
           file,
         );
-        const postImage = await this.postImageService.createPostImage(url, undefined, board);
+        const postImage = await this.postImageService.createPostImage(
+          url,
+          undefined,
+          board,
+        );
         board.post_images.push(postImage);
       }
     }
 
-    await this.boardRepository.update({id: board.id}, {...board, ...rest});
-    return this.findById(board.id);
+    const result = await this.boardRepository.update(
+      { id: board.id },
+      { ...board, ...rest },
+    );
+    if (result.affected > 0) {
+      return await this.findById(board.id);
+    }
+    return null;
   }
 
   async delete(user_id: string, board_id: string): Promise<boolean> {
@@ -184,10 +213,9 @@ export class BoardService {
         `본인이 작성한 게시글만 수정할 수 있습니다.`,
       );
     }
-    
+
     for (const post_image of board.post_images) {
       await this.postImageService.deleteImageFromS3(post_image.imagePath);
-      await this.postImageService.removePostImage(post_image.id);
     }
 
     const result = await this.boardRepository.delete(board_id);

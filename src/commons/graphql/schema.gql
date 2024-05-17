@@ -75,8 +75,14 @@ type Board {
   """작성일"""
   create_at: DateTime!
 
+  """좋아요 기록"""
+  like_user: [LikeUserRecord!]
+
+  """댓글 정보"""
+  reply: [Reply!]
+
   """이미지"""
-  post_images: [PostImage!]!
+  post_images: [PostImage!]
 }
 
 type Cook {
