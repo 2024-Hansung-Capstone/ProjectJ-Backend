@@ -53,7 +53,7 @@ docker-compose up
 
 # ﻿Release Link
 
-[http://13.209.72.136:5000/graphql](http://54.180.182.40:5000/graphql)
+[http://54.180.182.40:5000/graphql](http://54.180.182.40:5000/graphql)
 
 # ﻿Apollo GraphQL Playground UI
 __<UI 설명>__    
@@ -108,7 +108,7 @@ __<요리 추천 AI API 실행 결과>__
 ![image](https://github.com/2024-Hansung-Capstone/ProjectJ-Backend/assets/157611169/6f96c4e1-2880-49b4-9944-9b1a108777ad)    
 
 ### 기타 API 기능 설명
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;배포된 링크([http://13.209.72.136:5000/graphql](http://54.180.182.40:5000/graphql))의 Docs를 참고하여 사용 가능하다.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;배포된 링크([http://54.180.182.40:5000/graphql](http://54.180.182.40:5000/graphql))의 Docs를 참고하여 사용 가능하다.
 
 
 
