@@ -121,6 +121,20 @@ export class CookService {
     return result.affected > 0;
   }
 
+  async findAll(): Promise<Cook[]> {
+    return await this.cookRepository.find({
+      order: { create_at: 'DESC' },
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'post_images',
+        'post_images.cook',
+      ],
+    });
+  }
+
   async findById(cook_id: string): Promise<Cook> {
     return await this.cookRepository.findOne({
       where: { id: cook_id },

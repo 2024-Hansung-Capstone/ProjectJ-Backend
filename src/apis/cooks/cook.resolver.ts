@@ -29,12 +29,17 @@ export class CookResolver {
   @UseGuards(gqlAccessGuard)
   @Query(() => [Cook])
   async fetchMyCooks(@Context() context: IContext): Promise<Cook[]> {
-    return this.cookService.findByUserId(context.req.user.id);
+    return await this.cookService.findByUserId(context.req.user.id);
   }
 
   @Query(() => Cook)
   async fetchCookById(@Args('cook_id') cook_id: string): Promise<Cook> {
-    return this.cookService.findById(cook_id);
+    return await this.cookService.findById(cook_id);
+  }
+
+  @Query(() => [Cook])
+  async fetchAllCooks(): Promise<Cook[]> {
+    return await this.cookService.findAll();
   }
 
   //수정

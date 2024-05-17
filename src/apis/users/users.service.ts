@@ -215,6 +215,7 @@ export class UserService {
    */
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({
+      order: { create_at: 'DESC' },
       relations: ['dong', 'dong.sgng', 'dong.sgng.sido', 'profile_image'],
     });
   }

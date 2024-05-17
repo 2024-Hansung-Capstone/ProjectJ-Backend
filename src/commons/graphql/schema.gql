@@ -490,6 +490,7 @@ type Query {
   fetchMyRole: Role!
   fetchMyCooks: [Cook!]!
   fetchCookById(cook_id: String!): Cook!
+  fetchAllCooks: [Cook!]!
   increaseCookView(id: String!): Cook!
   searchCook(keyword: String!): [Cook!]!
   fetchIngredients: [Ingredient!]!
