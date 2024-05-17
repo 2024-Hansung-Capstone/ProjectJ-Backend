@@ -232,7 +232,6 @@ export class CookService {
     const myIngredients = await this.findIngredientByUserId(user_id);
     const ingredientsInfo = myIngredients.map((ingredient) => ({
       name: ingredient.name,
-      count: ingredient.count,
       volume: ingredient.volume,
       volume_unit: ingredient.volume_unit,
     }));

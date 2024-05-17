@@ -24,17 +24,13 @@ export class Ingredient {
   @Field(() => String, { description: '재료 이름' })
   name: string;
 
-  @Column({ nullable: true })
-  @Field(() => Int, { nullable: true, description: '재료 수량' })
-  count?: number;
-
   @Column({ type: 'double precision', nullable: true })
-  @Field(() => Float, { nullable: true, description: '재료 양' })
-  volume?: number;
+  @Field(() => Float, { description: '재료 양' })
+  volume: number;
 
   @Column({ nullable: true })
-  @Field(() => String, { nullable: true, description: '재료 양 단위' })
-  volume_unit?: string;
+  @Field(() => String, { description: '재료 양 단위' })
+  volume_unit: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   @Field(() => Date, { description: '추가일' })

@@ -15,12 +15,13 @@ import { PostImage } from 'src/apis/post_image/entities/postImage.entity';
 @ObjectType()
 export class Cook {
   @PrimaryGeneratedColumn('uuid')
-  @Field(() => String)
+  @Field(() => String, { description: '요리 ID' })
   id: string;
 
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
   })
+  @Field(() => User, { description: '작성자 정보' })
   user: User;
 
   @JoinColumn()
@@ -28,22 +29,22 @@ export class Cook {
     nullable: true,
     onDelete: 'CASCADE',
   })
-  @Field(() => [PostImage])
+  @Field(() => [PostImage], { description: '요리 이미지' })
   post_images: PostImage[];
 
   @Column({ length: 100 })
-  @Field(() => String)
+  @Field(() => String, { description: '요리 이름' })
   name: string;
 
   @Column({ type: 'text' })
-  @Field(() => String)
+  @Field(() => String, { description: '요리 설명' })
   detail: string;
 
   @Column({ default: 0 })
-  @Field(() => Int)
+  @Field(() => Int, { description: '조회수' })
   view: number;
 
   @CreateDateColumn({ type: 'timestamp' })
-  @Field(() => Date)
+  @Field(() => Date, { description: '작성일' })
   create_at: Date;
 }

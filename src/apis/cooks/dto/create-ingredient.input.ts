@@ -5,12 +5,9 @@ export class CreateIngredientInput {
   @Field(() => String, { description: '식재료 이름' })
   name: string;
 
-  @Field(() => Int, { nullable: true, description: '식재료 수량' })
-  count?: number;
+  @Field(() => Float, { description: '식재료 양' })
+  volume: number;
 
-  @Field(() => Float, { nullable: true, description: '식재료 양' })
-  volume?: number;
-
-  @Field(() => String, { nullable: true, description: '식재료 양 단위' })
-  volume_unit?: string;
+  @Field(() => String, { description: '식재료 양 단위' })
+  volume_unit: string;
 }
