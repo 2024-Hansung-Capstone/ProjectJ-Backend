@@ -82,7 +82,7 @@ type Board {
   reply: [Reply!]
 
   """이미지"""
-  post_images: [PostImage!]
+  post_images: [PostImage!]!
 }
 
 type Cook {
@@ -159,6 +159,9 @@ type UsedProduct {
 
   """중고물품 생성시간"""
   create_at: DateTime!
+
+  """이미지"""
+  post_images: [PostImage!]!
 }
 
 """좋아요 기록 정보"""
@@ -230,7 +233,7 @@ type User {
   id: String!
 
   """사용자 프로필 이미지"""
-  profile_image: PostImage!
+  profile_image: PostImage
 
   """사용자 거주지역(행정동)"""
   dong: Dong!
@@ -432,6 +435,15 @@ type Query {
     """행정동 이름"""
     dong_name: String!
   ): Dong!
+
+  """전체 시도 정보를 조회합니다."""
+  fetchAllSido: [Sido!]!
+
+  """전체 시군구 정보를 조회합니다."""
+  fetchAllSgng: [Sgng!]!
+
+  """전체 행정동 정보를 조회합니다."""
+  fetchAllDong: [Dong!]!
 
   """입력된 카테고리에 해당하는 게시글의 정보를 확인합니다."""
   fetchBoards(
@@ -691,6 +703,8 @@ type Mutation {
   """나의 알림을 전체 삭제합니다."""
   deleteAllMyNotificationMessages: Boolean!
   dailyCheckIn: Boolean!
+
+  """요리 게시글 작성 기능입니다."""
   createCook(createCookInput: CreateCookInput!): Cook!
   updateCook(cook_id: String!, updateCookInput: UpdateCookInput!): Cook!
   deleteCook(cook_id: String!): Boolean!
@@ -790,6 +804,9 @@ input CreateUsedProductInput {
 
   """중고마켓 상품 거래 상태(판매중/예약중/판매완료)"""
   state: String!
+
+  """중고상품 이미지"""
+  post_images: [Upload!]!
 }
 
 """중고마켓 상품 수정 입력 정보"""
@@ -811,6 +828,9 @@ input UpdateUsedProductInput {
 
   """상품 거래 상태(판매중/예약중/판매완료)"""
   state: String
+
+  """중고상품 이미지"""
+  post_images: [Upload!]
 }
 
 """게시글 생성 입력 정보"""
@@ -867,6 +887,7 @@ input ReplyLetterInput {
   detail: String!
 }
 
+"""요리 생성 입력 정보"""
 input CreateCookInput {
   """요리 이름"""
   name: String!
@@ -878,6 +899,7 @@ input CreateCookInput {
   post_images: [Upload!]!
 }
 
+"""요리 수정 입력 정보"""
 input UpdateCookInput {
   """요리 이름"""
   name: String

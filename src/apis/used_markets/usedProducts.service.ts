@@ -15,8 +15,11 @@ import { LikeUserRecord } from '../like/entities/like_user_record.entity';
 import { UserService } from '../users/users.service';
 import { LikeUserRecordService } from '../like/like_user_record.service';
 import { NotificationService } from '../notifications/notifications.service';
+import { PostImageService } from '../post_image/postImage.service';
 @Injectable()
 export class UsedProductService {
+  private imageFolder = 'used_product';
+
   constructor(
     @InjectRepository(UsedProduct)
     private usedProductRepository: Repository<UsedProduct>,
@@ -27,6 +30,7 @@ export class UsedProductService {
     private readonly likeUserRecordService: LikeUserRecordService,
     @Inject(forwardRef(() => NotificationService))
     private readonly notificationService: NotificationService,
+    private readonly postImageService: PostImageService,
   ) {}
 
   async findAll(): Promise<UsedProduct[]> {
@@ -37,6 +41,7 @@ export class UsedProductService {
         'user.dong.sgng',
         'user.dong.sgng.sido',
         'like_user',
+        'post_images',
       ],
     });
   }
@@ -50,6 +55,7 @@ export class UsedProductService {
         'user.dong.sgng',
         'user.dong.sgng.sido',
         'like_user',
+        'post_images',
       ],
     });
   }
@@ -63,6 +69,7 @@ export class UsedProductService {
         'user.dong.sgng',
         'user.dong.sgng.sido',
         'like_user',
+        'post_images',
       ],
     });
   }
@@ -88,64 +95,103 @@ export class UsedProductService {
     if (state) {
       searchConditions.state = state;
     }
-    return await this.usedProductRepository.find({ where: searchConditions });
-  }
-
-  async create(
-    user_id: string,
-    usedProduct: CreateUsedProductInput,
-  ): Promise<UsedProduct> {
-    const { title, price, detail, category, state } = usedProduct;
-    const user = await this.userService.findById(user_id);
-
-    const Used_Product = new UsedProduct();
-    Used_Product.title = title;
-    Used_Product.price = price;
-    Used_Product.detail = detail;
-    Used_Product.category = category;
-    Used_Product.state = state;
-    Used_Product.user = user;
-    Used_Product.create_at = new Date(); // DTO에서 받은 create_at 할당
-    const newProduct = await this.usedProductRepository.save(Used_Product);
-    return await this.findById(newProduct.id);
-  }
-
-  async update(
-    user_id: string,
-    updateUsedProductInput: UpdateUsedProductInput,
-  ): Promise<UsedProduct> {
-    const { id, ...rest } = updateUsedProductInput;
-    const used_product = await this.findById(id);
-    if (!used_product) {
-      throw new NotFoundException(`ID가 ${id}인 상품을 찾을 수 없습니다.`);
-    }
-    const user = await this.userService.findById(user_id);
-
-    if (used_product.user.id !== user.id) {
-      throw new ForbiddenException(
-        `본인이 작성한 게시글만 수정할 수 있습니다.`,
-      );
-    }
-
-    if (used_product.price !== rest.price) {
-      const likes = await this.likeUserRecordService.findByUsedProductId(id);
-      for (const like of likes) {
-        await this.notificationService.create(like.id, '201');
-      }
-    }
-
-    await this.usedProductRepository.update({ id: id }, { ...rest });
-
-    return await this.usedProductRepository.findOne({
-      where: { id: id },
+    return await this.usedProductRepository.find({
+      where: searchConditions,
       relations: [
         'user',
         'user.dong',
         'user.dong.sgng',
         'user.dong.sgng.sido',
         'like_user',
+        'post_images',
       ],
     });
+  }
+
+  async create(
+    user_id: string,
+    createUsedProduct: CreateUsedProductInput,
+  ): Promise<UsedProduct> {
+    const { post_images, ...rest } = createUsedProduct;
+    const user = await this.userService.findById(user_id);
+    if (!user) {
+      throw new Error('해당 사용자가 존재하지 않습니다');
+    }
+
+    const usedProduct = await this.usedProductRepository.save({
+      user: user,
+      create_at: new Date(),
+      post_images: [],
+      ...rest,
+    });
+
+    const files = await Promise.all(post_images);
+
+    for (const file of files) {
+      const url = await this.postImageService.saveImageToS3(
+        this.imageFolder,
+        file,
+      );
+      const postImage = await this.postImageService.createPostImage(
+        url,
+        null,
+        null,
+        null,
+        usedProduct,
+      );
+      usedProduct.post_images.push(postImage);
+    }
+
+    return await this.usedProductRepository.save(usedProduct);
+  }
+
+  async update(
+    user_id: string,
+    updateUsedProductInput: UpdateUsedProductInput,
+  ): Promise<UsedProduct> {
+    const { id, post_images, ...rest } = updateUsedProductInput;
+    const usedProduct = await this.findById(id);
+    if (!usedProduct) {
+      throw new NotFoundException(`ID가 ${id}인 상품을 찾을 수 없습니다.`);
+    }
+    const user = await this.userService.findById(user_id);
+
+    if (usedProduct.user.id !== user.id) {
+      throw new ForbiddenException(
+        `본인이 작성한 판매글만 수정할 수 있습니다.`,
+      );
+    }
+
+    if (usedProduct.price !== rest.price) {
+      const likes = await this.likeUserRecordService.findByUsedProductId(id);
+      for (const like of likes) {
+        await this.notificationService.create(like.id, '201');
+      }
+    }
+
+    const files = await Promise.all(post_images);
+
+    for (const file of files) {
+      const url = await this.postImageService.saveImageToS3(
+        this.imageFolder,
+        file,
+      );
+      const postImage = await this.postImageService.createPostImage(
+        url,
+        null,
+        null,
+        null,
+        usedProduct,
+      );
+      usedProduct.post_images.push(postImage);
+    }
+
+    const result = await this.usedProductRepository.update(
+      { id: id },
+      { ...usedProduct, ...rest },
+    );
+
+    return result.affected ? await this.findById(id) : null;
   }
 
   async delete(user_id: string, product_id: string): Promise<boolean> {
@@ -157,13 +203,16 @@ export class UsedProductService {
       );
     }
 
-    const user = await this.userService.findById(user_id);
-
-    if (used_product.user.id !== user.id) {
+    if (used_product.user.id !== user_id) {
       throw new ForbiddenException(
         `본인이 작성한 게시글만 삭제할 수 있습니다.`,
       );
     }
+
+    for (const post_image of used_product.post_images) {
+      await this.postImageService.deleteImageFromS3(post_image.imagePath);
+    }
+
     const result = await this.usedProductRepository.delete(product_id);
     return result.affected ? true : false;
   }

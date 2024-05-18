@@ -70,6 +70,8 @@ export class UsedProduct {
   @JoinColumn()
   @OneToMany(() => PostImage, (PostImage) => PostImage.used_proudct, {
     nullable: true,
+    onDelete: 'CASCADE',
   })
+  @Field(() => [PostImage], { description: '이미지' })
   post_images: PostImage[];
 }

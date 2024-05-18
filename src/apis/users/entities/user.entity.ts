@@ -25,8 +25,11 @@ export class User {
     nullable: true,
     onDelete: 'CASCADE',
   })
-  @Field(() => PostImage, { description: '사용자 프로필 이미지' })
-  profile_image: PostImage;
+  @Field(() => PostImage, {
+    description: '사용자 프로필 이미지',
+    nullable: true,
+  })
+  profile_image?: PostImage;
 
   @ManyToOne(() => Dong, { nullable: false })
   @JoinColumn()
