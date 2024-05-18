@@ -15,6 +15,9 @@ export class UpdateBoardInput {
   @Field(() => String, { nullable: true, description: '게시글 내용' })
   detail?: string;
 
-  @Field(() => [GraphQLUpload], { nullable: true, description: '게시글 이미지' })
+  @Field(() => [GraphQLUpload], {
+    nullable: true,
+    description: '게시글 이미지',
+  })
   post_images?: FileUpload[];
 }

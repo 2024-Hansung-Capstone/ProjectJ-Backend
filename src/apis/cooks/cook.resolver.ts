@@ -17,7 +17,7 @@ export class CookResolver {
 
   //요리 게시글 작성
   @UseGuards(gqlAccessGuard)
-  @Mutation(() => Cook)
+  @Mutation(() => Cook, { description: '요리 게시글 작성 기능입니다.' })
   async createCook(
     @Context() context: IContext,
     @Args('createCookInput')

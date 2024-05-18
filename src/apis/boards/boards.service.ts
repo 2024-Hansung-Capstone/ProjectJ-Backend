@@ -19,10 +19,8 @@ import { LikeUserRecord } from '../like/entities/like_user_record.entity';
 import { Reply } from './entities/reply.entity';
 import { NotificationService } from '../notifications/notifications.service';
 import { PointService } from '../point/point.service';
-import { PostImage } from '../post_image/entities/postImage.entity';
 import { PostImageService } from '../post_image/postImage.service';
 import { CommentReply } from './entities/commet_reply.entity';
-import { FileUpload } from 'graphql-upload';
 
 @Injectable()
 export class BoardService {
@@ -33,8 +31,6 @@ export class BoardService {
     private readonly boardRepository: Repository<Board>,
     @InjectRepository(LikeUserRecord)
     private readonly likeUserRecordRepository: Repository<LikeUserRecord>,
-    @InjectRepository(PostImage)
-    private readonly postImageRepository: Repository<PostImage>,
     @InjectRepository(Reply)
     private readonly replyRepository: Repository<Reply>,
     @InjectRepository(CommentReply)
@@ -195,19 +191,19 @@ export class BoardService {
       { id: board.id },
       { ...board, ...rest },
     );
-    if (result.affected > 0) {
-      return await this.findById(board.id);
-    }
-    return null;
+
+    return result.affected ? await this.findById(id) : null;
   }
 
   async delete(user_id: string, board_id: string): Promise<boolean> {
     const board = await this.findById(board_id);
+
     if (!board) {
       throw new NotFoundException(
         `ID가 ${board_id}인 게시글을 찾을 수 없습니다.`,
       );
     }
+
     if (board.user.id !== user_id) {
       throw new ForbiddenException(
         `본인이 작성한 게시글만 수정할 수 있습니다.`,

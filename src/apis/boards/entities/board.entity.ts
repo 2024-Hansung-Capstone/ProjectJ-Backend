@@ -71,6 +71,6 @@ export class Board {
     nullable: true,
     onDelete: 'CASCADE',
   })
-  @Field(() => [PostImage], { description: '이미지', nullable: true })
+  @Field(() => [PostImage], { description: '이미지' })
   post_images: PostImage[];
 }

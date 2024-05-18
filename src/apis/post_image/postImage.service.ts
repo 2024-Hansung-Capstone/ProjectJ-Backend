@@ -7,6 +7,7 @@ import { FileUpload } from 'graphql-upload';
 import { Cook } from '../cooks/entities/cook.entity';
 import { Board } from '../boards/entities/board.entity';
 import { User } from '../users/entities/user.entity';
+import { UsedProduct } from '../used_markets/entities/used_product.entity';
 
 @Injectable()
 export class PostImageService {
@@ -77,11 +78,13 @@ export class PostImageService {
     cook?: Cook,
     board?: Board,
     user?: User,
+    usedProduct?: UsedProduct,
   ) {
     return await this.postImageRepository.save({
       cook: cook,
       board: board,
       user: user,
+      used_product: usedProduct,
       imagePath: imagePath,
     });
   }

@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { FileUpload, GraphQLUpload } from 'graphql-upload';
 
-@InputType()
+@InputType({ description: '요리 수정 입력 정보' })
 export class UpdateCookInput {
   @Field(() => String, { nullable: true, description: '요리 이름' })
   name?: string;
