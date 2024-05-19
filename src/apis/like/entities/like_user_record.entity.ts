@@ -49,7 +49,7 @@ export class LikeUserRecord {
   @Field(() => Reply, { nullable: true, description: '좋아요 누른 댓글 정보' })
   reply: Reply;
 
-  @ManyToOne(() => Reply, (Reply) => Reply.like_user, {
+  @ManyToOne(() => CommentReply, (CommentReply) => CommentReply.like_user, {
     nullable: true,
     onDelete: 'CASCADE',
   })
