@@ -45,6 +45,10 @@ export class CommentReply {
       nullable: true,
     },
   )
+  @Field(() => [LikeUserRecord], {
+    nullable: true,
+    description: '좋아요 사용자 기록',
+  })
   like_user: LikeUserRecord[];
 
   @CreateDateColumn({ type: 'timestamp' })
