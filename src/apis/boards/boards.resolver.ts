@@ -7,7 +7,9 @@ import { CreateBoardInput } from './dto/create-board.input';
 import { IContext } from '../users/interfaces/user-service.interface';
 import { UseGuards } from '@nestjs/common';
 import { gqlAccessGuard } from '../users/guards/gql-auth.guard';
-
+import { LikeUserRecord } from '../like/entities/like_user_record.entity';
+import { Reply } from './entities/reply.entity';
+import { CommentReply } from './entities/commet_reply.entity';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 
 @Resolver('Board')
@@ -131,14 +133,14 @@ export class BoardResolver {
   }
 
   @UseGuards(gqlAccessGuard)
-  @Mutation(() => Board, {
+  @Mutation(() => Reply, {
     description: '게시글에 댓글을 생성하는 기능입니다.',
   })
   createReply(
     @Context() context: IContext,
     @Args('board_id', { description: '게시글 고유 ID' }) board_id: string,
     @Args('detail', { description: '댓글 내용' }) detail: string,
-  ): Promise<Board> {
+  ): Promise<Reply> {
     return this.boardService.addReply(context.req.user.id, detail, board_id);
   }
 
@@ -166,14 +168,14 @@ export class BoardResolver {
   }
 
   @UseGuards(gqlAccessGuard)
-  @Mutation(() => Boolean, {
+  @Mutation(() => LikeUserRecord, {
     description:
       '댓글의 좋아요 수를 올려주고 좋아요한 회원과 댓글 정보를 저장합니다.',
   })
   increaseReplyLike(
     @Args('reply_id', { description: '댓글 고유 ID' }) reply_id: string,
     @Context() context: IContext,
-  ): Promise<boolean> {
+  ): Promise<LikeUserRecord> {
     return this.boardService.addReplyLike(context.req.user.id, reply_id);
   }
 
@@ -190,14 +192,14 @@ export class BoardResolver {
   }
 
   @UseGuards(gqlAccessGuard)
-  @Mutation(() => Board, {
+  @Mutation(() => CommentReply, {
     description: '댓글에 대댓글을 작성하는 기능입니다.',
   })
   createCommetReply(
     @Context() context: IContext,
     @Args('reply_id', { description: '댓글 고유 ID' }) reply_id: string,
     @Args('detail', { description: '댓글 내용' }) detail: string,
-  ): Promise<Board> {
+  ): Promise<CommentReply> {
     return this.boardService.addCommnetReply(
       context.req.user.id,
 

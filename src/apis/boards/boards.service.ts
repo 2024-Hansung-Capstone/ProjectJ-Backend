@@ -51,6 +51,12 @@ export class BoardService {
       relations: [
         'user',
         'reply',
+        'reply.user',
+        'reply.like_user',
+        'reply.like_user.user',
+        'reply.comment_reply',
+        'reply.commnet_reply.user',
+        'reply.comment-reply.like_user',
         'like_user',
         'like_user.user',
         'post_images',
@@ -64,6 +70,12 @@ export class BoardService {
       relations: [
         'user',
         'reply',
+        'reply.user',
+        'reply.like_user',
+        'reply.like_user.user',
+        'reply.comment_reply',
+        'reply.commnet_reply.user',
+        'reply.comment-reply.like_user',
         'like_user',
         'like_user.user',
         'post_images',
@@ -276,7 +288,7 @@ export class BoardService {
     await this.boardRepository.save(board);
     return await this.findById(id);
   }
-  async addReply(user_id: string, detail: string, id: string): Promise<Board> {
+  async addReply(user_id: string, detail: string, id: string): Promise<Reply> {
     const board = await this.findById(id);
     const user = await this.userService.findById(user_id);
     const reply = new Reply();
@@ -298,7 +310,7 @@ export class BoardService {
     const result = await this.replyRepository.save(reply);
     await this.boardRepository.save(board);
     await this.notificationService.create(result.id, '300');
-    return await this.findById(id);
+    return result;
   }
   async deleteReply(user_id: string, reply_id: string): Promise<Board> {
     const checkreply = await this.replyRepository.findOne({
@@ -354,7 +366,10 @@ export class BoardService {
     return await this.findById(checkreply.board.id);
   }
 
-  async addReplyLike(user_id: string, reply_id: string): Promise<boolean> {
+  async addReplyLike(
+    user_id: string,
+    reply_id: string,
+  ): Promise<LikeUserRecord> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
       relations: ['like_user', 'user'],
@@ -419,7 +434,7 @@ export class BoardService {
     );
     await this.notificationService.create(savedLikeUserRecord.id, '203');
 
-    return !!savedTarget;
+    return savedLikeUserRecord;
   }
 
   async deleteReplyLike(user_id: string, reply_id: string): Promise<boolean> {
@@ -489,7 +504,7 @@ export class BoardService {
     user_id: string,
     reply_id: string,
     detail: string,
-  ): Promise<Board> {
+  ): Promise<CommentReply> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
       relations: ['user', 'board', 'comment_reply'],
@@ -515,7 +530,7 @@ export class BoardService {
     await this.commentReplyRepository.save(commentReply);
     await this.replyRepository.save(reply);
     //await this.notificationService.create(commentReply.id, '300');
-    return await this.findById(reply.board.id);
+    return await this.commentReplyRepository.save(commentReply);
   }
 
   async deleteCommentReply(
