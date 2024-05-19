@@ -418,6 +418,9 @@ type Query {
   """현재 로그인된 사용자 정보를 조회하는 기능입니다."""
   whoAmI: User!
 
+  """자취생 메이트 찾기 여부 기준으로 사용자 정보 조회 기능입니다."""
+  fetchUserByIsFindMate(is_find_mate: Boolean!): [User!]!
+
   """전체 중고 물품 정보를 확인합니다."""
   fetchUsedProducts: [UsedProduct!]!
 
@@ -640,7 +643,7 @@ type Mutation {
 
     """댓글 내용"""
     detail: String!
-  ): Board!
+  ): Reply!
 
   """게시글에 댓글을 삭제하는 기능입니다."""
   deleteReply(
@@ -661,7 +664,7 @@ type Mutation {
   increaseReplyLike(
     """댓글 고유 ID"""
     reply_id: String!
-  ): Boolean!
+  ): LikeUserRecord!
 
   """댓글의 좋아요를 취소하는 기능입니다. (좋아요한 댓글에게만 동작)"""
   decreaseReplyLike(
@@ -676,7 +679,7 @@ type Mutation {
 
     """댓글 내용"""
     detail: String!
-  ): Board!
+  ): CommentReply!
 
   """댓글에 대댓글을 삭제하는 기능입니다."""
   deleteCommentReply(

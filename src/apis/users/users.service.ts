@@ -245,6 +245,18 @@ export class UserService {
   }
 
   /**
+   * 자취생 메이트를 찾는 지 여부에 따른 사용자 정보 조회 서비스 메서드
+   * @param is_find_mate 자취생 메이트 찾기 여부
+   * @returns is_find_mate가 true/false인 사용자 정보
+   */
+  async findByIsFindMate(is_find_mate: boolean): Promise<User[]> {
+    return await this.userRepository.find({
+      where: { is_find_mate: is_find_mate },
+      relations: ['dong', 'dong.sgng', 'dong.sgng.sido', 'profile_image'],
+    });
+  }
+
+  /**
    * 핸드폰 본인 인증 번호 생성 서비스 메서드
    * 6자리 토큰 생성 후, SMS로 전송
    * @param phone_number 사용자 휴대폰 번호
