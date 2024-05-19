@@ -43,15 +43,22 @@ export class LetterService {
         receiver: product.user,
         sender: sender,
       });
-    } else if (
-      createLetterInput.category == '자취생메이트' ||
-      createLetterInput.category == '룸메이트'
-    ) {
+    } else if (createLetterInput.category == '룸메이트') {
       const board = await this.boardService.findById(writing_id);
       letter = this.letterRepository.create({
         ...createLetterInput,
         board: board,
         receiver: board.user,
+        sender: sender,
+      });
+    } else if (createLetterInput.category == '자취생메이트') {
+      const user = await this.userService.findById(writing_id);
+      if (user.is_find_mate == false) {
+        throw new BadRequestException('자취생메이트를 찾지 않는 사용자입니다.');
+      }
+      letter = this.letterRepository.create({
+        ...createLetterInput,
+        receiver: user,
         sender: sender,
       });
     } else {
@@ -87,7 +94,20 @@ export class LetterService {
   async findById(letter_id: string): Promise<Letter> {
     const letter = await this.letterRepository.findOne({
       where: { id: letter_id },
-      relations: ['sender', 'receiver', 'product', 'board'],
+      relations: [
+        'sender',
+        'sender.profile_image',
+        'sender.dong',
+        'sender.dong.sgng',
+        'sender.dong.sgng.sido',
+        'receiver',
+        'receiver.profile_image',
+        'receiver.dong',
+        'receiver.dong.sgng',
+        'receiver.dong.sgng.sido',
+        'product',
+        'board',
+      ],
     });
 
     if (!letter) {
@@ -99,14 +119,40 @@ export class LetterService {
   async findSendAll(user_id: string): Promise<Letter[]> {
     return await this.letterRepository.find({
       where: { sender: { id: user_id } },
-      relations: ['sender', 'receiver', 'product', 'board'],
+      relations: [
+        'sender',
+        'sender.profile_image',
+        'sender.dong',
+        'sender.dong.sgng',
+        'sender.dong.sgng.sido',
+        'receiver',
+        'receiver.profile_image',
+        'receiver.dong',
+        'receiver.dong.sgng',
+        'receiver.dong.sgng.sido',
+        'product',
+        'board',
+      ],
     });
   }
 
   async findReceiveAll(user_id: string): Promise<Letter[]> {
     return await this.letterRepository.find({
       where: { receiver: { id: user_id } },
-      relations: ['sender', 'receiver', 'product', 'board'],
+      relations: [
+        'sender',
+        'sender.profile_image',
+        'sender.dong',
+        'sender.dong.sgng',
+        'sender.dong.sgng.sido',
+        'receiver',
+        'receiver.profile_image',
+        'receiver.dong',
+        'receiver.dong.sgng',
+        'receiver.dong.sgng.sido',
+        'product',
+        'board',
+      ],
     });
   }
 

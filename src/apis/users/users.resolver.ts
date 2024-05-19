@@ -46,6 +46,16 @@ export class UserResolver {
     return await this.userService.findById(context.req.user.id);
   }
 
+  @Query(() => [User], {
+    description:
+      '자취생 메이트 찾기 여부 기준으로 사용자 정보 조회 기능입니다.',
+  })
+  async fetchUserByIsFindMate(
+    @Args('is_find_mate') is_find_mate: boolean,
+  ): Promise<User[]> {
+    return await this.userService.findByIsFindMate(is_find_mate);
+  }
+
   @UseGuards(gqlAccessGuard)
   @Mutation(() => User, {
     description: '현재 로그인 된 사용자의 정보를 수정하는 기능입니다.',
