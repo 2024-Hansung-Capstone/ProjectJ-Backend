@@ -19,6 +19,9 @@ type CommentReply {
   """좋아요 수"""
   like: Int!
 
+  """좋아요 사용자 기록"""
+  like_user: [LikeUserRecord!]
+
   """작성일"""
   create_at: DateTime!
 }
@@ -44,6 +47,12 @@ type Reply {
 
   """좋아요 수"""
   like: Int!
+
+  """좋아요 사용자 기록"""
+  like_user: [LikeUserRecord!]
+
+  """댓글에 대한 답글"""
+  comment_reply: [CommentReply!]
 
   """작성일"""
   create_at: DateTime!
@@ -690,6 +699,7 @@ type Mutation {
   writeLetter(writing_id: String!, createLetterInput: CreateLetterInput!): Letter!
   replyLetter(letter_id: String!, replyLetterInput: ReplyLetterInput!): Letter!
   deleteLetter(letter_id: String!): Boolean!
+  readLetter(letter_id: String!): Boolean!
 
   """해당 지역에 원룸들을 OpenApi를 통해 가져옴(중복된 원룸자료들은 DB에 저장 X)"""
   fetchOneRoomFromOpenAPI(LAWD_CD: String!): Boolean!
