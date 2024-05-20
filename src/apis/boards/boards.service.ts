@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Inject,
   forwardRef,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -141,19 +142,25 @@ export class BoardService {
       post_images: [],
     });
 
-    const files = await Promise.all(createBoardInput.post_images);
+    try {
+      const files = await Promise.all(createBoardInput.post_images);
 
-    for (const file of files) {
-      const url = await this.postImageService.saveImageToS3(
-        this.imageFolder,
-        file,
-      );
-      const postImage = await this.postImageService.createPostImage(
-        url,
-        null,
-        board,
-      );
-      board.post_images.push(postImage);
+      for (const file of files) {
+        const url = await this.postImageService.saveImageToS3(
+          this.imageFolder,
+          file,
+        );
+        const postImage = await this.postImageService.createPostImage(
+          url,
+          null,
+          board,
+        );
+        board.post_images.push(postImage);
+      }
+    } catch (error) {
+      console.error('이미지 업로드 중 에러사유:', error);
+      this.delete(user_id, board.id);
+      throw new BadRequestException('이미지 업로드에 에러 발생', error);
     }
 
     await this.pointService.increase(user.id, +10);
@@ -201,7 +208,7 @@ export class BoardService {
 
     const result = await this.boardRepository.update(
       { id: board.id },
-      { ...board, ...rest },
+      { ...rest },
     );
 
     return result.affected ? await this.findById(id) : null;
@@ -369,7 +376,7 @@ export class BoardService {
   async addReplyLike(
     user_id: string,
     reply_id: string,
-  ): Promise<LikeUserRecord> {
+  ): Promise<Reply | CommentReply> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
       relations: ['like_user', 'user'],
@@ -434,10 +441,13 @@ export class BoardService {
     );
     await this.notificationService.create(savedLikeUserRecord.id, '203');
 
-    return savedLikeUserRecord;
+    return savedTarget;
   }
 
-  async deleteReplyLike(user_id: string, reply_id: string): Promise<boolean> {
+  async deleteReplyLike(
+    user_id: string,
+    reply_id: string,
+  ): Promise<CommentReply | Reply> {
     const reply = await this.replyRepository.findOne({
       where: { id: reply_id },
       relations: ['like_user', 'user'],
@@ -490,7 +500,7 @@ export class BoardService {
     } else {
       savedTarget = await this.commentReplyRepository.save(target);
     }
-    return !!savedTarget;
+    return savedTarget;
   }
 
   async findReplyById(reply_id: string): Promise<Reply> {
@@ -527,16 +537,16 @@ export class BoardService {
     commentReply.detail = detail;
     reply.comment_reply.push(commentReply);
     //const result = await this.replyRepository.save(commentReply);
-    await this.commentReplyRepository.save(commentReply);
+    const result = await this.commentReplyRepository.save(commentReply);
     await this.replyRepository.save(reply);
     //await this.notificationService.create(commentReply.id, '300');
-    return await this.commentReplyRepository.save(commentReply);
+    return result;
   }
 
   async deleteCommentReply(
     user_id: string,
     commentReply_id: string,
-  ): Promise<Board> {
+  ): Promise<Reply> {
     const checkcomment_reply = await this.commentReplyRepository.findOne({
       where: { id: commentReply_id },
       relations: ['user', 'board', 'reply'],
@@ -554,7 +564,6 @@ export class BoardService {
     await this.pointService.increase(user_id, -1);
     reply.comment_reply.splice(replyIndex, 1);
     await this.commentReplyRepository.delete(checkcomment_reply.id);
-    await this.boardRepository.save(reply);
-    return await this.findById(reply.board.id);
+    return await this.replyRepository.save(reply);
   }
 }

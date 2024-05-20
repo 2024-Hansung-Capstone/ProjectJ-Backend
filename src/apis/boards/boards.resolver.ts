@@ -168,26 +168,28 @@ export class BoardResolver {
   }
 
   @UseGuards(gqlAccessGuard)
-  @Mutation(() => LikeUserRecord, {
+  @Mutation(() => Reply || CommentReply, {
     description:
       '댓글의 좋아요 수를 올려주고 좋아요한 회원과 댓글 정보를 저장합니다.',
   })
   increaseReplyLike(
-    @Args('reply_id', { description: '댓글 고유 ID' }) reply_id: string,
+    @Args('reply_id', { description: '댓글 or 대댓글 고유 ID' })
+    reply_id: string,
     @Context() context: IContext,
-  ): Promise<LikeUserRecord> {
+  ): Promise<Reply | CommentReply> {
     return this.boardService.addReplyLike(context.req.user.id, reply_id);
   }
 
   @UseGuards(gqlAccessGuard)
-  @Mutation(() => Boolean, {
+  @Mutation(() => Reply || CommentReply, {
     description:
       '댓글의 좋아요를 취소하는 기능입니다. (좋아요한 댓글에게만 동작)',
   })
   decreaseReplyLike(
-    @Args('reply_id', { description: '댓글 고유 ID' }) reply_id: string,
+    @Args('reply_id', { description: '댓글 or 대댓글 고유 ID' })
+    reply_id: string,
     @Context() context: IContext,
-  ): Promise<boolean> {
+  ): Promise<CommentReply | Reply> {
     return this.boardService.deleteReplyLike(context.req.user.id, reply_id);
   }
 
@@ -209,14 +211,14 @@ export class BoardResolver {
   }
 
   @UseGuards(gqlAccessGuard)
-  @Mutation(() => Board, {
+  @Mutation(() => Reply, {
     description: '댓글에 대댓글을 삭제하는 기능입니다.',
   })
   deleteCommentReply(
     @Context() context: IContext,
     @Args('commentReply_id', { description: '대댓글 고유 ID' })
     commentReply_id: string,
-  ): Promise<Board> {
+  ): Promise<Reply> {
     return this.boardService.deleteCommentReply(
       context.req.user.id,
       commentReply_id,

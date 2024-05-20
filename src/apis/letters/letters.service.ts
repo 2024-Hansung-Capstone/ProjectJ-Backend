@@ -160,4 +160,16 @@ export class LetterService {
     const result = await this.letterRepository.delete({ id: letter_id });
     return result.affected > 0;
   }
+
+  async read(letter_id: string): Promise<boolean> {
+    const letter = await this.letterRepository.findOne({
+      where: { id: letter_id },
+    });
+    if (!letter) {
+      throw new NotFoundException('쪽지를 찾을 수 없습니다.');
+    }
+    letter.is_read = true;
+    await this.letterRepository.save(letter);
+    return true;
+  }
 }

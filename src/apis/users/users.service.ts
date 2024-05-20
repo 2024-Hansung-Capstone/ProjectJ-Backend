@@ -89,34 +89,40 @@ export class UserService {
       ...rest,
     });
 
-    if (profile_image) {
-      const url = await this.postImageService.saveImageToS3(
-        this.imageFolder,
-        await profile_image,
+    try {
+      if (profile_image) {
+        const url = await this.postImageService.saveImageToS3(
+          this.imageFolder,
+          await profile_image,
+        );
+        const postImage = await this.postImageService.createPostImage(
+          url,
+          undefined,
+          undefined,
+          user,
+        );
+        await this.userRepository.update(
+          { id: user.id },
+          { profile_image: postImage },
+        );
+      }
+
+      // Token에 user 정보 업데이트
+      await this.tokenRepository.update(
+        { phone_number: createUserInput.phone_number },
+        { user: user },
       );
-      const postImage = await this.postImageService.createPostImage(
-        url,
-        undefined,
-        undefined,
-        user,
-      );
-      await this.userRepository.update(
-        { id: user.id },
-        { profile_image: postImage },
-      );
+
+      // 회원 가입 알림 생성
+      await this.notificationService.create(user.id, '100');
+
+      //포인트 적립
+      await this.pointService.increase(user.id, 300);
+    } catch (error) {
+      console.log('회원가입 에러', error);
+      await this.userRepository.delete({ id: user.id });
+      throw new BadRequestException('회원가입에 실패하였습니다.', error);
     }
-
-    // Token에 user 정보 업데이트
-    await this.tokenRepository.update(
-      { phone_number: createUserInput.phone_number },
-      { user: user },
-    );
-
-    // 회원 가입 알림 생성
-    await this.notificationService.create(user.id, '100');
-
-    //포인트 적립
-    await this.pointService.increase(user.id, 300);
 
     return await this.userRepository.findOne({
       where: { id: user.id },
@@ -134,6 +140,7 @@ export class UserService {
     user_id: string,
     { updateUserInput }: IUserServiceUpdate,
   ): Promise<User> {
+    let result = null;
     const user = await this.findById(user_id);
     const { birth_year, birth_month, birth_day, profile_image, ...rest } =
       updateUserInput;
@@ -143,7 +150,6 @@ export class UserService {
       const hashedPassword = await bcrypt.hash(rest.password, 10);
       rest.password = hashedPassword;
     }
-    let result = null;
 
     if (profile_image) {
       await this.postImageService.deleteImageFromS3(
@@ -155,10 +161,11 @@ export class UserService {
         this.imageFolder,
         await profile_image,
       );
+
       const postImage = await this.postImageService.createPostImage(
         url,
-        undefined,
-        undefined,
+        null,
+        null,
         user,
       );
       user.profile_image = postImage;
@@ -167,10 +174,12 @@ export class UserService {
     // 날짜에 대한 수정이 들어오면, date타입으로 전환하는 메커니즘을 실행한 후, update를 진행
     if (birth_year && birth_month && birth_day) {
       const birthDate = setDateFormat(birth_year, birth_month, birth_day);
+      console.log('2', user);
       result = await this.userRepository.update(
         { id: user_id },
         { birth_at: birthDate, profile_image: user.profile_image, ...rest },
       );
+      console.log('3', user);
     }
     // 날짜에 대한 수정이 없을 때, 날짜 변환 없이 전부 update 진행
     else {
