@@ -19,6 +19,9 @@ type CommentReply {
   """좋아요 수"""
   like: Int!
 
+  """좋아요 사용자 기록"""
+  like_user: [LikeUserRecord!]
+
   """작성일"""
   create_at: DateTime!
 }
@@ -44,6 +47,12 @@ type Reply {
 
   """좋아요 수"""
   like: Int!
+
+  """좋아요 사용자 기록"""
+  like_user: [LikeUserRecord!]
+
+  """댓글에 대한 답글"""
+  comment_reply: [CommentReply!]
 
   """작성일"""
   create_at: DateTime!
@@ -185,6 +194,42 @@ type LikeUserRecord {
   commet_reply: CommentReply
 }
 
+"""사용자 정보"""
+type User {
+  """고유 ID"""
+  id: String!
+
+  """사용자 프로필 이미지"""
+  profile_image: PostImage
+
+  """이메일"""
+  email: String!
+
+  """성함"""
+  name: String!
+
+  """성별"""
+  gender: String!
+
+  """생년월일"""
+  birth_at: DateTime!
+
+  """MBTI"""
+  mbti: String!
+
+  """휴대폰 번호 ex)01012345678"""
+  phone_number: String!
+
+  """메이트 매칭 여부"""
+  is_find_mate: Boolean!
+
+  """포인트"""
+  point: Int!
+
+  """가입일"""
+  create_at: DateTime!
+}
+
 """시/도 정보"""
 type Sido {
   """시/도 코드"""
@@ -225,45 +270,6 @@ type Dong {
 
   """기준일자"""
   crtr_at: DateTime!
-}
-
-"""사용자 정보"""
-type User {
-  """고유 ID"""
-  id: String!
-
-  """사용자 프로필 이미지"""
-  profile_image: PostImage
-
-  """사용자 거주지역(행정동)"""
-  dong: Dong!
-
-  """이메일"""
-  email: String!
-
-  """성함"""
-  name: String!
-
-  """성별"""
-  gender: String!
-
-  """생년월일"""
-  birth_at: DateTime!
-
-  """MBTI"""
-  mbti: String!
-
-  """휴대폰 번호 ex)01012345678"""
-  phone_number: String!
-
-  """메이트 매칭 여부"""
-  is_find_mate: Boolean!
-
-  """포인트"""
-  point: Int!
-
-  """가입일"""
-  create_at: DateTime!
 }
 
 """쪽지 정보"""
@@ -662,15 +668,15 @@ type Mutation {
 
   """댓글의 좋아요 수를 올려주고 좋아요한 회원과 댓글 정보를 저장합니다."""
   increaseReplyLike(
-    """댓글 고유 ID"""
+    """댓글 or 대댓글 고유 ID"""
     reply_id: String!
-  ): LikeUserRecord!
+  ): Reply!
 
   """댓글의 좋아요를 취소하는 기능입니다. (좋아요한 댓글에게만 동작)"""
   decreaseReplyLike(
-    """댓글 고유 ID"""
+    """댓글 or 대댓글 고유 ID"""
     reply_id: String!
-  ): Boolean!
+  ): Reply!
 
   """댓글에 대댓글을 작성하는 기능입니다."""
   createCommetReply(
@@ -685,7 +691,7 @@ type Mutation {
   deleteCommentReply(
     """대댓글 고유 ID"""
     commentReply_id: String!
-  ): Board!
+  ): Reply!
   uploadFile(file: Upload!): Boolean!
   writeLetter(writing_id: String!, createLetterInput: CreateLetterInput!): Letter!
   replyLetter(letter_id: String!, replyLetterInput: ReplyLetterInput!): Letter!
