@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Inject,
   forwardRef,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -141,19 +142,25 @@ export class BoardService {
       post_images: [],
     });
 
-    const files = await Promise.all(createBoardInput.post_images);
+    try {
+      const files = await Promise.all(createBoardInput.post_images);
 
-    for (const file of files) {
-      const url = await this.postImageService.saveImageToS3(
-        this.imageFolder,
-        file,
-      );
-      const postImage = await this.postImageService.createPostImage(
-        url,
-        null,
-        board,
-      );
-      board.post_images.push(postImage);
+      for (const file of files) {
+        const url = await this.postImageService.saveImageToS3(
+          this.imageFolder,
+          file,
+        );
+        const postImage = await this.postImageService.createPostImage(
+          url,
+          null,
+          board,
+        );
+        board.post_images.push(postImage);
+      }
+    } catch (error) {
+      console.error('이미지 업로드 중 에러사유:', error);
+      this.delete(user_id, board.id);
+      throw new BadRequestException('이미지 업로드에 에러 발생', error);
     }
 
     await this.pointService.increase(user.id, +10);
