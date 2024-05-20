@@ -57,14 +57,14 @@ export class Board {
     },
   )
   @Field(() => [LikeUserRecord], { description: '좋아요 기록', nullable: true })
-  like_user: LikeUserRecord[];
+  like_user?: LikeUserRecord[];
 
   @JoinColumn()
   @OneToMany(() => Reply, (Reply) => Reply.board, {
     nullable: true,
   })
   @Field(() => [Reply], { description: '댓글 정보', nullable: true })
-  reply: Reply[];
+  reply?: Reply[];
 
   @JoinColumn()
   @OneToMany(() => PostImage, (PostImage) => PostImage.board, {

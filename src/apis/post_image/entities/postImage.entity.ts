@@ -27,7 +27,7 @@ export class PostImage {
 
   @ManyToOne(() => Board, (Board) => Board.post_images, {
     nullable: true,
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   @JoinColumn()
   @Field(() => Board, {
@@ -38,7 +38,7 @@ export class PostImage {
 
   @ManyToOne(() => UsedProduct, (UsedProduct) => UsedProduct.post_images, {
     nullable: true,
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   @JoinColumn()
   @Field(() => UsedProduct, {
@@ -50,7 +50,7 @@ export class PostImage {
   @JoinColumn()
   @ManyToOne(() => Cook, (Cook) => Cook.post_images, {
     nullable: true,
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   @Field(() => Cook, {
     nullable: true,
@@ -60,6 +60,7 @@ export class PostImage {
 
   @JoinColumn()
   @OneToOne(() => User, (user) => user.profile_image, {
+    cascade: false,
     nullable: true,
     onDelete: 'CASCADE',
   })
