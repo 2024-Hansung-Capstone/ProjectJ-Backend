@@ -201,6 +201,14 @@ export class CookService {
     }
     return await this.cookRepository.find({
       where: { name: Like(`%${keyword}%`) },
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'post_images',
+        'post_images.cook',
+      ],
     });
   }
 
