@@ -184,6 +184,14 @@ export class CookService {
     return await this.cookRepository.find({
       order: { view: 'DESC' },
       take: rank,
+      relations: [
+        'user',
+        'user.dong',
+        'user.dong.sgng',
+        'user.dong.sgng.sido',
+        'post_images',
+        'post_images.cook',
+      ],
     });
   }
 
