@@ -74,12 +74,13 @@ export class CookResolver {
   }
 
   //조회수 증가
-  @Query(() => Cook)
+  @Mutation(() => Cook)
   async increaseCookView(@Args('id') id: string): Promise<Cook> {
     return await this.cookService.increaseView(id);
   }
 
   //조회수로 순위 생성
+  @Query(() => [Cook])
   async fetchCookByViewRank(@Args('rank') rank: number): Promise<Cook[]> {
     return this.cookService.findTopCooks(rank);
   }
