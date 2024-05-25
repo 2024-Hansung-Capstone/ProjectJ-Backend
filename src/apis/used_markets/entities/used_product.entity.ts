@@ -65,7 +65,11 @@ export class UsedProduct {
       nullable: true,
     },
   )
-  like_user: LikeUserRecord[];
+  @Field(() => LikeUserRecord, {
+    description: '좋아요 기록',
+    nullable: true,
+  })
+  like_user?: LikeUserRecord[];
 
   @JoinColumn()
   @OneToMany(() => PostImage, (PostImage) => PostImage.used_proudct, {
