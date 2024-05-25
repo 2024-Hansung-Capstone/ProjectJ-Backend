@@ -42,6 +42,7 @@ export class UsedProductService {
         'user.dong.sgng',
         'user.dong.sgng.sido',
         'like_user',
+        'like_user.user',
         'post_images',
       ],
     });
@@ -56,6 +57,7 @@ export class UsedProductService {
         'user.dong.sgng',
         'user.dong.sgng.sido',
         'like_user',
+        'like_user.user',
         'post_images',
       ],
     });
@@ -70,6 +72,7 @@ export class UsedProductService {
         'user.dong.sgng',
         'user.dong.sgng.sido',
         'like_user',
+        'like_user.user',
         'post_images',
       ],
     });
@@ -104,6 +107,7 @@ export class UsedProductService {
         'user.dong.sgng',
         'user.dong.sgng.sido',
         'like_user',
+        'like_user.user',
         'post_images',
       ],
     });
