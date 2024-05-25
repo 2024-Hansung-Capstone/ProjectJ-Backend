@@ -198,7 +198,7 @@ export class UsedProductService {
 
     const result = await this.usedProductRepository.update(
       { id: id },
-      { ...usedProduct, ...rest },
+      { ...rest },
     );
 
     return result.affected ? await this.findById(id) : null;
