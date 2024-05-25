@@ -23,7 +23,7 @@ export class User {
   @JoinColumn()
   @OneToOne(() => PostImage, (PostImage) => PostImage.user, {
     nullable: true,
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   @Field(() => PostImage, {
     description: '사용자 프로필 이미지',

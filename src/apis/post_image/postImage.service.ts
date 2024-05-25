@@ -92,4 +92,20 @@ export class PostImageService {
   async removePostImage(id: string) {
     return await this.postImageRepository.delete({ id: id });
   }
+
+  async newPostImage(
+    imagePath: string,
+    cook?: Cook,
+    board?: Board,
+    user?: User,
+    usedProduct?: UsedProduct,
+  ) {
+    return this.postImageRepository.create({
+      cook: cook,
+      board: board,
+      user: user,
+      used_proudct: usedProduct,
+      imagePath: imagePath,
+    });
+  }
 }

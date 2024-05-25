@@ -44,15 +44,23 @@ export class CookService {
       post_images: [],
     });
 
-    const files = await Promise.all(createCookInput.post_images);
+    try {
+      const files = await Promise.all(createCookInput.post_images);
 
-    for (const file of files) {
-      const url = await this.postImageService.saveImageToS3(
-        this.imageFolder,
-        file,
-      );
-      const postImage = await this.postImageService.createPostImage(url, cook);
-      cook.post_images.push(postImage);
+      for (const file of files) {
+        const url = await this.postImageService.saveImageToS3(
+          this.imageFolder,
+          file,
+        );
+        const postImage = await this.postImageService.createPostImage(
+          url,
+          cook,
+        );
+        cook.post_images.push(postImage);
+      }
+    } catch (error) {
+      console.error('이미지 업로드 중 에러사유:', error);
+      throw new BadRequestException('이미지 업로드에 에러 발생', error);
     }
     return await this.cookRepository.save(cook);
   }

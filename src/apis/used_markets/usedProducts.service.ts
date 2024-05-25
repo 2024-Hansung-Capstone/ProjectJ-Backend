@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Inject,
   forwardRef,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, LessThanOrEqual, Repository } from 'typeorm';
@@ -125,21 +126,26 @@ export class UsedProductService {
       ...rest,
     });
 
-    const files = await Promise.all(post_images);
+    try {
+      const files = await Promise.all(post_images);
 
-    for (const file of files) {
-      const url = await this.postImageService.saveImageToS3(
-        this.imageFolder,
-        file,
-      );
-      const postImage = await this.postImageService.createPostImage(
-        url,
-        null,
-        null,
-        null,
-        usedProduct,
-      );
-      usedProduct.post_images.push(postImage);
+      for (const file of files) {
+        const url = await this.postImageService.saveImageToS3(
+          this.imageFolder,
+          file,
+        );
+        const postImage = await this.postImageService.createPostImage(
+          url,
+          null,
+          null,
+          null,
+          usedProduct,
+        );
+        usedProduct.post_images.push(postImage);
+      }
+    } catch (error) {
+      console.error('이미지 업로드 중 에러사유:', error);
+      throw new BadRequestException('이미지 업로드에 에러 발생', error);
     }
 
     return await this.usedProductRepository.save(usedProduct);

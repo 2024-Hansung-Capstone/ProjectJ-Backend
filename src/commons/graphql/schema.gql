@@ -194,42 +194,6 @@ type LikeUserRecord {
   commet_reply: CommentReply
 }
 
-"""사용자 정보"""
-type User {
-  """고유 ID"""
-  id: String!
-
-  """사용자 프로필 이미지"""
-  profile_image: PostImage
-
-  """이메일"""
-  email: String!
-
-  """성함"""
-  name: String!
-
-  """성별"""
-  gender: String!
-
-  """생년월일"""
-  birth_at: DateTime!
-
-  """MBTI"""
-  mbti: String!
-
-  """휴대폰 번호 ex)01012345678"""
-  phone_number: String!
-
-  """메이트 매칭 여부"""
-  is_find_mate: Boolean!
-
-  """포인트"""
-  point: Int!
-
-  """가입일"""
-  create_at: DateTime!
-}
-
 """시/도 정보"""
 type Sido {
   """시/도 코드"""
@@ -270,6 +234,45 @@ type Dong {
 
   """기준일자"""
   crtr_at: DateTime!
+}
+
+"""사용자 정보"""
+type User {
+  """고유 ID"""
+  id: String!
+
+  """사용자 프로필 이미지"""
+  profile_image: PostImage
+
+  """사용자 거주지역(행정동)"""
+  dong: Dong!
+
+  """이메일"""
+  email: String!
+
+  """성함"""
+  name: String!
+
+  """성별"""
+  gender: String!
+
+  """생년월일"""
+  birth_at: DateTime!
+
+  """MBTI"""
+  mbti: String!
+
+  """휴대폰 번호 ex)01012345678"""
+  phone_number: String!
+
+  """메이트 매칭 여부"""
+  is_find_mate: Boolean!
+
+  """포인트"""
+  point: Int!
+
+  """가입일"""
+  create_at: DateTime!
 }
 
 """쪽지 정보"""
@@ -345,9 +348,6 @@ type Notification {
 
   """알림 코드(코드표 참조)"""
   code: String!
-
-  """확인 여부"""
-  is_read: Boolean!
 
   """알림 생성일"""
   create_at: DateTime!
@@ -696,6 +696,7 @@ type Mutation {
   writeLetter(writing_id: String!, createLetterInput: CreateLetterInput!): Letter!
   replyLetter(letter_id: String!, replyLetterInput: ReplyLetterInput!): Letter!
   deleteLetter(letter_id: String!): Boolean!
+  readLetter(letter_id: String!): Boolean!
 
   """해당 지역에 원룸들을 OpenApi를 통해 가져옴(중복된 원룸자료들은 DB에 저장 X)"""
   fetchOneRoomFromOpenAPI(LAWD_CD: String!): Boolean!

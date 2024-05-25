@@ -90,9 +90,9 @@ export class Notification {
   @Field(() => String, { description: '알림 코드(코드표 참조)' })
   code: string;
 
-  @Column({ default: false })
-  @Field(() => Boolean, { description: '확인 여부' })
-  is_read: boolean;
+  // @Column({ default: false })
+  // @Field(() => Boolean, { description: '확인 여부' })
+  // is_read: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   @Field(() => Date, { description: '알림 생성일' })

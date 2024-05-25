@@ -67,4 +67,10 @@ export class LetterResolver {
   async deleteLetter(@Args('letter_id') letter_id: string): Promise<boolean> {
     return await this.letterService.delete(letter_id);
   }
+
+  //쪽지 읽기
+  @Mutation(() => Boolean)
+  async readLetter(@Args('letter_id') letter_id: string): Promise<boolean> {
+    return await this.letterService.read(letter_id);
+  }
 }
