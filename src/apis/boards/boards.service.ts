@@ -542,7 +542,7 @@ export class BoardService {
   ): Promise<Reply> {
     const checkcomment_reply = await this.commentReplyRepository.findOne({
       where: { id: commentReply_id },
-      relations: ['user', 'board', 'reply'],
+      relations: ['user', 'reply'],
     });
     const reply = checkcomment_reply.reply;
     if (checkcomment_reply.user.id !== user_id) {
