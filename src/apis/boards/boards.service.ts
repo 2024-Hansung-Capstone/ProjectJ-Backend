@@ -439,7 +439,8 @@ export class BoardService {
     const savedLikeUserRecord = await this.likeUserRecordRepository.save(
       like_user_record,
     );
-    await this.notificationService.create(savedLikeUserRecord.id, '203');
+    if (target instanceof Reply)
+      await this.notificationService.create(savedLikeUserRecord.id, '203');
 
     return savedTarget;
   }
