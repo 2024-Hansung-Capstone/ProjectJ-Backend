@@ -551,7 +551,10 @@ export class BoardService {
       where: { id: commentReply_id },
       relations: ['user', 'reply'],
     });
-    const reply = checkcomment_reply.reply;
+    const reply = await this.replyRepository.findOne({
+      where: { id: checkcomment_reply.reply.id },
+      relations: ['user', 'board', 'comment_reply'],
+    });
     if (checkcomment_reply.user.id !== user_id) {
       throw new ForbiddenException(`본인이 작성한 댓글만 삭제할 수 있습니다.`);
     }
