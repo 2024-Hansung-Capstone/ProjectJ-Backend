@@ -105,7 +105,6 @@ export class CookService {
       {
         name: updateCookInput.name,
         detail: updateCookInput.detail,
-        post_images: cook.post_images,
       },
     );
 

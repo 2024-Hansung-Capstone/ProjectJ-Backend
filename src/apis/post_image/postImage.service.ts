@@ -80,13 +80,15 @@ export class PostImageService {
     user?: User,
     usedProduct?: UsedProduct,
   ) {
-    return await this.postImageRepository.save({
+    const a = await this.postImageRepository.save({
       cook: cook,
       board: board,
       user: user,
       used_product: usedProduct,
       imagePath: imagePath,
     });
+    console.log(a);
+    return a;
   }
 
   async removePostImage(id: string) {
