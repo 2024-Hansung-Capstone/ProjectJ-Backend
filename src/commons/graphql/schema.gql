@@ -169,6 +169,9 @@ type UsedProduct {
   """중고물품 생성시간"""
   create_at: DateTime!
 
+  """좋아요 기록"""
+  like_user: LikeUserRecord
+
   """이미지"""
   post_images: [PostImage!]!
 }
@@ -512,7 +515,7 @@ type Query {
   fetchMyCooks: [Cook!]!
   fetchCookById(cook_id: String!): Cook!
   fetchAllCooks: [Cook!]!
-  increaseCookView(id: String!): Cook!
+  fetchCookByViewRank(rank: Float!): [Cook!]!
   searchCook(keyword: String!): [Cook!]!
   fetchIngredients: [Ingredient!]!
   fetchMyIngredients: [Ingredient!]!
@@ -718,6 +721,7 @@ type Mutation {
   createCook(createCookInput: CreateCookInput!): Cook!
   updateCook(cook_id: String!, updateCookInput: UpdateCookInput!): Cook!
   deleteCook(cook_id: String!): Boolean!
+  increaseCookView(id: String!): Cook!
   createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
   updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
   deleteIngredient(ingredient_id: String!): Boolean!

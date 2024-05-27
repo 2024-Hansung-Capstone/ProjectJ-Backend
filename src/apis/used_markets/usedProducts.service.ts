@@ -179,22 +179,33 @@ export class UsedProductService {
       }
     }
 
-    const files = await Promise.all(post_images);
+    if (updateUsedProductInput.post_images) {
+      // 기존 이미지 삭제
+      for (const postImage of usedProduct.post_images) {
+        await this.postImageService.deleteImageFromS3(postImage.imagePath);
+        await this.postImageService.removePostImage(postImage.id);
+      }
+      usedProduct.post_images = [];
 
-    for (const file of files) {
-      const url = await this.postImageService.saveImageToS3(
-        this.imageFolder,
-        file,
-      );
-      const postImage = await this.postImageService.createPostImage(
-        url,
-        null,
-        null,
-        null,
-        usedProduct,
-      );
-      usedProduct.post_images.push(postImage);
+      const files = await Promise.all(post_images);
+
+      for (const file of files) {
+        const url = await this.postImageService.saveImageToS3(
+          this.imageFolder,
+          file,
+        );
+        const postImage = await this.postImageService.createPostImage(
+          url,
+          null,
+          null,
+          null,
+          usedProduct,
+        );
+        usedProduct.post_images.push(postImage);
+      }
     }
+
+    await this.usedProductRepository.save(usedProduct);
 
     const result = await this.usedProductRepository.update(
       { id: id },
