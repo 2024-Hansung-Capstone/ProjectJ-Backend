@@ -473,7 +473,7 @@ export class BoardService {
     if (target instanceof CommentReply) {
       checkreply = await this.likeUserRecordRepository.findOne({
         where: { commet_reply: { id: target.id }, user: { id: user_id } },
-        relations: ['user', 'comment_reply'],
+        relations: ['user', 'commet_reply'],
       });
     } else {
       checkreply = await this.likeUserRecordRepository.findOne({
