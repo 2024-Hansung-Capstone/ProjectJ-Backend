@@ -2,14 +2,14 @@ import { Field, Float, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class Ing {
-  @Field(() => String, { description: '재료 이름' })
-  name: string;
+  @Field(() => String, { description: '재료 이름', nullable: true })
+  name?: string;
 
-  @Field(() => Float, { description: '재료 양' })
-  volume: number;
+  @Field(() => Float, { description: '재료 양', nullable: true })
+  volume?: number;
 
-  @Field(() => String, { description: '재료 단위' })
-  volume_unit: string;
+  @Field(() => String, { description: '재료 단위', nullable: true })
+  volume_unit?: string;
 }
 
 @ObjectType()
