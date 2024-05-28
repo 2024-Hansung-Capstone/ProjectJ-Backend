@@ -170,7 +170,7 @@ type UsedProduct {
   create_at: DateTime!
 
   """좋아요 기록"""
-  like_user: LikeUserRecord
+  like_user: [LikeUserRecord!]
 
   """이미지"""
   post_images: [PostImage!]!
