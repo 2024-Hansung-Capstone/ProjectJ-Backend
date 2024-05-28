@@ -48,7 +48,8 @@ docker-compose up
 
 # ﻿Database 구조 (ERD)
 
-![image](https://github.com/2024-Hansung-Capstone/ProjectJ-Backend/assets/157611169/60601345-f122-4f14-967e-64a9d3ae6594)
+![ProjectJ](https://github.com/2024-Hansung-Capstone/ProjectJ-Backend/assets/107747359/176afa68-81b9-4cd0-b85d-675cdc2c81cc)
+
 
 
 # ﻿Release Link
