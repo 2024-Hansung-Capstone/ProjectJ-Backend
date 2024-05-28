@@ -65,7 +65,7 @@ export class UsedProduct {
       nullable: true,
     },
   )
-  @Field(() => LikeUserRecord, {
+  @Field(() => [LikeUserRecord], {
     description: '좋아요 기록',
     nullable: true,
   })

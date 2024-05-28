@@ -170,7 +170,7 @@ type UsedProduct {
   create_at: DateTime!
 
   """좋아요 기록"""
-  like_user: LikeUserRecord
+  like_user: [LikeUserRecord!]
 
   """이미지"""
   post_images: [PostImage!]!
@@ -394,13 +394,13 @@ type OneRoom {
 
 type Ing {
   """재료 이름"""
-  name: String!
+  name: String
 
   """재료 양"""
-  volume: Float!
+  volume: Float
 
   """재료 단위"""
-  volume_unit: String!
+  volume_unit: String
 }
 
 type Recipe {
