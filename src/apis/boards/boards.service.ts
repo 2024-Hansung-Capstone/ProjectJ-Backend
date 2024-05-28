@@ -73,12 +73,15 @@ export class BoardService {
       where: { id: id },
       relations: [
         'user',
+        'user.profile_image',
         'reply',
         'reply.user',
+        'reply.user.profile_image',
         'reply.like_user',
         'reply.like_user.user',
         'reply.comment_reply',
         'reply.comment_reply.user',
+        'reply.comment_reply.user.profile_image',
         'reply.comment_reply.like_user',
         'like_user',
         'like_user.user',
@@ -109,14 +112,47 @@ export class BoardService {
       searchConditions.detail = Like(`%${detail}%`);
     }
 
-    return await this.boardRepository.find({ where: searchConditions });
+    return await this.boardRepository.find({
+      where: searchConditions,
+      relations: [
+        'user',
+        'user.profile_image',
+        'reply',
+        'reply.user',
+        'reply.user.profile_image',
+        'reply.like_user',
+        'reply.like_user.user',
+        'reply.comment_reply',
+        'reply.comment_reply.user',
+        'reply.comment_reply.user.profile_image',
+        'reply.comment_reply.like_user',
+        'like_user',
+        'like_user.user',
+        'post_images',
+      ],
+    });
   }
 
   async findTopBoards(category: string, rank: number): Promise<Board[]> {
     const boards = await this.boardRepository.find({
       where: { category: category },
       order: { like: 'DESC' },
-      relations: ['user'],
+      relations: [
+        'user',
+        'user.profile_image',
+        'reply',
+        'reply.user',
+        'reply.user.profile_image',
+        'reply.like_user',
+        'reply.like_user.user',
+        'reply.comment_reply',
+        'reply.comment_reply.user',
+        'reply.comment_reply.user.profile_image',
+        'reply.comment_reply.like_user',
+        'like_user',
+        'like_user.user',
+        'post_images',
+      ],
       take: rank,
     });
 
