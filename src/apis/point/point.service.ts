@@ -33,7 +33,12 @@ export class PointService {
 
     const role = await this.findRoleByUserId(user_id);
     if (role.code == 'admin') {
-      throw new Error('관리자는 포인트를 증가시킬 수 없습니다');
+      return user;
+    }
+
+    if (user.point + point <= 0) {
+      await this.userRepository.update(user_id, { point: 0 });
+      return user;
     }
 
     await this.userRepository.update(user_id, { point: user.point + point });
