@@ -195,9 +195,6 @@ export class CookService {
   }
 
   async search(keyword: string): Promise<Cook[]> {
-    if (keyword.length < 2) {
-      throw new BadRequestException('검색어가 두 글자 이상이어야 합니다.');
-    }
     return await this.cookRepository.find({
       where: { name: Like(`%${keyword}%`) },
       relations: [
