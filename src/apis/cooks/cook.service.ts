@@ -317,6 +317,10 @@ export class CookService {
       })
       .toPromise();
 
+    console.log(
+      JSON.parse(response.data.data[0].content[0].text.value).recipes,
+    );
+
     return JSON.parse(response.data.data[0].content[0].text.value).recipes;
   }
 }
