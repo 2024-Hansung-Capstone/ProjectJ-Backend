@@ -1,4 +1,7 @@
 ![header](https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=10&height=200&text=ProjectJ-Backend&fontSize=50&animation=twinkling&fontAlign=68&fontAlignY=36)
+# <Notion 링크>
+https://www.notion.so/2024-Hansung-Capstone-77b3aed17b6d49a6b03315a2495406a7?pvs=4
+
 # 1. 정의
 ﻿자취생들의 편의를 위한 사이트인 “자취만렙”에서 필요한 기능을 구현한 API 백엔드 서버이다. </br>
 NestJS 프레임워크에서 GraphQL 쿼리 언어를 사용하여 개발 완료 후 Docker를 통해 패키징 하였다. </br>
